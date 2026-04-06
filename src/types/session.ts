@@ -13,14 +13,19 @@ export interface UISlot {
   code: string;
 }
 
-// ─── Per-slot review rating ───────────────────────────────────────────────────
+// ─── Per-slot review rating (8 questions) ────────────────────────────────────
+
+export type AcceptDecision = 'yes' | 'no' | 'needs_changes';
 
 export interface SlotRating {
-  trustScore: number;           // 1–5
-  readability: number;          // 1–5
-  correctnessConfidence: number; // 1–5
-  bugConcern: 'none' | 'minor' | 'major';
-  notes: string;
+  readability: number;               // 1–10
+  perceivedRobustness: number;       // 1–10
+  maintenanceConfidence: number;     // 1–10
+  perceivedAuthorCompetence: number; // 1–10
+  willingnessToApprove: number;      // 1–5
+  hiddenComplexity: number;          // 1–10
+  acceptDecision: AcceptDecision | null;
+  briefExplanation: string;
 }
 
 // ─── Final assessment after reviewing all 4 slots ────────────────────────────

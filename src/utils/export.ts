@@ -5,19 +5,22 @@ import { avgRating } from './helpers';
 
 export interface SlotExport {
   solutionId: string;
-  originLabel: string;             // "human 1" | "human 2" | "LLM concise" | "LLM readable"
-  trustScore: number;
+  originLabel: string;               // "human 1" | "human 2" | "LLM concise" | "LLM readable"
   readability: number;
-  correctnessConfidence: number;
-  averageScore: number;
-  bugConcern: 'none' | 'minor' | 'major';
-  notes: string;
+  perceivedRobustness: number;
+  maintenanceConfidence: number;
+  perceivedAuthorCompetence: number;
+  willingnessToApprove: number;
+  hiddenComplexity: number;
+  averageScore: number;              // mean of the five 1–10 dimensions
+  acceptDecision: string;            // "yes" | "no" | "needs_changes"
+  briefExplanation: string;
 }
 
 export interface ExportPayload {
   meta: {
     sessionId: string;
-    exportedAt: string;           // ISO-8601
+    exportedAt: string;              // ISO-8601
     studyVersion: string;
   };
   participant: {
@@ -28,27 +31,27 @@ export interface ExportPayload {
     role: string;
     reviewFrequency: string;
     aiFamiliarity: string;
-    languageConfidence: number;   // 1–5
+    languageConfidence: number;
   };
   session: {
     category: string;
     questionId: string;
     questionTitle: string;
     language: string;
-    startedAt: string;            // ISO-8601
-    solutionOrder: string[];      // solutionId at positions [A, B, C, D]
-    slotMapping: Record<string, string>; // "A" → solutionId, …
-    solutionLabels: Record<string, string>; // solutionId → "human 1" | "LLM concise" | …
+    startedAt: string;               // ISO-8601
+    solutionOrder: string[];         // solutionId at positions [A, B, C, D]
+    slotMapping: Record<string, string>;
+    solutionLabels: Record<string, string>;
   };
   ratings: Partial<Record<SlotLabel, SlotExport>>;
   finalAssessment: {
     bestChoice: SlotLabel;
     bestChoiceSolutionId: string;
-    bestChoiceOriginLabel: string;   // "human 1" | "LLM concise" | …
-    ranking: SlotLabel[];            // [1st, 2nd, 3rd, 4th]
+    bestChoiceOriginLabel: string;
+    ranking: SlotLabel[];
     rankingSolutionIds: string[];
-    rankingOriginLabels: string[];   // origin label for each ranked position
-    rankingSummary: string;          // "A > C > B > D"
+    rankingOriginLabels: string[];
+    rankingSummary: string;
     explanation: string;
   } | null;
 }
@@ -72,12 +75,15 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
       ratings[slot] = {
         solutionId: sid,
         originLabel: labels[sid] ?? '',
-        trustScore: r.trustScore,
         readability: r.readability,
-        correctnessConfidence: r.correctnessConfidence,
+        perceivedRobustness: r.perceivedRobustness,
+        maintenanceConfidence: r.maintenanceConfidence,
+        perceivedAuthorCompetence: r.perceivedAuthorCompetence,
+        willingnessToApprove: r.willingnessToApprove,
+        hiddenComplexity: r.hiddenComplexity,
         averageScore: parseFloat(avgRating(r).toFixed(2)),
-        bugConcern: r.bugConcern,
-        notes: r.notes,
+        acceptDecision: r.acceptDecision ?? '',
+        briefExplanation: r.briefExplanation,
       };
     }
   }
@@ -92,7 +98,7 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
     meta: {
       sessionId: participant.id,
       exportedAt: new Date().toISOString(),
-      studyVersion: '1.0',
+      studyVersion: '2.0',
     },
     participant: {
       id: participant.id,
@@ -155,12 +161,6 @@ export async function copyExportJSON(payload: ExportPayload): Promise<void> {
 
 export type SheetSubmitStatus = 'idle' | 'submitting' | 'success' | 'error' | 'unconfigured';
 
-/**
- * POST the flat CSV row to a Google Apps Script web endpoint.
- * The script writes it as a new row in your Google Sheet.
- *
- * Set VITE_SHEETS_URL in .env to enable. If unset, returns 'unconfigured'.
- */
 export async function submitToSheets(payload: ExportPayload): Promise<SheetSubmitStatus> {
   const url = import.meta.env.VITE_SHEETS_URL as string | undefined;
   if (!url) return 'unconfigured';
@@ -169,8 +169,6 @@ export async function submitToSheets(payload: ExportPayload): Promise<SheetSubmi
   try {
     const res = await fetch(url, {
       method:  'POST',
-      // Google Apps Script doPost requires text/plain to avoid a CORS preflight
-      // that Apps Script cannot respond to correctly.
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body:    JSON.stringify(row),
     });
@@ -178,21 +176,6 @@ export async function submitToSheets(payload: ExportPayload): Promise<SheetSubmi
   } catch {
     return 'error';
   }
-}
-
-/** Build the URL query-string fragment used for Qualtrics Embedded Data handoff. */
-export function buildQualtricsParams(payload: ExportPayload): string {
-  const fa = payload.finalAssessment;
-  const params: Record<string, string> = {
-    sessionId: payload.meta.sessionId,
-    category: payload.session.category,
-    questionId: payload.session.questionId,
-    language: payload.session.language,
-    solutionOrder: payload.session.solutionOrder.join(','),
-    selectedBestSolution: fa?.bestChoice ?? '',
-    rankingSummary: fa?.rankingSummary ?? '',
-  };
-  return new URLSearchParams(params).toString();
 }
 
 // ─── Internals ─────────────────────────────────────────────────────────────────
@@ -234,23 +217,26 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   r['solutionOrder']      = p.session.solutionOrder;
   // per-slot ratings
   for (const slot of SLOT_LABELS) {
-    const rating = p.ratings[slot];
-    r[`slot${slot}_solutionId`]            = rating?.solutionId ?? '';
-    r[`slot${slot}_originLabel`]           = rating?.originLabel ?? '';
-    r[`slot${slot}_trustScore`]            = rating?.trustScore ?? '';
-    r[`slot${slot}_readability`]           = rating?.readability ?? '';
-    r[`slot${slot}_correctnessConfidence`] = rating?.correctnessConfidence ?? '';
-    r[`slot${slot}_averageScore`]          = rating?.averageScore ?? '';
-    r[`slot${slot}_bugConcern`]            = rating?.bugConcern ?? '';
-    r[`slot${slot}_notes`]                 = rating?.notes ?? '';
+    const s = p.ratings[slot];
+    r[`slot${slot}_solutionId`]               = s?.solutionId ?? '';
+    r[`slot${slot}_originLabel`]              = s?.originLabel ?? '';
+    r[`slot${slot}_readability`]              = s?.readability ?? '';
+    r[`slot${slot}_perceivedRobustness`]      = s?.perceivedRobustness ?? '';
+    r[`slot${slot}_maintenanceConfidence`]    = s?.maintenanceConfidence ?? '';
+    r[`slot${slot}_perceivedAuthorCompetence`]= s?.perceivedAuthorCompetence ?? '';
+    r[`slot${slot}_willingnessToApprove`]     = s?.willingnessToApprove ?? '';
+    r[`slot${slot}_hiddenComplexity`]         = s?.hiddenComplexity ?? '';
+    r[`slot${slot}_averageScore`]             = s?.averageScore ?? '';
+    r[`slot${slot}_acceptDecision`]           = s?.acceptDecision ?? '';
+    r[`slot${slot}_briefExplanation`]         = s?.briefExplanation ?? '';
   }
   // final assessment
-  r['bestChoice']              = p.finalAssessment?.bestChoice ?? '';
-  r['bestChoiceSolutionId']    = p.finalAssessment?.bestChoiceSolutionId ?? '';
-  r['bestChoiceOriginLabel']   = p.finalAssessment?.bestChoiceOriginLabel ?? '';
-  r['rankingSummary']          = p.finalAssessment?.rankingSummary ?? '';
-  r['rankingSolutionIds']      = p.finalAssessment?.rankingSolutionIds ?? '';
-  r['rankingOriginLabels']     = p.finalAssessment?.rankingOriginLabels ?? '';
-  r['explanation']             = p.finalAssessment?.explanation ?? '';
+  r['bestChoice']            = p.finalAssessment?.bestChoice ?? '';
+  r['bestChoiceSolutionId']  = p.finalAssessment?.bestChoiceSolutionId ?? '';
+  r['bestChoiceOriginLabel'] = p.finalAssessment?.bestChoiceOriginLabel ?? '';
+  r['rankingSummary']        = p.finalAssessment?.rankingSummary ?? '';
+  r['rankingSolutionIds']    = p.finalAssessment?.rankingSolutionIds ?? '';
+  r['rankingOriginLabels']   = p.finalAssessment?.rankingOriginLabels ?? '';
+  r['explanation']           = p.finalAssessment?.explanation ?? '';
   return r;
 }

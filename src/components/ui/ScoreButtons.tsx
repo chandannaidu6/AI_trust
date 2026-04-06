@@ -20,7 +20,6 @@ export function ScoreButtons({
   const range = Array.from({ length: max - min + 1 }, (_, i) => i + min);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Arrow-key navigation: Left/Down decrements, Right/Up increments
   const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>, idx: number) => {
     let next = -1;
     if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
@@ -36,8 +35,12 @@ export function ScoreButtons({
     }
   };
 
-  // Roving tabindex: only the selected (or first) button is in tab order
   const tabTarget = value >= min && value <= max ? value - min : 0;
+
+  // Smaller buttons for 1–10 scale so they fit on mobile
+  const btnCls = max > 5
+    ? 'w-8 h-8 rounded-md text-xs font-semibold border transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900'
+    : 'w-10 h-10 rounded-lg text-sm font-semibold border transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900';
 
   return (
     <div className="space-y-2">
@@ -48,7 +51,7 @@ export function ScoreButtons({
         )}
       </div>
       <div
-        className="flex gap-1.5"
+        className="flex gap-1 flex-wrap"
         role="radiogroup"
         aria-label={label}
         aria-required="true"
@@ -64,13 +67,11 @@ export function ScoreButtons({
             tabIndex={idx === tabTarget ? 0 : -1}
             onKeyDown={e => handleKeyDown(e, idx)}
             onClick={() => onChange(n)}
-            className={`w-10 h-10 rounded-lg text-sm font-semibold border transition-all
-              focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-              dark:focus-visible:ring-offset-slate-900
-              ${n <= value
+            className={`${btnCls} ${
+              n <= value
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
                 : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-600 dark:hover:border-indigo-500 dark:hover:text-indigo-300'
-              }`}
+            }`}
           >
             {n}
           </button>

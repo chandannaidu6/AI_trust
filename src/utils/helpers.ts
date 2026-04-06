@@ -5,9 +5,15 @@ export function generateId(): string {
   return 's-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
 }
 
-/** Average of trust + readability + correctness. */
+/** Average of the five 1–10 rating dimensions. */
 export function avgRating(r: SlotRating): number {
-  return (r.trustScore + r.readability + r.correctnessConfidence) / 3;
+  return (
+    r.readability +
+    r.perceivedRobustness +
+    r.maintenanceConfidence +
+    r.perceivedAuthorCompetence +
+    r.hiddenComplexity
+  ) / 5;
 }
 
 /** Count how many slots have been rated. */

@@ -20,7 +20,7 @@ const CATEGORIES = [
       ring:   'focus-visible:ring-sky-500',
       active: 'border-sky-500 bg-sky-50 dark:bg-sky-950 ring-2 ring-sky-200 dark:ring-sky-800',
     },
-    questionCount: 10,
+    questionCount: 3,
   },
   {
     id: 'Strings',
@@ -38,7 +38,7 @@ const CATEGORIES = [
       ring:   'focus-visible:ring-emerald-500',
       active: 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950 ring-2 ring-emerald-200 dark:ring-emerald-800',
     },
-    questionCount: 10,
+    questionCount: 3,
   },
   {
     id: 'Hashes',
@@ -56,7 +56,7 @@ const CATEGORIES = [
       ring:   'focus-visible:ring-violet-500',
       active: 'border-violet-500 bg-violet-50 dark:bg-violet-950 ring-2 ring-violet-200 dark:ring-violet-800',
     },
-    questionCount: 10,
+    questionCount: 3,
   },
 ];
 

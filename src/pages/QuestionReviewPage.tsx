@@ -14,7 +14,7 @@ import { loadQuestion } from '../data/loader';
 import { StudyQuestion, SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS } from '../types';
 import { allRated } from '../utils/helpers';
 
-const LANGUAGES = ['Python', 'Java', 'C', 'C++'];
+const LANGUAGES = ['Python', 'Java'];
 
 // Progress bar for rated-solutions count
 function RatingProgress({ rated }: { rated: number }) {

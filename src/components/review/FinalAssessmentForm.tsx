@@ -123,15 +123,23 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
               const r = ratings[slot];
               if (!r) return null;
               return (
-                <div key={slot} className={`rounded-lg border px-3 py-2.5 space-y-1 ${SLOT_COLORS[slot].card}`}>
+                <div key={slot} className={`rounded-lg border px-3 py-2.5 space-y-1.5 ${SLOT_COLORS[slot].card}`}>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold">Solution {slot}</span>
                     <span className="text-sm font-bold tabular-nums">{avgRating(r).toFixed(1)}</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-1 text-xs opacity-80">
-                    <div><span className="block opacity-70 text-[10px]">Trust</span>{r.trustScore}/5</div>
-                    <div><span className="block opacity-70 text-[10px]">Corr.</span>{r.correctnessConfidence}/5</div>
-                    <div><span className="block opacity-70 text-[10px]">Read.</span>{r.readability}/5</div>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs opacity-80">
+                    <div><span className="block opacity-70 text-[10px]">Read.</span>{r.readability}/10</div>
+                    <div><span className="block opacity-70 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
+                    <div><span className="block opacity-70 text-[10px]">Maint.</span>{r.maintenanceConfidence}/10</div>
+                    <div><span className="block opacity-70 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
+                  </div>
+                  <div className={`text-[10px] font-semibold mt-0.5 ${
+                    r.acceptDecision === 'yes' ? 'text-green-600 dark:text-green-400' :
+                    r.acceptDecision === 'no'  ? 'text-red-500 dark:text-red-400' :
+                    'text-amber-600 dark:text-amber-400'
+                  }`}>
+                    {r.acceptDecision === 'yes' ? '✓ Approve' : r.acceptDecision === 'no' ? '✗ Reject' : r.acceptDecision === 'needs_changes' ? '~ Changes' : '—'}
                   </div>
                 </div>
               );

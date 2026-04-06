@@ -169,10 +169,11 @@ export default function CompletionPage() {
                         {avgRating(r).toFixed(1)}
                       </span>
                     </div>
-                    <div className="grid grid-cols-3 gap-1 text-xs text-slate-500 dark:text-slate-400">
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Trust</span>{r.trustScore}/5</div>
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Corr.</span>{r.correctnessConfidence}/5</div>
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Read.</span>{r.readability}/5</div>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Read.</span>{r.readability}/10</div>
+                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
+                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
+                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Decision</span>{r.acceptDecision ?? '—'}</div>
                     </div>
                   </div>
                 );

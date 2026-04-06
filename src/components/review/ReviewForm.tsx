@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { SlotLabel, SlotRating } from '../../types';
+import { SlotLabel, SlotRating, AcceptDecision } from '../../types';
 import { ScoreButtons } from '../ui/ScoreButtons';
 import { Button } from '../ui/Button';
 
@@ -10,35 +10,41 @@ const SLOT_ACCENT: Record<SlotLabel, string> = {
   D: 'border-amber-200   dark:border-amber-800',
 };
 
-// Explicit active classes per option — avoids dynamically constructed class strings
-// that Tailwind's static analyser cannot detect and will not include in the bundle.
-const BUG_OPTIONS = [
+const ACCEPT_OPTIONS: {
+  value: AcceptDecision;
+  label: string;
+  inactiveCls: string;
+  activeCls: string;
+}[] = [
   {
-    value:      'none'  as const,
-    label:      'No concerns',
+    value: 'yes',
+    label: 'Yes — approve',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-green-400 hover:text-green-700',
     activeCls:   'border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 ring-2 ring-green-200 dark:ring-green-800 ring-offset-1',
   },
   {
-    value:      'minor' as const,
-    label:      'Minor concerns',
+    value: 'needs_changes',
+    label: 'Needs changes',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-700',
     activeCls:   'border-amber-500 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 ring-2 ring-amber-200 dark:ring-amber-800 ring-offset-1',
   },
   {
-    value:      'major' as const,
-    label:      'Significant concerns',
+    value: 'no',
+    label: 'No — reject',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-700',
     activeCls:   'border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 ring-2 ring-red-200 dark:ring-red-800 ring-offset-1',
   },
-] as const;
+];
 
 const DEFAULT: SlotRating = {
-  trustScore:            0,
-  readability:           0,
-  correctnessConfidence: 0,
-  bugConcern:            'none',
-  notes:                 '',
+  readability:               0,
+  perceivedRobustness:       0,
+  maintenanceConfidence:     0,
+  perceivedAuthorCompetence: 0,
+  willingnessToApprove:      0,
+  hiddenComplexity:          0,
+  acceptDecision:            null,
+  briefExplanation:          '',
 };
 
 interface ReviewFormProps {
@@ -51,16 +57,20 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
   const [form,  setForm]  = useState<SlotRating>(existing ?? DEFAULT);
   const [saved, setSaved] = useState(!!existing);
 
-  // Reset when navigating to a different slot tab
   useEffect(() => {
     setForm(existing ?? DEFAULT);
     setSaved(!!existing);
   }, [slot, existing]);
 
-  const valid =
-    form.trustScore > 0 &&
+  const numericComplete =
     form.readability > 0 &&
-    form.correctnessConfidence > 0;
+    form.perceivedRobustness > 0 &&
+    form.maintenanceConfidence > 0 &&
+    form.perceivedAuthorCompetence > 0 &&
+    form.willingnessToApprove > 0 &&
+    form.hiddenComplexity > 0;
+
+  const valid = numericComplete && form.acceptDecision !== null && form.briefExplanation.trim().length > 0;
 
   const set = <K extends keyof SlotRating>(key: K, val: SlotRating[K]) => {
     setForm(f => ({ ...f, [key]: val }));
@@ -73,12 +83,6 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
     onSubmit(form);
     setSaved(true);
   };
-
-  const missing = [
-    form.trustScore            === 0 && 'Trust',
-    form.correctnessConfidence === 0 && 'Correctness',
-    form.readability           === 0 && 'Readability',
-  ].filter(Boolean);
 
   return (
     <section
@@ -105,46 +109,76 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="px-5 py-5 space-y-6 bg-white/70 dark:bg-slate-900/70">
-        {/* Required ratings */}
+
+        {/* Q1–Q4: 1–10 scales */}
         <fieldset className="space-y-5 border-0 p-0 m-0">
-          <legend className="sr-only">Required ratings for Solution {slot}</legend>
-          <ScoreButtons
-            label="Trust"
-            description="How much do you trust this solution is correct?"
-            value={form.trustScore}
-            onChange={v => set('trustScore', v)}
-          />
-          <ScoreButtons
-            label="Correctness"
-            description="Does it handle all edge cases?"
-            value={form.correctnessConfidence}
-            onChange={v => set('correctnessConfidence', v)}
-          />
+          <legend className="sr-only">Code quality ratings for Solution {slot}</legend>
           <ScoreButtons
             label="Readability"
             description="How easy is this to read and follow?"
             value={form.readability}
             onChange={v => set('readability', v)}
+            max={10}
+          />
+          <ScoreButtons
+            label="Perceived robustness"
+            description="How well does it handle edge cases?"
+            value={form.perceivedRobustness}
+            onChange={v => set('perceivedRobustness', v)}
+            max={10}
+          />
+          <ScoreButtons
+            label="Maintenance confidence"
+            description="How confident are you modifying this later?"
+            value={form.maintenanceConfidence}
+            onChange={v => set('maintenanceConfidence', v)}
+            max={10}
+          />
+          <ScoreButtons
+            label="Perceived author competence"
+            description="How skilled does the author appear?"
+            value={form.perceivedAuthorCompetence}
+            onChange={v => set('perceivedAuthorCompetence', v)}
+            max={10}
           />
         </fieldset>
 
-        {/* Bug concern */}
+        {/* Q5: Willingness to approve 1–5 */}
+        <ScoreButtons
+          label="Willingness to approve"
+          description="Would you approve this in a real review? (1 = definitely not, 5 = definitely yes)"
+          value={form.willingnessToApprove}
+          onChange={v => set('willingnessToApprove', v)}
+          max={5}
+        />
+
+        {/* Q6: Hidden complexity 1–10 */}
+        <ScoreButtons
+          label="Hidden complexity"
+          description="How much non-obvious complexity is lurking here?"
+          value={form.hiddenComplexity}
+          onChange={v => set('hiddenComplexity', v)}
+          max={10}
+        />
+
+        {/* Q7: Accept decision */}
         <div className="space-y-2">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            Bug concern
+            Would you accept this code?{' '}
+            <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </span>
-          <div className="flex gap-2 flex-wrap" role="radiogroup" aria-label="Bug concern level">
-            {BUG_OPTIONS.map(opt => (
+          <div className="flex gap-2 flex-wrap" role="radiogroup" aria-label="Accept decision">
+            {ACCEPT_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
                 role="radio"
-                aria-checked={form.bugConcern === opt.value}
-                onClick={() => set('bugConcern', opt.value)}
+                aria-checked={form.acceptDecision === opt.value}
+                onClick={() => set('acceptDecision', opt.value)}
                 className={`px-3.5 py-2 text-xs font-medium rounded-lg border transition-all
                   focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
                   dark:focus-visible:ring-offset-slate-900
-                  ${form.bugConcern === opt.value ? opt.activeCls : opt.inactiveCls}`}
+                  ${form.acceptDecision === opt.value ? opt.activeCls : opt.inactiveCls}`}
               >
                 {opt.label}
               </button>
@@ -152,20 +186,20 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
           </div>
         </div>
 
-        {/* Notes */}
+        {/* Q8: Brief explanation */}
         <div className="space-y-1.5">
           <label
-            htmlFor={`notes-${slot}`}
+            htmlFor={`explanation-${slot}`}
             className="text-sm font-semibold text-slate-800 dark:text-slate-200"
           >
-            Notes{' '}
-            <span className="text-slate-400 dark:text-slate-500 font-normal">(optional)</span>
+            Briefly explain why you would or would not accept this code{' '}
+            <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <textarea
-            id={`notes-${slot}`}
-            value={form.notes}
-            onChange={e => set('notes', e.target.value)}
-            placeholder="What stood out? Any specific observations…"
+            id={`explanation-${slot}`}
+            value={form.briefExplanation}
+            onChange={e => set('briefExplanation', e.target.value)}
+            placeholder="e.g. clear naming but risky edge case handling, overly complex for the problem…"
             rows={2}
             className="w-full text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5
                        text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800
@@ -180,12 +214,11 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
           <Button type="submit" disabled={!valid}>
             {saved ? 'Update Rating' : 'Save Rating'}
           </Button>
-          {!valid && missing.length > 0 && (
+          {!valid && (
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Please rate:{' '}
-              <span className="font-medium text-slate-700 dark:text-slate-300">
-                {missing.join(', ')}
-              </span>
+              {!numericComplete && 'Complete all ratings. '}
+              {numericComplete && !form.acceptDecision && 'Choose accept/reject. '}
+              {numericComplete && form.acceptDecision && !form.briefExplanation.trim() && 'Add a brief explanation.'}
             </p>
           )}
         </div>
