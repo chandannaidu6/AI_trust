@@ -1,9 +1,11 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { ProblemStatement } from '../components/review/ProblemStatement';
 import { SolutionSwitcher } from '../components/review/SolutionSwitcher';
-import { CodeViewer } from '../components/review/CodeViewer';
+const CodeViewer = lazy(() =>
+  import('../components/review/CodeViewer').then(m => ({ default: m.CodeViewer }))
+);
 import { ReviewForm } from '../components/review/ReviewForm';
 import { FinalAssessmentForm } from '../components/review/FinalAssessmentForm';
 import { Button } from '../components/ui/Button';
@@ -172,11 +174,20 @@ export default function QuestionReviewPage() {
             />
 
             {activeSlotData && (
-              <CodeViewer
-                code={activeSlotData.code}
-                language={language}
-                slot={activeSlot}
-              />
+              <Suspense fallback={
+                <div className="rounded-xl bg-[#161b2e] border border-slate-700/60 h-48 flex items-center justify-center">
+                  <svg className="w-4 h-4 animate-spin text-slate-500" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </div>
+              }>
+                <CodeViewer
+                  code={activeSlotData.code}
+                  language={language}
+                  slot={activeSlot}
+                />
+              </Suspense>
             )}
 
             <RatingProgress rated={ratedCount} />
