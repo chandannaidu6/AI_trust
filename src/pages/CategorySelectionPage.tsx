@@ -83,7 +83,7 @@ export default function CategorySelectionPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Choose a Category</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
-            Select the problem category you want to review. Each category has 10 questions.
+            Select the problem category you want to review. Each category has 3 questions.
           </p>
         </div>
 
