@@ -5,16 +5,23 @@
   "description": "Unified dataset for blind code review study. Each question contains 4 solutions per language (2 human, 2 AI). _hidden fields must never be exposed to study participants.",
   "uiNote": "Solution order must be randomized per participant and per question. Slot labels A/B/C/D are purely positional. The _hidden key on every solution object must not be rendered in any participant-facing UI component.",
   "categories": ["Arrays", "Strings", "Hashes"],
+  "totalQuestions": 9,
+  "totalSolutions": 72,
   "questions": [
     {
       "id": "arr-001",
       "category": "Arrays",
       "title": "Container With Most Water",
-      "leetcodeNumber": 11,
+      "summary": "Find two lines forming a container with maximum water capacity using two pointers.",
+      "paraphrasedPrompt": "You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i`-th line are `(i, 0)` and `(i, height[i])`. Find two lines that together with the x-axis form a container such that the container holds the most water. Return the maximum amount of water a container can store. You may not slant the container.",
       "difficulty": "Medium",
-      "acceptanceRate": "54%",
+      "acceptanceRate": 54,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 11,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `i`-th line are `(i, 0)` and `(i, height[i])`. Find two lines that together with the x-axis form a container, such that the container contains the most water. Return the maximum amount of water a container can store.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "n == height.length",
         "2 <= n <= 10^5",
@@ -26,50 +33,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-001-py-h1",
               "code": "def maxArea(self, height):\n    left = 0\n    right = len(height) - 1\n    best = 0\n    while left < right:\n        h = min(height[left], height[right])\n        w = right - left\n        best = max(best, h * w)\n        if height[left] < height[right]:\n            left += 1\n        else:\n            right -= 1\n    return best",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-001-py-h2",
               "code": "def maxArea(self, height):\n    lo, hi = 0, len(height) - 1\n    ans = 0\n    while lo < hi:\n        area = (hi - lo) * min(height[lo], height[hi])\n        if area > ans:\n            ans = area\n        if height[lo] <= height[hi]:\n            lo += 1\n        else:\n            hi -= 1\n    return ans",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-001-py-aiReadable",
               "code": "def maxArea(self, height):\n    # Use two pointers starting from both ends\n    left_pointer = 0\n    right_pointer = len(height) - 1\n    maximum_water = 0\n\n    while left_pointer < right_pointer:\n        # Calculate water with current boundaries\n        current_height = min(height[left_pointer], height[right_pointer])\n        current_width = right_pointer - left_pointer\n        current_water = current_height * current_width\n        maximum_water = max(maximum_water, current_water)\n\n        # Move the shorter boundary inward to potentially find a better solution\n        if height[left_pointer] < height[right_pointer]:\n            left_pointer += 1\n        else:\n            right_pointer -= 1\n\n    return maximum_water",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "verbose names and inline comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-001-py-aiConcise",
               "code": "def maxArea(self, height):\n    l, r, res = 0, len(height) - 1, 0\n    while l < r:\n        res = max(res, (r - l) * min(height[l], height[r]))\n        if height[l] < height[r]: l += 1\n        else: r -= 1\n    return res",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "minimal variables, condensed logic", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-001-java-h1",
               "code": "public int maxArea(int[] height) {\n    int left = 0;\n    int right = height.length - 1;\n    int best = 0;\n    while (left < right) {\n        int h = Math.min(height[left], height[right]);\n        int w = right - left;\n        best = Math.max(best, h * w);\n        if (height[left] < height[right]) {\n            left++;\n        } else {\n            right--;\n        }\n    }\n    return best;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-001-java-h2",
               "code": "public int maxArea(int[] height) {\n    int lo = 0, hi = height.length - 1, ans = 0;\n    while (lo < hi) {\n        int area = (hi - lo) * Math.min(height[lo], height[hi]);\n        if (area > ans) ans = area;\n        if (height[lo] <= height[hi]) lo++;\n        else hi--;\n    }\n    return ans;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-001-java-aiReadable",
               "code": "public int maxArea(int[] height) {\n    // Two-pointer approach starting from both ends\n    int leftPointer = 0;\n    int rightPointer = height.length - 1;\n    int maximumWater = 0;\n\n    while (leftPointer < rightPointer) {\n        // Compute water volume for current container\n        int currentHeight = Math.min(height[leftPointer], height[rightPointer]);\n        int currentWidth = rightPointer - leftPointer;\n        int currentWater = currentHeight * currentWidth;\n        maximumWater = Math.max(maximumWater, currentWater);\n\n        // Advance the side with the shorter line\n        if (height[leftPointer] < height[rightPointer]) {\n            leftPointer++;\n        } else {\n            rightPointer--;\n        }\n    }\n    return maximumWater;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "verbose names and inline comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-001-java-aiConcise",
               "code": "public int maxArea(int[] height) {\n    int l = 0, r = height.length - 1, res = 0;\n    while (l < r) {\n        res = Math.max(res, (r - l) * Math.min(height[l], height[r]));\n        if (height[l] < height[r]) l++; else r--;\n    }\n    return res;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "minimal variables, condensed logic", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -79,11 +90,16 @@
       "id": "arr-002",
       "category": "Arrays",
       "title": "Next Permutation",
-      "leetcodeNumber": 31,
+      "summary": "Rearrange an array into the next lexicographically greater permutation in-place.",
+      "paraphrasedPrompt": "A permutation of an array of integers is an arrangement of its members into a sequence. The next permutation is the next lexicographically greater permutation of the integer array. If no such arrangement is possible (i.e., the array is in descending order), rearrange it to the lowest possible order (ascending order). The replacement must be done in-place using only constant extra memory.",
       "difficulty": "Medium",
-      "acceptanceRate": "38%",
+      "acceptanceRate": 38,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 31,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "A permutation of an array of integers is an arrangement of its members into a sequence or linear order. The next permutation of an array of integers is the next lexicographically greater permutation of its integer. If such arrangement is not possible, the array must be rearranged as the lowest possible order (sorted in ascending order). Implement the function in-place.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= nums.length <= 100",
         "0 <= nums[i] <= 100"
@@ -95,50 +111,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-002-py-h1",
               "code": "def nextPermutation(self, nums):\n    n = len(nums)\n    i = n - 2\n    while i >= 0 and nums[i] >= nums[i + 1]:\n        i -= 1\n    if i >= 0:\n        j = n - 1\n        while nums[j] <= nums[i]:\n            j -= 1\n        nums[i], nums[j] = nums[j], nums[i]\n    left, right = i + 1, n - 1\n    while left < right:\n        nums[left], nums[right] = nums[right], nums[left]\n        left += 1\n        right -= 1",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-002-py-h2",
               "code": "def nextPermutation(self, nums):\n    k = len(nums) - 2\n    while k >= 0 and nums[k] >= nums[k+1]:\n        k -= 1\n    if k != -1:\n        m = len(nums) - 1\n        while nums[m] <= nums[k]:\n            m -= 1\n        nums[k], nums[m] = nums[m], nums[k]\n    nums[k+1:] = nums[k+1:][::-1]",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-002-py-aiReadable",
               "code": "def nextPermutation(self, nums):\n    n = len(nums)\n\n    # Step 1: Find the rightmost element smaller than its successor\n    pivot_index = n - 2\n    while pivot_index >= 0 and nums[pivot_index] >= nums[pivot_index + 1]:\n        pivot_index -= 1\n\n    if pivot_index >= 0:\n        # Step 2: Find the smallest element to the right of pivot that is larger\n        swap_index = n - 1\n        while nums[swap_index] <= nums[pivot_index]:\n            swap_index -= 1\n        # Step 3: Swap pivot with that element\n        nums[pivot_index], nums[swap_index] = nums[swap_index], nums[pivot_index]\n\n    # Step 4: Reverse the suffix to get the next smallest permutation\n    left, right = pivot_index + 1, n - 1\n    while left < right:\n        nums[left], nums[right] = nums[right], nums[left]\n        left += 1\n        right -= 1",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "step comments, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-002-py-aiConcise",
               "code": "def nextPermutation(self, nums):\n    i = len(nums) - 2\n    while i >= 0 and nums[i] >= nums[i+1]: i -= 1\n    if i >= 0:\n        j = len(nums) - 1\n        while nums[j] <= nums[i]: j -= 1\n        nums[i], nums[j] = nums[j], nums[i]\n    nums[i+1:] = reversed(nums[i+1:])",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "minimal lines, slice reversal", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-002-java-h1",
               "code": "public void nextPermutation(int[] nums) {\n    int n = nums.length;\n    int i = n - 2;\n    while (i >= 0 && nums[i] >= nums[i + 1]) i--;\n    if (i >= 0) {\n        int j = n - 1;\n        while (nums[j] <= nums[i]) j--;\n        int tmp = nums[i]; nums[i] = nums[j]; nums[j] = tmp;\n    }\n    int left = i + 1, right = n - 1;\n    while (left < right) {\n        int tmp = nums[left]; nums[left] = nums[right]; nums[right] = tmp;\n        left++; right--;\n    }\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-002-java-h2",
               "code": "public void nextPermutation(int[] nums) {\n    int n = nums.length, k = n - 2;\n    while (k >= 0 && nums[k] >= nums[k + 1]) k--;\n    if (k >= 0) {\n        int m = n - 1;\n        while (nums[m] <= nums[k]) m--;\n        swap(nums, k, m);\n    }\n    for (int lo = k + 1, hi = n - 1; lo < hi; lo++, hi--) swap(nums, lo, hi);\n}\nprivate void swap(int[] a, int i, int j) {\n    int t = a[i]; a[i] = a[j]; a[j] = t;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-002-java-aiReadable",
               "code": "public void nextPermutation(int[] nums) {\n    int length = nums.length;\n\n    // Find the rightmost element that is smaller than the element to its right\n    int pivotIndex = length - 2;\n    while (pivotIndex >= 0 && nums[pivotIndex] >= nums[pivotIndex + 1]) {\n        pivotIndex--;\n    }\n\n    if (pivotIndex >= 0) {\n        // Find the smallest element larger than the pivot in the suffix\n        int swapIndex = length - 1;\n        while (nums[swapIndex] <= nums[pivotIndex]) {\n            swapIndex--;\n        }\n        // Swap pivot with that element\n        int temp = nums[pivotIndex];\n        nums[pivotIndex] = nums[swapIndex];\n        nums[swapIndex] = temp;\n    }\n\n    // Reverse the suffix to produce the next permutation\n    int left = pivotIndex + 1;\n    int right = length - 1;\n    while (left < right) {\n        int temp = nums[left];\n        nums[left++] = nums[right];\n        nums[right--] = temp;\n    }\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "step comments, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-002-java-aiConcise",
               "code": "public void nextPermutation(int[] nums) {\n    int n = nums.length, i = n - 2;\n    while (i >= 0 && nums[i] >= nums[i+1]) i--;\n    if (i >= 0) { int j = n-1; while (nums[j] <= nums[i]) j--; int t=nums[i]; nums[i]=nums[j]; nums[j]=t; }\n    for (int l=i+1,r=n-1; l<r; l++,r--) { int t=nums[l]; nums[l]=nums[r]; nums[r]=t; }\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "single-line logic, minimal whitespace", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -148,11 +168,16 @@
       "id": "arr-003",
       "category": "Arrays",
       "title": "3Sum",
-      "leetcodeNumber": 15,
+      "summary": "Find all unique triplets in an array that sum to zero.",
+      "paraphrasedPrompt": "Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i`, `j`, and `k` are all distinct indices and `nums[i] + nums[j] + nums[k] == 0`. The solution set must not contain duplicate triplets.",
       "difficulty": "Medium",
-      "acceptanceRate": "35%",
+      "acceptanceRate": 35,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 15,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, and `j != k`, and `nums[i] + nums[j] + nums[k] == 0`. Notice that the solution set must not contain duplicate triplets.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "3 <= nums.length <= 3000",
         "-10^5 <= nums[i] <= 10^5"
@@ -164,50 +189,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-003-py-h1",
               "code": "def threeSum(self, nums):\n    nums.sort()\n    result = []\n    for i in range(len(nums) - 2):\n        if i > 0 and nums[i] == nums[i - 1]:\n            continue\n        left, right = i + 1, len(nums) - 1\n        while left < right:\n            total = nums[i] + nums[left] + nums[right]\n            if total == 0:\n                result.append([nums[i], nums[left], nums[right]])\n                while left < right and nums[left] == nums[left + 1]:\n                    left += 1\n                while left < right and nums[right] == nums[right - 1]:\n                    right -= 1\n                left += 1\n                right -= 1\n            elif total < 0:\n                left += 1\n            else:\n                right -= 1\n    return result",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-003-py-h2",
               "code": "def threeSum(self, nums):\n    nums.sort()\n    res = []\n    n = len(nums)\n    for k in range(n - 2):\n        if nums[k] > 0:\n            break\n        if k > 0 and nums[k] == nums[k-1]:\n            continue\n        i, j = k + 1, n - 1\n        while i < j:\n            s = nums[k] + nums[i] + nums[j]\n            if s < 0:\n                i += 1\n            elif s > 0:\n                j -= 1\n            else:\n                res.append([nums[k], nums[i], nums[j]])\n                i += 1\n                j -= 1\n                while i < j and nums[i] == nums[i-1]: i += 1\n                while i < j and nums[j] == nums[j+1]: j -= 1\n    return res",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-003-py-aiReadable",
               "code": "def threeSum(self, nums):\n    nums.sort()\n    triplets = []\n    n = len(nums)\n\n    for anchor_index in range(n - 2):\n        anchor = nums[anchor_index]\n\n        # Early termination: if smallest remaining is positive, no zero sum possible\n        if anchor > 0:\n            break\n\n        # Skip duplicate anchors to avoid duplicate triplets\n        if anchor_index > 0 and nums[anchor_index] == nums[anchor_index - 1]:\n            continue\n\n        left = anchor_index + 1\n        right = n - 1\n\n        while left < right:\n            current_sum = anchor + nums[left] + nums[right]\n\n            if current_sum == 0:\n                triplets.append([anchor, nums[left], nums[right]])\n                # Advance past duplicates\n                while left < right and nums[left] == nums[left + 1]:\n                    left += 1\n                while left < right and nums[right] == nums[right - 1]:\n                    right -= 1\n                left += 1\n                right -= 1\n            elif current_sum < 0:\n                left += 1\n            else:\n                right -= 1\n\n    return triplets",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "descriptive names, early-termination comment", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-003-py-aiConcise",
               "code": "def threeSum(self, nums):\n    nums.sort()\n    res = []\n    for i, v in enumerate(nums[:-2]):\n        if v > 0: break\n        if i > 0 and v == nums[i-1]: continue\n        l, r = i+1, len(nums)-1\n        while l < r:\n            s = v + nums[l] + nums[r]\n            if s < 0: l += 1\n            elif s > 0: r -= 1\n            else:\n                res.append([v, nums[l], nums[r]])\n                while l < r and nums[l] == nums[l+1]: l += 1\n                while l < r and nums[r] == nums[r-1]: r -= 1\n                l += 1; r -= 1\n    return res",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "enumerate-based loop, minimal spacing", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "arr-003-java-h1",
               "code": "public List<List<Integer>> threeSum(int[] nums) {\n    Arrays.sort(nums);\n    List<List<Integer>> result = new ArrayList<>();\n    for (int i = 0; i < nums.length - 2; i++) {\n        if (i > 0 && nums[i] == nums[i - 1]) continue;\n        int left = i + 1, right = nums.length - 1;\n        while (left < right) {\n            int sum = nums[i] + nums[left] + nums[right];\n            if (sum == 0) {\n                result.add(Arrays.asList(nums[i], nums[left], nums[right]));\n                while (left < right && nums[left] == nums[left + 1]) left++;\n                while (left < right && nums[right] == nums[right - 1]) right--;\n                left++; right--;\n            } else if (sum < 0) left++;\n            else right--;\n        }\n    }\n    return result;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-003-java-h2",
               "code": "public List<List<Integer>> threeSum(int[] nums) {\n    Arrays.sort(nums);\n    List<List<Integer>> res = new ArrayList<>();\n    int n = nums.length;\n    for (int k = 0; k < n - 2; k++) {\n        if (nums[k] > 0) break;\n        if (k > 0 && nums[k] == nums[k-1]) continue;\n        int i = k + 1, j = n - 1;\n        while (i < j) {\n            int s = nums[k] + nums[i] + nums[j];\n            if (s < 0) { i++; }\n            else if (s > 0) { j--; }\n            else {\n                res.add(Arrays.asList(nums[k], nums[i++], nums[j--]));\n                while (i < j && nums[i] == nums[i-1]) i++;\n                while (i < j && nums[j] == nums[j+1]) j--;\n            }\n        }\n    }\n    return res;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "arr-003-java-aiReadable",
               "code": "public List<List<Integer>> threeSum(int[] nums) {\n    Arrays.sort(nums);\n    List<List<Integer>> triplets = new ArrayList<>();\n    int length = nums.length;\n\n    for (int anchorIndex = 0; anchorIndex < length - 2; anchorIndex++) {\n        int anchor = nums[anchorIndex];\n\n        // No zero-sum possible if smallest element is positive\n        if (anchor > 0) break;\n\n        // Skip duplicates for the anchor position\n        if (anchorIndex > 0 && nums[anchorIndex] == nums[anchorIndex - 1]) continue;\n\n        int left = anchorIndex + 1;\n        int right = length - 1;\n\n        while (left < right) {\n            int currentSum = anchor + nums[left] + nums[right];\n\n            if (currentSum == 0) {\n                triplets.add(Arrays.asList(anchor, nums[left], nums[right]));\n                while (left < right && nums[left] == nums[left + 1]) left++;\n                while (left < right && nums[right] == nums[right - 1]) right--;\n                left++;\n                right--;\n            } else if (currentSum < 0) {\n                left++;\n            } else {\n                right--;\n            }\n        }\n    }\n    return triplets;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "descriptive names, early-termination comment", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "arr-003-java-aiConcise",
               "code": "public List<List<Integer>> threeSum(int[] nums) {\n    Arrays.sort(nums);\n    List<List<Integer>> res = new ArrayList<>();\n    for (int i = 0; i < nums.length - 2 && nums[i] <= 0; i++) {\n        if (i > 0 && nums[i] == nums[i-1]) continue;\n        for (int l = i+1, r = nums.length-1; l < r;) {\n            int s = nums[i] + nums[l] + nums[r];\n            if (s < 0) l++;\n            else if (s > 0) r--;\n            else { res.add(Arrays.asList(nums[i], nums[l++], nums[r--]));\n                   while (l < r && nums[l] == nums[l-1]) l++;\n                   while (l < r && nums[r] == nums[r+1]) r--; }\n        }\n    }\n    return res;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "for-loop two-pointer, minimal spacing", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -217,11 +246,16 @@
       "id": "str-001",
       "category": "Strings",
       "title": "Longest Palindromic Substring",
-      "leetcodeNumber": 5,
+      "summary": "Return the longest palindromic substring using expand-around-center.",
+      "paraphrasedPrompt": "Given a string `s`, return the longest palindromic substring in `s`. A palindrome is a string that reads the same forward and backward.",
       "difficulty": "Medium",
-      "acceptanceRate": "35%",
+      "acceptanceRate": 35,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 5,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given a string `s`, return the longest palindromic substring in `s`.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= s.length <= 1000",
         "s consists of only digits and English letters"
@@ -232,50 +266,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-001-py-h1",
               "code": "def longestPalindrome(self, s):\n    res = ''\n    for i in range(len(s)):\n        # Odd length\n        l, r = i, i\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            if r - l + 1 > len(res):\n                res = s[l:r+1]\n            l -= 1\n            r += 1\n        # Even length\n        l, r = i, i + 1\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            if r - l + 1 > len(res):\n                res = s[l:r+1]\n            l -= 1\n            r += 1\n    return res",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-001-py-h2",
               "code": "def longestPalindrome(self, s):\n    def expand(l, r):\n        while l >= 0 and r < len(s) and s[l] == s[r]:\n            l -= 1\n            r += 1\n        return s[l+1:r]\n    best = ''\n    for i in range(len(s)):\n        for p in [expand(i, i), expand(i, i+1)]:\n            if len(p) > len(best):\n                best = p\n    return best",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-001-py-aiReadable",
               "code": "def longestPalindrome(self, s):\n    def expand_from_center(left, right):\n        \"\"\"Expand outward as long as characters match.\"\"\"\n        while left >= 0 and right < len(s) and s[left] == s[right]:\n            left -= 1\n            right += 1\n        # Return the valid palindrome (shrink back one step)\n        return s[left + 1:right]\n\n    longest = ''\n\n    for center_index in range(len(s)):\n        # Check odd-length palindromes centered at center_index\n        odd_palindrome = expand_from_center(center_index, center_index)\n        if len(odd_palindrome) > len(longest):\n            longest = odd_palindrome\n\n        # Check even-length palindromes centered between center_index and center_index+1\n        even_palindrome = expand_from_center(center_index, center_index + 1)\n        if len(even_palindrome) > len(longest):\n            longest = even_palindrome\n\n    return longest",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "docstring, descriptive names, odd/even comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-001-py-aiConcise",
               "code": "def longestPalindrome(self, s):\n    def expand(l, r):\n        while l >= 0 and r < len(s) and s[l] == s[r]: l -= 1; r += 1\n        return s[l+1:r]\n    return max((expand(i, i) for i in range(len(s))),\n               (expand(i, i+1) for i in range(len(s))),\n               key=len, default='')",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "generator max, one-liner expand", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-001-java-h1",
               "code": "public String longestPalindrome(String s) {\n    String res = \"\";\n    for (int i = 0; i < s.length(); i++) {\n        // Odd\n        int l = i, r = i;\n        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }\n        if (r - l - 1 > res.length()) res = s.substring(l + 1, r);\n        // Even\n        l = i; r = i + 1;\n        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }\n        if (r - l - 1 > res.length()) res = s.substring(l + 1, r);\n    }\n    return res;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-001-java-h2",
               "code": "public String longestPalindrome(String s) {\n    int start = 0, maxLen = 0;\n    for (int i = 0; i < s.length(); i++) {\n        for (int[] c : new int[][]{{i, i}, {i, i + 1}}) {\n            int l = c[0], r = c[1];\n            while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }\n            if (r - l - 1 > maxLen) {\n                maxLen = r - l - 1;\n                start = l + 1;\n            }\n        }\n    }\n    return s.substring(start, start + maxLen);\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-001-java-aiReadable",
               "code": "public String longestPalindrome(String s) {\n    String longestFound = \"\";\n\n    for (int centerIndex = 0; centerIndex < s.length(); centerIndex++) {\n        // Expand for odd-length palindromes\n        String oddPalindrome = expandFromCenter(s, centerIndex, centerIndex);\n        if (oddPalindrome.length() > longestFound.length()) {\n            longestFound = oddPalindrome;\n        }\n\n        // Expand for even-length palindromes\n        String evenPalindrome = expandFromCenter(s, centerIndex, centerIndex + 1);\n        if (evenPalindrome.length() > longestFound.length()) {\n            longestFound = evenPalindrome;\n        }\n    }\n    return longestFound;\n}\n\nprivate String expandFromCenter(String s, int left, int right) {\n    while (left >= 0 && right < s.length() && s.charAt(left) == s.charAt(right)) {\n        left--;\n        right++;\n    }\n    return s.substring(left + 1, right);\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "extracted helper, descriptive names, odd/even comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-001-java-aiConcise",
               "code": "public String longestPalindrome(String s) {\n    int start = 0, end = 0;\n    for (int i = 0; i < s.length(); i++) {\n        int len = Math.max(expand(s, i, i), expand(s, i, i + 1));\n        if (len > end - start) { start = i - (len - 1) / 2; end = i + len / 2; }\n    }\n    return s.substring(start, end + 1);\n}\nprivate int expand(String s, int l, int r) {\n    while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)) { l--; r++; }\n    return r - l - 1;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "length-based index tracking, compact helper", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -285,11 +323,16 @@
       "id": "str-002",
       "category": "Strings",
       "title": "Group Anagrams",
-      "leetcodeNumber": 49,
+      "summary": "Group strings that are anagrams of each other using a sorted-key hash map.",
+      "paraphrasedPrompt": "Given an array of strings `strs`, group all anagrams together into sublists. You may return the output in any order. An anagram is a string that contains the exact same characters as another string, but the order of the characters can be different.",
       "difficulty": "Medium",
-      "acceptanceRate": "68%",
+      "acceptanceRate": 68,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 49,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given an array of strings `strs`, group the anagrams together. You can return the answer in any order. An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= strs.length <= 10^4",
         "0 <= strs[i].length <= 100",
@@ -302,50 +345,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-002-py-h1",
               "code": "def groupAnagrams(self, strs):\n    from collections import defaultdict\n    groups = defaultdict(list)\n    for word in strs:\n        key = tuple(sorted(word))\n        groups[key].append(word)\n    return list(groups.values())",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-002-py-h2",
               "code": "def groupAnagrams(self, strs):\n    mapping = {}\n    for s in strs:\n        k = ''.join(sorted(s))\n        if k not in mapping:\n            mapping[k] = []\n        mapping[k].append(s)\n    return list(mapping.values())",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-002-py-aiReadable",
               "code": "def groupAnagrams(self, strs):\n    from collections import defaultdict\n\n    # Group words by their sorted character signature (anagrams share the same signature)\n    anagram_groups = defaultdict(list)\n\n    for word in strs:\n        # Sorting the characters gives a canonical form for all anagrams\n        canonical_form = tuple(sorted(word))\n        anagram_groups[canonical_form].append(word)\n\n    return list(anagram_groups.values())",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "inline comments explaining canonical form", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-002-py-aiConcise",
               "code": "def groupAnagrams(self, strs):\n    from collections import defaultdict\n    d = defaultdict(list)\n    for s in strs: d[tuple(sorted(s))].append(s)\n    return list(d.values())",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "single-loop, inline key", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-002-java-h1",
               "code": "public List<List<String>> groupAnagrams(String[] strs) {\n    Map<String, List<String>> groups = new HashMap<>();\n    for (String word : strs) {\n        char[] chars = word.toCharArray();\n        Arrays.sort(chars);\n        String key = new String(chars);\n        groups.computeIfAbsent(key, k -> new ArrayList<>()).add(word);\n    }\n    return new ArrayList<>(groups.values());\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-002-java-h2",
               "code": "public List<List<String>> groupAnagrams(String[] strs) {\n    HashMap<String, List<String>> map = new HashMap<>();\n    for (String s : strs) {\n        char[] arr = s.toCharArray();\n        Arrays.sort(arr);\n        String k = String.valueOf(arr);\n        if (!map.containsKey(k)) map.put(k, new ArrayList<>());\n        map.get(k).add(s);\n    }\n    return new ArrayList<>(map.values());\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-002-java-aiReadable",
               "code": "public List<List<String>> groupAnagrams(String[] strs) {\n    // Use sorted characters as a canonical key for each anagram group\n    Map<String, List<String>> anagramGroups = new HashMap<>();\n\n    for (String word : strs) {\n        char[] characters = word.toCharArray();\n        Arrays.sort(characters);\n        String canonicalKey = new String(characters);\n\n        anagramGroups.computeIfAbsent(canonicalKey, k -> new ArrayList<>()).add(word);\n    }\n\n    return new ArrayList<>(anagramGroups.values());\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "canonical key comment, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-002-java-aiConcise",
               "code": "public List<List<String>> groupAnagrams(String[] strs) {\n    Map<String, List<String>> m = new HashMap<>();\n    for (String s : strs) {\n        char[] c = s.toCharArray(); Arrays.sort(c);\n        m.computeIfAbsent(new String(c), k -> new ArrayList<>()).add(s);\n    }\n    return new ArrayList<>(m.values());\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "single-line sort + insert", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -355,64 +402,74 @@
       "id": "str-003",
       "category": "Strings",
       "title": "Generate Parentheses",
-      "leetcodeNumber": 22,
+      "summary": "Generate all valid combinations of n pairs of parentheses via backtracking.",
+      "paraphrasedPrompt": "Given `n` pairs of parentheses, write a function to generate all combinations of well-formed parentheses. A combination is well-formed if every opening bracket `(` has a corresponding closing bracket `)` in the correct nesting order.",
       "difficulty": "Medium",
-      "acceptanceRate": "73%",
+      "acceptanceRate": 73,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 22,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given `n` pairs of parentheses, write a function to generate all combinations of well-formed parentheses.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= n <= 8"
       ],
       "examples": [
-        { "input": "n = 3", "output": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]" },
-        { "input": "n = 1", "output": "[\"()\"]" }
+        { "input": "n = 1", "output": "[\"()\"]" },
+        { "input": "n = 2", "output": "[\"(())\",\"()()\"]" },
+        { "input": "n = 3", "output": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]" }
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-003-py-h1",
               "code": "def generateParenthesis(self, n):\n    result = []\n    def backtrack(current, open_count, close_count):\n        if len(current) == 2 * n:\n            result.append(current)\n            return\n        if open_count < n:\n            backtrack(current + '(', open_count + 1, close_count)\n        if close_count < open_count:\n            backtrack(current + ')', open_count, close_count + 1)\n    backtrack('', 0, 0)\n    return result",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-003-py-h2",
               "code": "def generateParenthesis(self, n):\n    res = []\n    def gen(s, op, cl):\n        if len(s) == 2*n:\n            res.append(s)\n            return\n        if op < n: gen(s+'(', op+1, cl)\n        if cl < op: gen(s+')', op, cl+1)\n    gen('', 0, 0)\n    return res",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-003-py-aiReadable",
               "code": "def generateParenthesis(self, n):\n    valid_combinations = []\n\n    def backtrack(current_string, open_count, close_count):\n        # Base case: string is complete\n        if len(current_string) == 2 * n:\n            valid_combinations.append(current_string)\n            return\n\n        # Add opening bracket if we still have some left to place\n        if open_count < n:\n            backtrack(current_string + '(', open_count + 1, close_count)\n\n        # Add closing bracket only if it won't exceed the number of open brackets\n        if close_count < open_count:\n            backtrack(current_string + ')', open_count, close_count + 1)\n\n    backtrack('', 0, 0)\n    return valid_combinations",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "inline comments on each branching condition", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-003-py-aiConcise",
               "code": "def generateParenthesis(self, n):\n    res = []\n    def bt(s='', o=0, c=0):\n        if len(s) == 2*n: res.append(s); return\n        if o < n: bt(s+'(', o+1, c)\n        if c < o: bt(s+')', o, c+1)\n    bt()\n    return res",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "default args, one-liner base case", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "str-003-java-h1",
               "code": "public List<String> generateParenthesis(int n) {\n    List<String> result = new ArrayList<>();\n    backtrack(result, \"\", 0, 0, n);\n    return result;\n}\nprivate void backtrack(List<String> result, String current, int open, int close, int max) {\n    if (current.length() == max * 2) {\n        result.add(current);\n        return;\n    }\n    if (open < max) backtrack(result, current + \"(\", open + 1, close, max);\n    if (close < open) backtrack(result, current + \")\", open, close + 1, max);\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-003-java-h2",
               "code": "public List<String> generateParenthesis(int n) {\n    List<String> res = new ArrayList<>();\n    gen(res, new StringBuilder(), 0, 0, n);\n    return res;\n}\nvoid gen(List<String> res, StringBuilder sb, int op, int cl, int n) {\n    if (sb.length() == 2 * n) { res.add(sb.toString()); return; }\n    if (op < n) { sb.append('('); gen(res, sb, op+1, cl, n); sb.deleteCharAt(sb.length()-1); }\n    if (cl < op) { sb.append(')'); gen(res, sb, op, cl+1, n); sb.deleteCharAt(sb.length()-1); }\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "str-003-java-aiReadable",
               "code": "public List<String> generateParenthesis(int n) {\n    List<String> validCombinations = new ArrayList<>();\n    generateHelper(validCombinations, \"\", 0, 0, n);\n    return validCombinations;\n}\n\nprivate void generateHelper(List<String> results, String currentString,\n                             int openCount, int closeCount, int maxPairs) {\n    // Base case: we have placed all parentheses\n    if (currentString.length() == maxPairs * 2) {\n        results.add(currentString);\n        return;\n    }\n\n    // Add opening bracket if we have capacity\n    if (openCount < maxPairs) {\n        generateHelper(results, currentString + \"(\", openCount + 1, closeCount, maxPairs);\n    }\n\n    // Add closing bracket only if it won't exceed open brackets\n    if (closeCount < openCount) {\n        generateHelper(results, currentString + \")\", openCount, closeCount + 1, maxPairs);\n    }\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "extracted helper, inline condition comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "str-003-java-aiConcise",
               "code": "public List<String> generateParenthesis(int n) {\n    List<String> res = new ArrayList<>();\n    bt(res, \"\", 0, 0, n);\n    return res;\n}\nvoid bt(List<String> res, String s, int o, int c, int n) {\n    if (s.length() == 2*n) { res.add(s); return; }\n    if (o < n) bt(res, s+\"(\", o+1, c, n);\n    if (c < o) bt(res, s+\")\", o, c+1, n);\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "short method name, minimal whitespace", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -422,14 +479,20 @@
       "id": "hash-001",
       "category": "Hashes",
       "title": "Top K Frequent Elements",
-      "leetcodeNumber": 347,
+      "summary": "Return the k most frequent elements using bucket sort for O(n) time.",
+      "paraphrasedPrompt": "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order. It is guaranteed that the answer is unique. Your algorithm's time complexity must be better than O(n log n), where n is the array's size.",
       "difficulty": "Medium",
-      "acceptanceRate": "62%",
+      "acceptanceRate": 62,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 347,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= nums.length <= 10^5",
-        "k is in the range [1, the number of unique elements in the array]",
+        "-10^4 <= nums[i] <= 10^4",
+        "1 <= k <= number of unique elements in the array",
         "It is guaranteed that the answer is unique"
       ],
       "examples": [
@@ -438,50 +501,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-001-py-h1",
               "code": "def topKFrequent(self, nums, k):\n    from collections import Counter\n    count = Counter(nums)\n    return [x for x, _ in count.most_common(k)]",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-001-py-h2",
               "code": "def topKFrequent(self, nums, k):\n    import heapq\n    freq = {}\n    for n in nums:\n        freq[n] = freq.get(n, 0) + 1\n    return heapq.nlargest(k, freq.keys(), key=lambda x: freq[x])",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-001-py-aiReadable",
               "code": "def topKFrequent(self, nums, k):\n    from collections import Counter\n\n    # Count frequency of each number\n    frequency_map = Counter(nums)\n\n    # Use bucket sort: index represents frequency, value is list of numbers\n    buckets = [[] for _ in range(len(nums) + 1)]\n    for number, frequency in frequency_map.items():\n        buckets[frequency].append(number)\n\n    # Collect top-k elements by iterating from highest frequency bucket\n    top_k_elements = []\n    for bucket in reversed(buckets):\n        for number in bucket:\n            top_k_elements.append(number)\n            if len(top_k_elements) == k:\n                return top_k_elements\n\n    return top_k_elements",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "bucket sort with explanatory comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-001-py-aiConcise",
               "code": "def topKFrequent(self, nums, k):\n    from collections import Counter\n    cnt = Counter(nums)\n    buckets = [[] for _ in range(len(nums)+1)]\n    for n, f in cnt.items(): buckets[f].append(n)\n    return [n for b in reversed(buckets) for n in b][:k]",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "list comprehension flatten, slice to k", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-001-java-h1",
               "code": "public int[] topKFrequent(int[] nums, int k) {\n    Map<Integer, Integer> count = new HashMap<>();\n    for (int n : nums) count.merge(n, 1, Integer::sum);\n    PriorityQueue<Map.Entry<Integer, Integer>> heap =\n        new PriorityQueue<>(Comparator.comparingInt(Map.Entry::getValue));\n    for (Map.Entry<Integer, Integer> e : count.entrySet()) {\n        heap.offer(e);\n        if (heap.size() > k) heap.poll();\n    }\n    return heap.stream().mapToInt(Map.Entry::getKey).toArray();\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-001-java-h2",
               "code": "public int[] topKFrequent(int[] nums, int k) {\n    HashMap<Integer, Integer> freq = new HashMap<>();\n    for (int n : nums) freq.put(n, freq.getOrDefault(n, 0) + 1);\n    List<Integer>[] bucket = new List[nums.length + 1];\n    for (int key : freq.keySet()) {\n        int f = freq.get(key);\n        if (bucket[f] == null) bucket[f] = new ArrayList<>();\n        bucket[f].add(key);\n    }\n    int[] res = new int[k];\n    int idx = 0;\n    for (int i = bucket.length - 1; i >= 0 && idx < k; i--)\n        if (bucket[i] != null)\n            for (int n : bucket[i]) if (idx < k) res[idx++] = n;\n    return res;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-001-java-aiReadable",
               "code": "public int[] topKFrequent(int[] nums, int k) {\n    // Count frequency of each number\n    Map<Integer, Integer> frequencyMap = new HashMap<>();\n    for (int number : nums) {\n        frequencyMap.merge(number, 1, Integer::sum);\n    }\n\n    // Bucket sort: index = frequency, value = list of numbers with that frequency\n    List<Integer>[] frequencyBuckets = new List[nums.length + 1];\n    for (Map.Entry<Integer, Integer> entry : frequencyMap.entrySet()) {\n        int frequency = entry.getValue();\n        if (frequencyBuckets[frequency] == null) {\n            frequencyBuckets[frequency] = new ArrayList<>();\n        }\n        frequencyBuckets[frequency].add(entry.getKey());\n    }\n\n    // Collect top-k by scanning from highest frequency\n    int[] topKElements = new int[k];\n    int resultIndex = 0;\n    for (int freq = frequencyBuckets.length - 1; freq >= 0 && resultIndex < k; freq--) {\n        if (frequencyBuckets[freq] != null) {\n            for (int number : frequencyBuckets[freq]) {\n                if (resultIndex < k) topKElements[resultIndex++] = number;\n            }\n        }\n    }\n    return topKElements;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "bucket sort with section comments", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-001-java-aiConcise",
               "code": "public int[] topKFrequent(int[] nums, int k) {\n    Map<Integer,Integer> cnt = new HashMap<>();\n    for (int n : nums) cnt.merge(n, 1, Integer::sum);\n    List<Integer>[] b = new List[nums.length+1];\n    cnt.forEach((n,f) -> { if (b[f]==null) b[f]=new ArrayList<>(); b[f].add(n); });\n    int[] res = new int[k]; int i = 0;\n    for (int f = b.length-1; f >= 0 && i < k; f--)\n        if (b[f] != null) for (int n : b[f]) if (i < k) res[i++] = n;\n    return res;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "lambda forEach, compact loop", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -491,11 +558,16 @@
       "id": "hash-002",
       "category": "Hashes",
       "title": "Subarray Sum Equals K",
-      "leetcodeNumber": 560,
+      "summary": "Count subarrays with sum exactly k using prefix sum hash map.",
+      "paraphrasedPrompt": "Given an array of integers `nums` and an integer `k`, return the total number of subarrays whose sum equals `k`. A subarray is a contiguous non-empty sequence of elements within an array.",
       "difficulty": "Medium",
-      "acceptanceRate": "44%",
+      "acceptanceRate": 44,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 560,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given an array of integers `nums` and an integer `k`, return the total number of subarrays whose sum equals to `k`. A subarray is a contiguous non-empty sequence of elements within an array.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "1 <= nums.length <= 2 * 10^4",
         "-1000 <= nums[i] <= 1000",
@@ -507,50 +579,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-002-py-h1",
               "code": "def subarraySum(self, nums, k):\n    from collections import defaultdict\n    count = 0\n    prefix = 0\n    seen = defaultdict(int)\n    seen[0] = 1\n    for n in nums:\n        prefix += n\n        count += seen[prefix - k]\n        seen[prefix] += 1\n    return count",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-002-py-h2",
               "code": "def subarraySum(self, nums, k):\n    freq = {0: 1}\n    total = 0\n    cur = 0\n    for x in nums:\n        cur += x\n        total += freq.get(cur - k, 0)\n        freq[cur] = freq.get(cur, 0) + 1\n    return total",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-002-py-aiReadable",
               "code": "def subarraySum(self, nums, k):\n    from collections import defaultdict\n\n    # prefix_count[s] = number of times prefix sum s has appeared so far\n    prefix_count = defaultdict(int)\n    prefix_count[0] = 1  # empty prefix has sum 0\n\n    running_sum = 0\n    valid_subarrays = 0\n\n    for number in nums:\n        running_sum += number\n\n        # If (running_sum - k) was seen before, those subarrays sum to k\n        valid_subarrays += prefix_count[running_sum - k]\n\n        prefix_count[running_sum] += 1\n\n    return valid_subarrays",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "prefix sum comment, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-002-py-aiConcise",
               "code": "def subarraySum(self, nums, k):\n    from collections import defaultdict\n    pre, res, d = 0, 0, defaultdict(int, {0: 1})\n    for n in nums:\n        pre += n\n        res += d[pre - k]\n        d[pre] += 1\n    return res",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "tuple unpack init, minimal names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-002-java-h1",
               "code": "public int subarraySum(int[] nums, int k) {\n    Map<Integer, Integer> seen = new HashMap<>();\n    seen.put(0, 1);\n    int count = 0, prefix = 0;\n    for (int n : nums) {\n        prefix += n;\n        count += seen.getOrDefault(prefix - k, 0);\n        seen.merge(prefix, 1, Integer::sum);\n    }\n    return count;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-002-java-h2",
               "code": "public int subarraySum(int[] nums, int k) {\n    HashMap<Integer, Integer> freq = new HashMap<>();\n    freq.put(0, 1);\n    int total = 0, cur = 0;\n    for (int x : nums) {\n        cur += x;\n        total += freq.getOrDefault(cur - k, 0);\n        freq.put(cur, freq.getOrDefault(cur, 0) + 1);\n    }\n    return total;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-002-java-aiReadable",
               "code": "public int subarraySum(int[] nums, int k) {\n    // prefixCount maps each prefix sum to how many times it has appeared\n    Map<Integer, Integer> prefixCount = new HashMap<>();\n    prefixCount.put(0, 1);  // base case: empty prefix\n\n    int runningSum = 0;\n    int validSubarrays = 0;\n\n    for (int number : nums) {\n        runningSum += number;\n\n        // Check how many previous prefix sums differ by exactly k\n        validSubarrays += prefixCount.getOrDefault(runningSum - k, 0);\n\n        // Record this prefix sum\n        prefixCount.merge(runningSum, 1, Integer::sum);\n    }\n\n    return validSubarrays;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "section comments, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-002-java-aiConcise",
               "code": "public int subarraySum(int[] nums, int k) {\n    Map<Integer,Integer> d = new HashMap<>();\n    d.put(0,1);\n    int pre=0, res=0;\n    for (int n : nums) { pre+=n; res+=d.getOrDefault(pre-k,0); d.merge(pre,1,Integer::sum); }\n    return res;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "one-liner loop body", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
@@ -560,14 +636,19 @@
       "id": "hash-003",
       "category": "Hashes",
       "title": "Longest Substring Without Repeating Characters",
-      "leetcodeNumber": 3,
+      "summary": "Find the length of the longest substring with no repeated characters using a sliding window.",
+      "paraphrasedPrompt": "Given a string `s`, find the length of the longest substring without repeating characters. A substring is a contiguous sequence of characters within a string.",
       "difficulty": "Medium",
-      "acceptanceRate": "35%",
+      "acceptanceRate": 35,
+      "acceptanceRateAvailable": true,
+      "sourceProblemNumber": 3,
+      "sourcePlatform": "LeetCode",
       "supportedLanguages": ["Python", "Java"],
-      "problemStatement": "Given a string `s`, find the length of the longest substring without repeating characters.",
+      "missingLanguages": [],
+      "hasFullCoverage": true,
       "constraints": [
         "0 <= s.length <= 5 * 10^4",
-        "s consists of English letters, digits, symbols and spaces"
+        "s consists of English letters, digits, symbols, and spaces"
       ],
       "examples": [
         { "input": "s = \"abcabcbb\"", "output": "3" },
@@ -576,50 +657,54 @@
       ],
       "solutionsByLanguage": {
         "Python": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-003-py-h1",
               "code": "def lengthOfLongestSubstring(self, s):\n    char_index = {}\n    left = 0\n    best = 0\n    for right, ch in enumerate(s):\n        if ch in char_index and char_index[ch] >= left:\n            left = char_index[ch] + 1\n        char_index[ch] = right\n        best = max(best, right - left + 1)\n    return best",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-003-py-h2",
               "code": "def lengthOfLongestSubstring(self, s):\n    seen = {}\n    lo = 0\n    ans = 0\n    for hi, c in enumerate(s):\n        if c in seen:\n            lo = max(lo, seen[c] + 1)\n        seen[c] = hi\n        ans = max(ans, hi - lo + 1)\n    return ans",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-003-py-aiReadable",
               "code": "def lengthOfLongestSubstring(self, s):\n    # Maps each character to the index of its last occurrence\n    last_seen_at = {}\n    window_start = 0\n    longest_length = 0\n\n    for current_index, character in enumerate(s):\n        # If character was seen inside the current window, shrink from the left\n        if character in last_seen_at and last_seen_at[character] >= window_start:\n            window_start = last_seen_at[character] + 1\n\n        last_seen_at[character] = current_index\n        current_window_length = current_index - window_start + 1\n        longest_length = max(longest_length, current_window_length)\n\n    return longest_length",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "sliding window comment, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-003-py-aiConcise",
               "code": "def lengthOfLongestSubstring(self, s):\n    seen, l, res = {}, 0, 0\n    for r, c in enumerate(s):\n        if c in seen: l = max(l, seen[c]+1)\n        seen[c] = r\n        res = max(res, r-l+1)\n    return res",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "tuple unpack, one-liner window shrink", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         },
         "Java": {
+          "solutionCount": 4,
+          "hasFullCoverage": true,
           "solutions": [
             {
               "solutionId": "hash-003-java-h1",
               "code": "public int lengthOfLongestSubstring(String s) {\n    Map<Character, Integer> charIndex = new HashMap<>();\n    int left = 0, best = 0;\n    for (int right = 0; right < s.length(); right++) {\n        char ch = s.charAt(right);\n        if (charIndex.containsKey(ch) && charIndex.get(ch) >= left) {\n            left = charIndex.get(ch) + 1;\n        }\n        charIndex.put(ch, right);\n        best = Math.max(best, right - left + 1);\n    }\n    return best;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human1" }
+              "_hidden": { "origin": "human", "variantKey": "human1", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-003-java-h2",
               "code": "public int lengthOfLongestSubstring(String s) {\n    HashMap<Character, Integer> seen = new HashMap<>();\n    int lo = 0, ans = 0;\n    for (int hi = 0; hi < s.length(); hi++) {\n        char c = s.charAt(hi);\n        if (seen.containsKey(c)) lo = Math.max(lo, seen.get(c) + 1);\n        seen.put(c, hi);\n        ans = Math.max(ans, hi - lo + 1);\n    }\n    return ans;\n}",
-              "_hidden": { "origin": "human", "variantKey": "human2" }
+              "_hidden": { "origin": "human", "variantKey": "human2", "styleNotes": "", "sourceRepoOrAuthor": "", "sourceUrl": "", "selectionNotes": "" }
             },
             {
               "solutionId": "hash-003-java-aiReadable",
               "code": "public int lengthOfLongestSubstring(String s) {\n    // Track the most recent index of each character\n    Map<Character, Integer> lastSeenAt = new HashMap<>();\n    int windowStart = 0;\n    int longestLength = 0;\n\n    for (int currentIndex = 0; currentIndex < s.length(); currentIndex++) {\n        char character = s.charAt(currentIndex);\n\n        // Shrink the window if this character is already inside it\n        if (lastSeenAt.containsKey(character) && lastSeenAt.get(character) >= windowStart) {\n            windowStart = lastSeenAt.get(character) + 1;\n        }\n\n        lastSeenAt.put(character, currentIndex);\n        longestLength = Math.max(longestLength, currentIndex - windowStart + 1);\n    }\n\n    return longestLength;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiReadable" }
+              "_hidden": { "origin": "ai", "variantKey": "aiReadable", "styleNotes": "sliding window comment, descriptive names", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             },
             {
               "solutionId": "hash-003-java-aiConcise",
               "code": "public int lengthOfLongestSubstring(String s) {\n    Map<Character,Integer> seen = new HashMap<>();\n    int l = 0, res = 0;\n    for (int r = 0; r < s.length(); r++) {\n        char c = s.charAt(r);\n        if (seen.containsKey(c)) l = Math.max(l, seen.get(c)+1);\n        seen.put(c, r); res = Math.max(res, r-l+1);\n    }\n    return res;\n}",
-              "_hidden": { "origin": "ai", "variantKey": "aiConcise" }
+              "_hidden": { "origin": "ai", "variantKey": "aiConcise", "styleNotes": "compact update, one-liner per step", "sourceRepoOrAuthor": "LLM", "sourceUrl": "", "selectionNotes": "", "generatedBy": "claude-sonnet-4-6", "generationDate": "2026-04-06" }
             }
           ]
         }
