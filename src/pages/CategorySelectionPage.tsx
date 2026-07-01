@@ -152,10 +152,6 @@ export default function CategorySelectionPage() {
 
   // Guard — use declarative Navigate instead of calling navigate() during render
   if (!state.participant) return <Navigate to="/participant" replace />;
-  // Lock — once a review is active, send participant back to that question
-  if (state.review) {
-    return <Navigate to={`/review/${state.review.question.category}/${state.review.question.id}`} replace />;
-  }
 
   const handleSelect = (id: string) => {
     setCategory(id);

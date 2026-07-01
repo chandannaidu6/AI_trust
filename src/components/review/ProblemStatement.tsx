@@ -52,18 +52,6 @@ export function ProblemStatement({ question, language }: ProblemStatementProps) 
 
       {!collapsed && (
         <div id="problem-body" className="px-5 py-5 space-y-4">
-          {/* Study note */}
-          <div className="flex items-start gap-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg px-3.5 py-2.5">
-            <svg className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className="text-xs text-amber-800 dark:text-amber-300 font-medium leading-relaxed">
-              All solutions are assumed to pass the same hidden test suite. Tests are not shown.
-              Evaluate code quality, clarity, and correctness on its own merits.
-            </p>
-          </div>
-
           {/* Title */}
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{question.title}</h2>
 

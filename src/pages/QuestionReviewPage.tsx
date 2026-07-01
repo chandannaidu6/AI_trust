@@ -103,7 +103,7 @@ export default function QuestionReviewPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-        <Header step={4} back={langPicked ? undefined : `/categories/${category}`} />
+        <Header step={4} back={`/categories/${category}`} />
         <div className="flex-1 flex items-center justify-center text-slate-400 dark:text-slate-500 gap-2">
           <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -118,7 +118,7 @@ export default function QuestionReviewPage() {
   if (error || !question) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-        <Header step={4} back={langPicked ? undefined : `/categories/${category}`} />
+        <Header step={4} back={`/categories/${category}`} />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-3">
             <p className="text-red-600 dark:text-red-400 text-sm">{error || 'Question not found.'}</p>
@@ -135,7 +135,7 @@ export default function QuestionReviewPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-      <Header step={4} back={langPicked ? undefined : `/categories/${category}`} />
+      <Header step={4} back={`/categories/${category}`} />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-4">
 

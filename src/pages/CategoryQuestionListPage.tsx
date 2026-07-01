@@ -17,10 +17,6 @@ export default function CategoryQuestionListPage() {
   const [error,     setError]     = useState('');
 
   if (!state.participant) return <Navigate to="/participant" replace />;
-  // Lock — once a review is active, send participant back to that question
-  if (state.review) {
-    return <Navigate to={`/review/${state.review.question.category}/${state.review.question.id}`} replace />;
-  }
 
   // Sync category into context
   useEffect(() => {
