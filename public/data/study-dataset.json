@@ -75,16 +75,16 @@
     {
       "id": "py-002",
       "category": "Data Structures",
-      "title": "Resolve Dotted Path In Nested Structure",
-      "summary": "Resolve Dotted Path In Nested Structure",
-      "paraphrasedPrompt": "Write a function `item_str_path(keys, dct)` that takes a string of path segments separated by dots (e.g. `'foo.bar.1.goo'`) and a nested structure of dicts and lists, and returns the value found by walking the structure using those segments. Segments that look like integers should be converted to integers so they can be used as list indices. For example, given `dct = {'foo': {'bar': [{'goo': 'a'}, {'goo': 'b'}]}}` and `keys = 'foo.bar.1.goo'`, the function should return `'b'`.",
+      "title": "Resolve Dotted Path In Nested Dict",
+      "summary": "Resolve Dotted Path In Nested Dict",
+      "paraphrasedPrompt": "Write a function `getitem_in(obj, name)` that finds a value in a nested dict `obj` via a period-delimited string `name`. For example, given `obj = {'foo': {'bar': {'baz': True}}}`, calling `getitem_in(obj, 'foo.bar.baz')` should return `True`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "calocan/rescape-python-helpers",
-      "sourceUrl": "https://github.com/calocan/rescape-python-helpers/blob/91a1724f062ee40a25aa60fc96b2d7acadd99618/rescape_python_helpers/functional/ramda.py#L212-L220",
+      "sourceRepo": "jaredLunde/vital-tools",
+      "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L59-L71",
       "supportedLanguages": [
         "Python"
       ],
@@ -101,19 +101,19 @@
           "solutions": [
             {
               "solutionId": "py-002-h",
-              "code": "def item_str_path(keys, dct):\n    return item_path(map(lambda segment: int(segment) if isint(segment) else segment, keys.split('.')), dct)",
+              "code": "def getitem_in(obj, name):\n    for part in name.split('.'):\n        obj = obj[part]\n    return obj",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "calocan/rescape-python-helpers",
-                "sourceUrl": "https://github.com/calocan/rescape-python-helpers/blob/91a1724f062ee40a25aa60fc96b2d7acadd99618/rescape_python_helpers/functional/ramda.py#L212-L220",
+                "sourceRepoOrAuthor": "jaredLunde/vital-tools",
+                "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L59-L71",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-002-ai",
-              "code": "def item_str_path(keys, dct):\n    value = dct\n    for segment in keys.split('.'):\n        key = int(segment) if segment.lstrip('-').isdigit() else segment\n        value = value[key]\n    return value",
+              "code": "def getitem_in(obj, name):\n    result = obj\n    for key in name.split('.'):\n        result = result[key]\n    return result",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -474,16 +474,16 @@
     {
       "id": "py-009",
       "category": "String Processing",
-      "title": "Suggest Similar Options For Invalid Input",
-      "summary": "Suggest Similar Options For Invalid Input",
-      "paraphrasedPrompt": "Write a function `suggestion_list(inp, options)` that, given an invalid input string `inp` and a list of valid option strings, returns the subset of `options` that are textually similar enough to `inp` to be worth suggesting, sorted from most to least similar. Similarity should be measured with an edit-distance metric, and an option should only be included if its distance from `inp` is within a reasonable threshold relative to the length of `inp`/the option (so wildly different strings are excluded).",
+      "title": "Convert Argument To Reddit-Formatted List",
+      "summary": "Convert Argument To Reddit-Formatted List",
+      "paraphrasedPrompt": "Write a function `to_reddit_list(arg)` that returns an argument converted to a reddit-formatted list: a comma-delimited string where each element is the string representation of an object. If `arg` is a string, or is not iterable/indexable at all, just return its string representation directly (don't try to iterate over the characters of a string). Otherwise, treat `arg` as an iterable of items and join their string representations with commas.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "graphql-python/graphql-core",
-      "sourceUrl": "https://github.com/graphql-python/graphql-core/blob/d8e9d3abe7c209eb2f51cf001402783bfd480596/graphql/utils/suggestion_list.py#L4-L20",
+      "sourceRepo": "michael-lazar/rtv",
+      "sourceUrl": "https://github.com/michael-lazar/rtv/blob/ccef2af042566ad384977028cf0bde01bc524dda/rtv/packages/praw/internal.py#L249-L260",
       "supportedLanguages": [
         "Python"
       ],
@@ -500,19 +500,19 @@
           "solutions": [
             {
               "solutionId": "py-009-h",
-              "code": "def suggestion_list(inp, options):\n    options_by_distance = OrderedDict()\n    input_threshold = len(inp) / 2\n\n    for option in options:\n        distance = lexical_distance(inp, option)\n        threshold = max(input_threshold, len(option) / 2, 1)\n        if distance <= threshold:\n            options_by_distance[option] = distance\n\n    return sorted(\n        list(options_by_distance.keys()), key=lambda k: options_by_distance[k]\n    )",
+              "code": "def to_reddit_list(arg):\n    if (isinstance(arg, six.string_types) or not (\n            hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\"))):\n        return six.text_type(arg)\n    else:\n        return ','.join(six.text_type(a) for a in arg)",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "graphql-python/graphql-core",
-                "sourceUrl": "https://github.com/graphql-python/graphql-core/blob/d8e9d3abe7c209eb2f51cf001402783bfd480596/graphql/utils/suggestion_list.py#L4-L20",
+                "sourceRepoOrAuthor": "michael-lazar/rtv",
+                "sourceUrl": "https://github.com/michael-lazar/rtv/blob/ccef2af042566ad384977028cf0bde01bc524dda/rtv/packages/praw/internal.py#L249-L260",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-009-ai",
-              "code": "def _edit_distance(a, b):\n    m, n = len(a), len(b)\n    prev = list(range(n + 1))\n    for i in range(1, m + 1):\n        curr = [i] + [0] * n\n        for j in range(1, n + 1):\n            cost = 0 if a[i - 1] == b[j - 1] else 1\n            curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)\n        prev = curr\n    return prev[n]\n\n\ndef suggestion_list(inp, options):\n    threshold = max(len(inp) / 2, 1)\n    scored = []\n    for option in options:\n        distance = _edit_distance(inp, option)\n        if distance <= max(threshold, len(option) / 2, 1):\n            scored.append((distance, option))\n    scored.sort(key=lambda pair: pair[0])\n    return [option for _, option in scored]",
+              "code": "def to_reddit_list(arg):\n    if isinstance(arg, str) or not (hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\")):\n        return str(arg)\n    return ','.join(str(item) for item in arg)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -644,17 +644,17 @@
     },
     {
       "id": "py-012",
-      "category": "String Processing",
-      "title": "Join Locations Into Pipe-Separated String",
-      "summary": "Join Locations Into Pipe-Separated String",
-      "paraphrasedPrompt": "Write a function `location_list(arg)` that joins a list of locations into a single pipe-separated (`|`) string, for use as a Google Maps API parameter. Each location can be: a dict with `'lat'`/`'lng'` keys (formatted as `'lat,lng'`), a 2-element tuple/list of `(lat, lng)` (formatted the same way), or a plain string (used as-is, e.g. an address like `'Sydney'`). If `arg` itself is a single `(lat, lng)` tuple (not a list of locations), treat it as one location and return its formatted `'lat,lng'` string directly, not as a joined list.",
+      "category": "Math & Numeric",
+      "title": "Compute Misclassification Cost",
+      "summary": "Compute Misclassification Cost",
+      "paraphrasedPrompt": "Write a function `calc_cost(y, yhat, cost_matrix)` that computes the average misclassification cost given ground-truth labels `y`, predicted labels `yhat`, and a `cost_matrix` where `cost_matrix[i][j]` is the cost of the ground truth being class `i` but predicted as class `j`. `y` and `yhat` are equal-length sequences of class indices. Return the mean cost over all predictions.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "googlemaps/google-maps-services-python",
-      "sourceUrl": "https://github.com/googlemaps/google-maps-services-python/blob/7ed40b4d8df63479794c46ce29d03ed6083071d7/googlemaps/convert.py#L110-L128",
+      "sourceRepo": "ntucllab/libact",
+      "sourceUrl": "https://github.com/ntucllab/libact/blob/e37e9ed6c36febe701d84b2d495c958ab02f0bc8/libact/utils/__init__.py#L41-L52",
       "supportedLanguages": [
         "Python"
       ],
@@ -671,19 +671,19 @@
           "solutions": [
             {
               "solutionId": "py-012-h",
-              "code": "def location_list(arg):\n    if isinstance(arg, tuple):\n        return latlng(arg)\n    else:\n        return \"|\".join([latlng(location) for location in as_list(arg)])",
+              "code": "def calc_cost(y, yhat, cost_matrix):\n    return np.mean(cost_matrix[list(y), list(yhat)])",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "googlemaps/google-maps-services-python",
-                "sourceUrl": "https://github.com/googlemaps/google-maps-services-python/blob/7ed40b4d8df63479794c46ce29d03ed6083071d7/googlemaps/convert.py#L110-L128",
+                "sourceRepoOrAuthor": "ntucllab/libact",
+                "sourceUrl": "https://github.com/ntucllab/libact/blob/e37e9ed6c36febe701d84b2d495c958ab02f0bc8/libact/utils/__init__.py#L41-L52",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-012-ai",
-              "code": "def _format_latlng(location):\n    if isinstance(location, dict):\n        return \"{0},{1}\".format(location[\"lat\"], location[\"lng\"])\n    if isinstance(location, (tuple, list)):\n        return \"{0},{1}\".format(location[0], location[1])\n    return location\n\n\ndef location_list(arg):\n    if isinstance(arg, tuple):\n        return _format_latlng(arg)\n    if isinstance(arg, list):\n        return \"|\".join(_format_latlng(location) for location in arg)\n    return _format_latlng(arg)",
+              "code": "import numpy as np\n\ndef calc_cost(y, yhat, cost_matrix):\n    y = list(y)\n    yhat = list(yhat)\n    costs = [cost_matrix[true][pred] for true, pred in zip(y, yhat)]\n    return float(np.mean(costs))",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -929,17 +929,17 @@
     },
     {
       "id": "py-017",
-      "category": "Data Structures",
-      "title": "Check If Object Is Sequence-Like",
-      "summary": "Check If Object Is Sequence-Like",
-      "paraphrasedPrompt": "Write a function `isseq(obj)` that returns `True` if `obj` is sequence-like (a tuple, a list, a subclass of either, or anything else that supports iteration via `__iter__`), but `False` if `obj` is a string or a dict.",
+      "category": "Encoding & Checksums",
+      "title": "Decode Base64-Encoded Int Array",
+      "summary": "Decode Base64-Encoded Int Array",
+      "paraphrasedPrompt": "Write a function `decode_ints(message)` that decodes a base64-encoded array of little-endian 32-bit integers. `message` is a base64-encoded string; base64-decode it first, then unpack the resulting bytes as a sequence of little-endian 4-byte signed integers, and return them.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "metagriffin/morph",
-      "sourceUrl": "https://github.com/metagriffin/morph/blob/907f169b0155712c466d3aac29f0907d0f36b443/morph/__init__.py#L44-L54",
+      "sourceRepo": "dwavesystems/dwave-cloud-client",
+      "sourceUrl": "https://github.com/dwavesystems/dwave-cloud-client/blob/df3221a8385dc0c04d7b4d84f740bf3ad6706230/dwave/cloud/coders.py#L144-L152",
       "supportedLanguages": [
         "Python"
       ],
@@ -956,19 +956,19 @@
           "solutions": [
             {
               "solutionId": "py-017-h",
-              "code": "def isseq(obj):\n  return \\\n    not isstr(obj) \\\n    and not isdict(obj) \\\n    and ( isinstance(obj, (list, tuple)) \\\n          or callable(getattr(obj, '__iter__', None)))",
+              "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    return struct.unpack('<' + ('i' * (len(binary) // 4)), binary)",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "metagriffin/morph",
-                "sourceUrl": "https://github.com/metagriffin/morph/blob/907f169b0155712c466d3aac29f0907d0f36b443/morph/__init__.py#L44-L54",
+                "sourceRepoOrAuthor": "dwavesystems/dwave-cloud-client",
+                "sourceUrl": "https://github.com/dwavesystems/dwave-cloud-client/blob/df3221a8385dc0c04d7b4d84f740bf3ad6706230/dwave/cloud/coders.py#L144-L152",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-017-ai",
-              "code": "def isseq(obj):\n    if isinstance(obj, (str, dict)):\n        return False\n    return isinstance(obj, (list, tuple)) or hasattr(obj, \"__iter__\")",
+              "code": "import base64\nimport struct\n\ndef decode_ints(message):\n    binary = base64.b64decode(message)\n    count = len(binary) // 4\n    return struct.unpack('<{}i'.format(count), binary)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1043,17 +1043,17 @@
     },
     {
       "id": "py-019",
-      "category": "String Processing",
-      "title": "Replace Substring Or Regex Match",
-      "summary": "Replace Substring Or Regex Match",
-      "paraphrasedPrompt": "Write a function `replace(text, old, new, count=None, strip=False)` that replaces `old` with `new` in `text`. `old` may either be a plain string or a compiled regular expression object; in either case use the appropriate replacement mechanism. If `count` is given, replace only that many occurrences; otherwise replace all occurrences. If `strip` is `True`, strip leading/trailing whitespace from the result afterward; if `strip` is a string, strip those specific characters instead.",
+      "category": "Data Structures",
+      "title": "Build Boolean Mask Array From Index Lists",
+      "summary": "Build Boolean Mask Array From Index Lists",
+      "paraphrasedPrompt": "Write a function `masks(list_of_index_lists, n)` that builds a 2D boolean array where each row is a length-`n` boolean mask. `list_of_index_lists` is a list of lists of indices; for each inner list, produce a length-`n` boolean array that is `True` at exactly the given indices and `False` elsewhere, and stack all of these rows into a single array.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "dakrauth/strutil",
-      "sourceUrl": "https://github.com/dakrauth/strutil/blob/c513645a919488d9b22ab612a539773bef866f10/strutil.py#L25-L43",
+      "sourceRepo": "theislab/scanpy",
+      "sourceUrl": "https://github.com/theislab/scanpy/blob/9e4e5ee02e04cf618872d9b098e24f0542e8b227/scanpy/utils.py#L786-L802",
       "supportedLanguages": [
         "Python"
       ],
@@ -1070,19 +1070,19 @@
           "solutions": [
             {
               "solutionId": "py-019-h",
-              "code": "def replace(text, old, new, count=None, strip=False):\n    if is_string(old):\n        text = text.replace(old, new, -1 if count is None else count)\n    else:\n        text = old.sub(new, text, 0 if count is None else count)\n\n    if strip:\n        text = text.strip(None if strip == True else strip)\n\n    return text",
+              "code": "def masks(list_of_index_lists, n):\n    for il,l in enumerate(list_of_index_lists):\n        mask = np.zeros(n,dtype=bool)\n        mask[l] = True\n        list_of_index_lists[il] = mask\n    masks = np.array(list_of_index_lists)\n    return masks",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "dakrauth/strutil",
-                "sourceUrl": "https://github.com/dakrauth/strutil/blob/c513645a919488d9b22ab612a539773bef866f10/strutil.py#L25-L43",
+                "sourceRepoOrAuthor": "theislab/scanpy",
+                "sourceUrl": "https://github.com/theislab/scanpy/blob/9e4e5ee02e04cf618872d9b098e24f0542e8b227/scanpy/utils.py#L786-L802",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-019-ai",
-              "code": "def replace(text, old, new, count=None, strip=False):\n    if isinstance(old, str):\n        text = text.replace(old, new, -1 if count is None else count)\n    else:\n        text = old.sub(new, text, count=0 if count is None else count)\n\n    if strip:\n        text = text.strip(None if strip is True else strip)\n\n    return text",
+              "code": "import numpy as np\n\ndef masks(list_of_index_lists, n):\n    result = []\n    for indices in list_of_index_lists:\n        mask = np.zeros(n, dtype=bool)\n        mask[indices] = True\n        result.append(mask)\n    return np.array(result)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1328,17 +1328,17 @@
     },
     {
       "id": "py-024",
-      "category": "Parsing & Conversion",
-      "title": "Parse SVG Transform String Into Matrix",
-      "summary": "Parse SVG Transform String Into Matrix",
-      "paraphrasedPrompt": "Write a function `parse_transform(transform_str)` that converts an SVG `transform` attribute string into a 3x3 homogeneous transformation matrix (as a numpy array). The string is a space/comma-separated sequence of one or more transform functions applied left to right, e.g. `'translate(10,20) rotate(45) scale(2)'`. Support at least `translate(tx[,ty])` (ty defaults to 0), `scale(sx[,sy])` (sy defaults to sx), `rotate(angle)` in degrees about the origin, `skewX(angle)`, `skewY(angle)`, and `matrix(a,b,c,d,e,f)`. Compose the individual matrices in the order they appear. If `transform_str` is empty or `None`, return the 3x3 identity matrix.",
+      "category": "Data Structures",
+      "title": "Find Return Target Index In Call Stack",
+      "summary": "Find Return Target Index In Call Stack",
+      "paraphrasedPrompt": "Write a function `find_return_target(stack, target)` that checks if `target` (a return address) exists in `stack`, a list of call-stack frame objects, each with a `ret_addr` attribute. Search from the start of `stack` (the most recent frame) and return the index of the first frame whose `ret_addr` equals `target`, or `None` if no frame matches.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "mathandy/svgpathtools",
-      "sourceUrl": "https://github.com/mathandy/svgpathtools/blob/fd7348a1dfd88b65ea61da02325c6605aedf8c4f/svgpathtools/parser.py#L287-L300",
+      "sourceRepo": "angr/angr",
+      "sourceUrl": "https://github.com/angr/angr/blob/4e2f97d56af5419ee73bdb30482c8dd8ff5f3e40/angr/state_plugins/callstack.py#L353-L366",
       "supportedLanguages": [
         "Python"
       ],
@@ -1355,19 +1355,19 @@
           "solutions": [
             {
               "solutionId": "py-024-h",
-              "code": "def parse_transform(transform_str):\n    if not transform_str:\n        return np.identity(3)\n    elif not isinstance(transform_str, str):\n        raise TypeError('Must provide a string to parse')\n\n    total_transform = np.identity(3)\n    transform_substrs = transform_str.split(')')[:-1]\n    for substr in transform_substrs:\n        total_transform = total_transform.dot(_parse_transform_substr(substr))\n\n    return total_transform",
+              "code": "def _find_return_target(self, target):\n        for i, frame in enumerate(self):\n            if frame.ret_addr == target:\n                return i\n        return None",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "mathandy/svgpathtools",
-                "sourceUrl": "https://github.com/mathandy/svgpathtools/blob/fd7348a1dfd88b65ea61da02325c6605aedf8c4f/svgpathtools/parser.py#L287-L300",
+                "sourceRepoOrAuthor": "angr/angr",
+                "sourceUrl": "https://github.com/angr/angr/blob/4e2f97d56af5419ee73bdb30482c8dd8ff5f3e40/angr/state_plugins/callstack.py#L353-L366",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-024-ai",
-              "code": "import re\nimport numpy as np\n\n\ndef _parse_transform_substr(substr):\n    name, _, args = substr.strip().partition(\"(\")\n    name = name.strip()\n    values = [float(v) for v in re.split(r\"[\\s,]+\", args.strip()) if v]\n\n    if name == \"translate\":\n        tx = values[0]\n        ty = values[1] if len(values) > 1 else 0.0\n        return np.array([[1, 0, tx], [0, 1, ty], [0, 0, 1]])\n    if name == \"scale\":\n        sx = values[0]\n        sy = values[1] if len(values) > 1 else sx\n        return np.array([[sx, 0, 0], [0, sy, 0], [0, 0, 1]])\n    if name == \"rotate\":\n        theta = np.radians(values[0])\n        c, s = np.cos(theta), np.sin(theta)\n        return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])\n    if name == \"skewX\":\n        return np.array([[1, np.tan(np.radians(values[0])), 0], [0, 1, 0], [0, 0, 1]])\n    if name == \"skewY\":\n        return np.array([[1, 0, 0], [np.tan(np.radians(values[0])), 1, 0], [0, 0, 1]])\n    if name == \"matrix\":\n        a, b, c, d, e, f = values\n        return np.array([[a, c, e], [b, d, f], [0, 0, 1]])\n    raise ValueError(\"Unsupported transform: %s\" % name)\n\n\ndef parse_transform(transform_str):\n    if not transform_str:\n        return np.identity(3)\n    if not isinstance(transform_str, str):\n        raise TypeError(\"Must provide a string to parse\")\n\n    total_transform = np.identity(3)\n    for substr in transform_str.split(\")\")[:-1]:\n        total_transform = total_transform.dot(_parse_transform_substr(substr))\n    return total_transform",
+              "code": "def find_return_target(stack, target):\n    for index, frame in enumerate(stack):\n        if frame.ret_addr == target:\n            return index\n    return None",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1385,17 +1385,17 @@
     },
     {
       "id": "py-025",
-      "category": "Date & Time",
-      "title": "Round Datetime To Nearest Interval",
-      "summary": "Round Datetime To Nearest Interval",
-      "paraphrasedPrompt": "Write a function `roundTime(dt=None, roundTo=1)` that rounds a `datetime.datetime` object to the nearest multiple of `roundTo` seconds. If `dt` is not given, use the current time. Return a new `datetime` object at the rounded time (do not mutate the input).",
+      "category": "Data Structures",
+      "title": "Decode Encoded Centroids Using Label Mappings",
+      "summary": "Decode Encoded Centroids Using Label Mappings",
+      "paraphrasedPrompt": "Write a function `decode_centroids(encoded, mapping)` that decodes an encoded 2D centroids array back into its original data labels. `encoded` is a 2D numpy array where `encoded[:, col]` holds integer-encoded values for feature `col`. `mapping` is a list of dicts (one per column), where `mapping[col]` maps an original label to its integer code. Return a 2D array of the same shape as `encoded`, with every encoded value replaced by its original label (i.e., invert each column's mapping and apply it element-wise).",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "Kortemme-Lab/klab",
-      "sourceUrl": "https://github.com/Kortemme-Lab/klab/blob/6d410ad08f1bd9f7cbbb28d7d946e94fbaaa2b6b/klab/cluster_template/template-2.py#L92-L103",
+      "sourceRepo": "nicodv/kmodes",
+      "sourceUrl": "https://github.com/nicodv/kmodes/blob/cdb19fe5448aba1bf501626694bb52e68eafab45/kmodes/util/__init__.py#L54-L63",
       "supportedLanguages": [
         "Python"
       ],
@@ -1412,19 +1412,19 @@
           "solutions": [
             {
               "solutionId": "py-025-h",
-              "code": "def roundTime(dt=None, roundTo=1):\n    if dt == None : dt = datetime.now()\n    seconds = total_seconds(dt - dt.min)\n    rounding = (seconds+roundTo/2) // roundTo * roundTo\n    return dt + timedelta(0,rounding-seconds,-dt.microsecond)",
+              "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for ii in range(encoded.shape[1]):\n        inv_mapping = {v: k for k, v in mapping[ii].items()}\n        decoded.append(np.vectorize(inv_mapping.__getitem__)(encoded[:, ii]))\n    return np.atleast_2d(np.array(decoded)).T",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "Kortemme-Lab/klab",
-                "sourceUrl": "https://github.com/Kortemme-Lab/klab/blob/6d410ad08f1bd9f7cbbb28d7d946e94fbaaa2b6b/klab/cluster_template/template-2.py#L92-L103",
+                "sourceRepoOrAuthor": "nicodv/kmodes",
+                "sourceUrl": "https://github.com/nicodv/kmodes/blob/cdb19fe5448aba1bf501626694bb52e68eafab45/kmodes/util/__init__.py#L54-L63",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-025-ai",
-              "code": "from datetime import datetime, timedelta\n\ndef roundTime(dt=None, roundTo=1):\n    if dt is None:\n        dt = datetime.now()\n    seconds = (dt - dt.min).total_seconds()\n    rounding = (seconds + roundTo / 2) // roundTo * roundTo\n    return dt + timedelta(seconds=rounding - seconds, microseconds=-dt.microsecond)",
+              "code": "import numpy as np\n\ndef decode_centroids(encoded, mapping):\n    decoded = []\n    for col in range(encoded.shape[1]):\n        inverse = {code: label for label, code in mapping[col].items()}\n        decoded.append([inverse[value] for value in encoded[:, col]])\n    return np.array(decoded).T",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1614,16 +1614,16 @@
     {
       "id": "py-029",
       "category": "Math & Numeric",
-      "title": "Compare Two Matrices For Approximate Equality",
-      "summary": "Compare Two Matrices For Approximate Equality",
-      "paraphrasedPrompt": "Write a function `compare_matrix(mat1, mat2, rel_tol)` that compares two matrices, given as nested lists of floats (or strings convertible to floats), for approximate equality. Return `True` only if both matrices have the same dimensions and every corresponding pair of values is within relative tolerance `rel_tol` of each other; otherwise return `False`.",
+      "title": "Transpose And Average Collected Stats",
+      "summary": "Transpose And Average Collected Stats",
+      "paraphrasedPrompt": "Write a function `iostats_dict(header, stats)` that transposes collected I/O statistics and averages them. `stats` is a list of samples, where each sample is a list of `decimal.Decimal` readings (one per header, in the same order as `header`). Group the readings by position (i.e., by header) across all samples, average each group, round to 2 decimal places, and return a dict mapping each entry of `header` to its rounded average `float` value.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "MolSSI-BSE/basis_set_exchange",
-      "sourceUrl": "https://github.com/MolSSI-BSE/basis_set_exchange/blob/e79110aaeb65f392ed5032420322dee3336948f7/basis_set_exchange/curate/compare.py#L93-L111",
+      "sourceRepo": "saltstack/salt",
+      "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/modules/disk.py#L796-L804",
       "supportedLanguages": [
         "Python"
       ],
@@ -1640,19 +1640,19 @@
           "solutions": [
             {
               "solutionId": "py-029-h",
-              "code": "def compare_matrix(mat1, mat2, rel_tol):\n    length = len(mat1)\n    if len(mat2) != length:\n        return False\n\n    for i in range(length):\n        if compare_vector(mat1[i], mat2[i], rel_tol) is False:\n            return False\n\n    return True",
+              "code": "def iostats_dict(header, stats):\n    stats = [float((sum(stat) / len(stat)).quantize(decimal.Decimal('.01'))) for stat in zip(*stats)]\n    stats = dict(zip(header, stats))\n    return stats",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "MolSSI-BSE/basis_set_exchange",
-                "sourceUrl": "https://github.com/MolSSI-BSE/basis_set_exchange/blob/e79110aaeb65f392ed5032420322dee3336948f7/basis_set_exchange/curate/compare.py#L93-L111",
+                "sourceRepoOrAuthor": "saltstack/salt",
+                "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/modules/disk.py#L796-L804",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-029-ai",
-              "code": "def _compare_vector(vec1, vec2, rel_tol):\n    if len(vec1) != len(vec2):\n        return False\n    for a, b in zip(vec1, vec2):\n        a, b = float(a), float(b)\n        if abs(a - b) > rel_tol * max(abs(a), abs(b), 1e-12):\n            return False\n    return True\n\n\ndef compare_matrix(mat1, mat2, rel_tol):\n    if len(mat1) != len(mat2):\n        return False\n    return all(_compare_vector(row1, row2, rel_tol) for row1, row2 in zip(mat1, mat2))",
+              "code": "import decimal\n\ndef iostats_dict(header, stats):\n    averaged = []\n    for column in zip(*stats):\n        avg = sum(column) / len(column)\n        averaged.append(float(avg.quantize(decimal.Decimal('0.01'))))\n    return dict(zip(header, averaged))",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1955,17 +1955,17 @@
     },
     {
       "id": "java-005",
-      "category": "Encoding & Checksums",
-      "title": "Decode Hex Characters Into Bytes",
-      "summary": "Decode Hex Characters Into Bytes",
-      "paraphrasedPrompt": "Write a method `convertFromHex(char[] toConvert)` that decodes a hex-encoded character array back into raw bytes: each consecutive pair of hex characters becomes one byte. Throw an `IllegalArgumentException` if the input length is odd.",
+      "category": "Data Structures",
+      "title": "Count Children Of A Parent In Dependency Tree",
+      "summary": "Count Children Of A Parent In Dependency Tree",
+      "paraphrasedPrompt": "Write a method `countChildrenOf(int[] parents, int parent)` that counts the number of children in a dependency tree for the given parent index. `parents` is an array where `parents[i]` contains the index of the parent of the word at position `i`. Return the number of positions `i` for which `parents[i] == parent`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "undertow-io/undertow",
-      "sourceUrl": "https://github.com/undertow-io/undertow/blob/87de0b856a7a4ba8faf5b659537b9af07b763263/core/src/main/java/io/undertow/util/HexConverter.java#L89-L102",
+      "sourceRepo": "mgormley/pacaya",
+      "sourceUrl": "https://github.com/mgormley/pacaya/blob/786294cbac7cc65dbc32210c10acc32ed0c69233/src/main/java/edu/jhu/pacaya/parse/dep/ParentsArray.java#L184-L192",
       "supportedLanguages": [
         "Java"
       ],
@@ -1982,19 +1982,19 @@
           "solutions": [
             {
               "solutionId": "java-005-h",
-              "code": "public static byte[] convertFromHex(final char[] toConvert) {\n        if (toConvert.length % 2 != 0) {\n            throw new IllegalArgumentException(\"The supplied character array must contain an even number of hex chars.\");\n        }\n\n        byte[] response = new byte[toConvert.length / 2];\n\n        for (int i = 0; i < response.length; i++) {\n            int posOne = i * 2;\n            response[i] =   (byte)(toByte(toConvert, posOne) << 4 | toByte(toConvert, posOne+1));\n        }\n\n        return response;\n    }",
+              "code": "public static int countChildrenOf(int[] parents, int parent) {\n        int count = 0;\n        for (int i=0; i<parents.length; i++) {\n            if (parents[i] == parent) {\n                count++;\n            }\n        }\n        return count;\n    }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "undertow-io/undertow",
-                "sourceUrl": "https://github.com/undertow-io/undertow/blob/87de0b856a7a4ba8faf5b659537b9af07b763263/core/src/main/java/io/undertow/util/HexConverter.java#L89-L102",
+                "sourceRepoOrAuthor": "mgormley/pacaya",
+                "sourceUrl": "https://github.com/mgormley/pacaya/blob/786294cbac7cc65dbc32210c10acc32ed0c69233/src/main/java/edu/jhu/pacaya/parse/dep/ParentsArray.java#L184-L192",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-005-ai",
-              "code": "public static byte[] convertFromHex(char[] toConvert) {\n    if (toConvert.length % 2 != 0) {\n        throw new IllegalArgumentException(\"The supplied character array must contain an even number of hex chars.\");\n    }\n\n    byte[] result = new byte[toConvert.length / 2];\n    for (int i = 0; i < result.length; i++) {\n        int hi = Character.digit(toConvert[i * 2], 16);\n        int lo = Character.digit(toConvert[i * 2 + 1], 16);\n        result[i] = (byte) ((hi << 4) | lo);\n    }\n    return result;\n}",
+              "code": "public static int countChildrenOf(int[] parents, int parent) {\n    int count = 0;\n    for (int p : parents) {\n        if (p == parent) {\n            count++;\n        }\n    }\n    return count;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2126,17 +2126,17 @@
     },
     {
       "id": "java-008",
-      "category": "Parsing & Conversion",
-      "title": "Null-Safe Compare Version Against Range",
-      "summary": "Null-Safe Compare Version Against Range",
-      "paraphrasedPrompt": "Write a method `compareVersionToRange(Version version, Version minVersion, Version maxVersion)` that null-safely compares `version` against the range `[minVersion, maxVersion)`. `minVersion` and/or `maxVersion` may be `null`, meaning that side of the range is unbounded. Return a negative number if `version` is `null` or below `minVersion`; a positive number if `version` is greater than or equal to `maxVersion`; and `0` if `version` falls within the range.",
+      "category": "Data Structures",
+      "title": "Compute Checkpointed Sequence And Garbage-Collect",
+      "summary": "Compute Checkpointed Sequence And Garbage-Collect",
+      "paraphrasedPrompt": "Write a method `getCheckpointedSequence()` on a class that tracks a sequence of removable values, with these existing instance fields: `lastSequence` (a `long`, the last sequence number ever added), `sequences` (a `TreeSet<Long>` of sequence numbers for values not yet garbage-collected), `firstValueSequence` (a `long`, the sequence number corresponding to `values.get(0)`), and `values` (a `List` in sequence order starting at `firstValueSequence`). The method must return the maximum consecutively-removed sequence number: if `sequences` is empty that's `lastSequence`, otherwise it's `sequences.first() - 1` (one less than the smallest still-pending sequence number). Before returning, garbage-collect: remove entries from the front of `values` for every sequence number up through the checkpoint, and advance `firstValueSequence` by however many were removed.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "sarl/sarl",
-      "sourceUrl": "https://github.com/sarl/sarl/blob/ca00ff994598c730339972def4e19a60e0b8cace/main/coreplugins/io.sarl.eclipse/src/io/sarl/eclipse/util/Utilities.java#L85-L97",
+      "sourceRepo": "couchbase/couchbase-lite-java-core",
+      "sourceUrl": "https://github.com/couchbase/couchbase-lite-java-core/blob/3b275642e2d2f231fd155ad9def9c5e9eff3118e/src/main/java/com/couchbase/lite/support/SequenceMap.java#L67-L83",
       "supportedLanguages": [
         "Java"
       ],
@@ -2153,19 +2153,19 @@
           "solutions": [
             {
               "solutionId": "java-008-h",
-              "code": "public static int compareVersionToRange(Version version, Version minVersion, Version maxVersion) {\n\t\tassert minVersion == null || maxVersion == null || minVersion.compareTo(maxVersion) < 0;\n\t\tif (version == null) {\n\t\t\treturn Integer.MIN_VALUE;\n\t\t}\n\t\tif (minVersion != null && compareVersionsNoQualifier(version, minVersion) < 0) {\n\t\t\treturn -1;\n\t\t}\n\t\tif (maxVersion != null && compareVersionsNoQualifier(version, maxVersion) >= 0) {\n\t\t\treturn 1;\n\t\t}\n\t\treturn 0;\n\t}",
+              "code": "public synchronized long getCheckpointedSequence() {\n\t\tlong sequence = lastSequence;\n\t\tif(!sequences.isEmpty()) {\n\t\t\tsequence = sequences.first() - 1;\n\t\t}\n\n\t\tif(sequence > firstValueSequence) {\n\t\t\tint numToRemove = (int)(sequence - firstValueSequence);\n\t\t\tfor(int i = 0; i < numToRemove; i++) {\n\t\t\t\tvalues.remove(0);\n\t\t\t}\n\t\t\tfirstValueSequence += numToRemove;\n\t\t}\n\n\t\treturn sequence;\n\t}",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "sarl/sarl",
-                "sourceUrl": "https://github.com/sarl/sarl/blob/ca00ff994598c730339972def4e19a60e0b8cace/main/coreplugins/io.sarl.eclipse/src/io/sarl/eclipse/util/Utilities.java#L85-L97",
+                "sourceRepoOrAuthor": "couchbase/couchbase-lite-java-core",
+                "sourceUrl": "https://github.com/couchbase/couchbase-lite-java-core/blob/3b275642e2d2f231fd155ad9def9c5e9eff3118e/src/main/java/com/couchbase/lite/support/SequenceMap.java#L67-L83",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-008-ai",
-              "code": "public static int compareVersionToRange(Version version, Version minVersion, Version maxVersion) {\n    if (version == null) {\n        return Integer.MIN_VALUE;\n    }\n    if (minVersion != null && version.compareTo(minVersion) < 0) {\n        return -1;\n    }\n    if (maxVersion != null && version.compareTo(maxVersion) >= 0) {\n        return 1;\n    }\n    return 0;\n}",
+              "code": "public synchronized long getCheckpointedSequence() {\n    long checkpoint = sequences.isEmpty() ? lastSequence : sequences.first() - 1;\n\n    int numToRemove = (int) Math.max(0, checkpoint - firstValueSequence);\n    for (int i = 0; i < numToRemove; i++) {\n        values.remove(0);\n    }\n    firstValueSequence += numToRemove;\n\n    return checkpoint;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2241,16 +2241,16 @@
     {
       "id": "java-010",
       "category": "Data Structures",
-      "title": "Find Element Index Within A Range",
-      "summary": "Find Element Index Within A Range",
-      "paraphrasedPrompt": "Write a method `indexOfFromTo(Object element, int from, int to, boolean testForEquality)` on a class backed by an `Object[] elements` field of length `size`, that returns the index of the first occurrence of `element` searching from index `from` to `to` inclusive, or `-1` if not found. If `testForEquality` is `true` and `element` is not `null`, compare using `.equals(...)`; otherwise compare using reference identity (`==`).",
+      "title": "Wrap Map Values Into Singleton Lists",
+      "summary": "Wrap Map Values Into Singleton Lists",
+      "paraphrasedPrompt": "Write a method `toMultivaluedMap(Map<String, Object> seed)` that converts a `Map<String, Object>` into a `Map<String, List<Object>>` by wrapping each value in a single-element, read-only list. Throw a `NullPointerException` if `seed` is `null`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "wellner/jcarafe",
-      "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/list/ObjectArrayList.java#L441-L458",
+      "sourceRepo": "apereo/person-directory",
+      "sourceUrl": "https://github.com/apereo/person-directory/blob/331200c0878aec202b8aff12a732402d6ba7681f/person-directory-impl/src/main/java/org/apereo/services/persondir/support/MultivaluedPersonAttributeUtils.java#L192-L202",
       "supportedLanguages": [
         "Java"
       ],
@@ -2267,19 +2267,19 @@
           "solutions": [
             {
               "solutionId": "java-010-h",
-              "code": "public int indexOfFromTo(Object element, int from, int to, boolean testForEquality) {\n\tif (size==0) return -1;\n\tcheckRangeFromTo(from, to, size);\n\n\tObject[] theElements = elements;\n\tif (testForEquality && element!=null) {\n\t\tfor (int i = from ; i <= to; i++) {\n\t\t    if (element.equals(theElements[i])) {return i;}\n\t\t}\n\n\t}\n\telse {\n\t\tfor (int i = from ; i <= to; i++) {\n\t\t    if (element==theElements[i]) {return i;}\n\t\t}\n\t}\n\treturn -1;\n}",
+              "code": "public static Map<String, List<Object>> toMultivaluedMap(final Map<String, Object> seed) {\n        Validate.notNull(seed, \"seed can not be null\");\n\n        final Map<String, List<Object>> multiSeed = new LinkedHashMap<>(seed.size());\n        for (final Map.Entry<String, Object> seedEntry : seed.entrySet()) {\n            final String seedName = seedEntry.getKey();\n            final Object seedValue = seedEntry.getValue();\n            multiSeed.put(seedName, Collections.singletonList(seedValue));\n        }\n        return multiSeed;\n    }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "wellner/jcarafe",
-                "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/list/ObjectArrayList.java#L441-L458",
+                "sourceRepoOrAuthor": "apereo/person-directory",
+                "sourceUrl": "https://github.com/apereo/person-directory/blob/331200c0878aec202b8aff12a732402d6ba7681f/person-directory-impl/src/main/java/org/apereo/services/persondir/support/MultivaluedPersonAttributeUtils.java#L192-L202",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-010-ai",
-              "code": "public int indexOfFromTo(Object element, int from, int to, boolean testForEquality) {\n    if (size == 0) {\n        return -1;\n    }\n    for (int i = from; i <= to; i++) {\n        boolean match = (testForEquality && element != null)\n                ? element.equals(elements[i])\n                : element == elements[i];\n        if (match) {\n            return i;\n        }\n    }\n    return -1;\n}",
+              "code": "public static Map<String, List<Object>> toMultivaluedMap(Map<String, Object> seed) {\n    if (seed == null) {\n        throw new NullPointerException(\"seed can not be null\");\n    }\n    Map<String, List<Object>> result = new LinkedHashMap<>();\n    for (Map.Entry<String, Object> entry : seed.entrySet()) {\n        result.put(entry.getKey(), Collections.singletonList(entry.getValue()));\n    }\n    return result;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2298,16 +2298,16 @@
     {
       "id": "java-011",
       "category": "Data Structures",
-      "title": "Replace A Range Of Array Elements",
-      "summary": "Replace A Range Of Array Elements",
-      "paraphrasedPrompt": "Write a method `replaceFromToWithFrom(int from, int to, AbstractDoubleList other, int otherFrom)` on a class backed by a `double[] elements` field, that replaces the elements of the receiver between index `from` (inclusive) and `to` (inclusive) with elements copied from `other` (also backed by a `double[] elements` field), starting at index `otherFrom` in `other`. If `to < from` there is nothing to replace and the array should be left unchanged.",
+      "title": "Filter Map Values By Key List",
+      "summary": "Filter Map Values By Key List",
+      "paraphrasedPrompt": "Write a method `filterMapToList(Map<String, ?> map, String[] nameMapping)` that returns a `List<Object>` of all the values in `map` whose key matches an entry in `nameMapping`, in the same order as `nameMapping` (so the result has one entry per name, possibly `null` if the key isn't present in `map`). Throw a `NullPointerException` if either `map` or `nameMapping` is `null`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "wellner/jcarafe",
-      "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/list/DoubleArrayList.java#L347-L360",
+      "sourceRepo": "super-csv/super-csv",
+      "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L159-L171",
       "supportedLanguages": [
         "Java"
       ],
@@ -2324,19 +2324,19 @@
           "solutions": [
             {
               "solutionId": "java-011-h",
-              "code": "public void replaceFromToWithFrom(int from, int to, AbstractDoubleList other, int otherFrom) {\n\tif (! (other instanceof DoubleArrayList)) {\n\t\tsuper.replaceFromToWithFrom(from,to,other,otherFrom);\n\t\treturn;\n\t}\n\tint length=to-from+1;\n\tif (length>0) {\n\t\tcheckRangeFromTo(from, to, size());\n\t\tcheckRangeFromTo(otherFrom,otherFrom+length-1,other.size());\n\t\tSystem.arraycopy(((DoubleArrayList) other).elements, otherFrom, elements, from, length);\n\t}\n}",
+              "code": "public static List<Object> filterMapToList(final Map<String, ?> map, final String[] nameMapping) {\n\t\tif( map == null ) {\n\t\t\tthrow new NullPointerException(\"map should not be null\");\n\t\t} else if( nameMapping == null ) {\n\t\t\tthrow new NullPointerException(\"nameMapping should not be null\");\n\t\t}\n\n\t\tfinal List<Object> result = new ArrayList<Object>(nameMapping.length);\n\t\tfor( final String key : nameMapping ) {\n\t\t\tresult.add(map.get(key));\n\t\t}\n\t\treturn result;\n\t}",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "wellner/jcarafe",
-                "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/list/DoubleArrayList.java#L347-L360",
+                "sourceRepoOrAuthor": "super-csv/super-csv",
+                "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L159-L171",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-011-ai",
-              "code": "public void replaceFromToWithFrom(int from, int to, DoubleArrayList other, int otherFrom) {\n    int length = to - from + 1;\n    if (length > 0) {\n        System.arraycopy(other.elements, otherFrom, elements, from, length);\n    }\n}",
+              "code": "public static List<Object> filterMapToList(Map<String, ?> map, String[] nameMapping) {\n    if (map == null) {\n        throw new NullPointerException(\"map should not be null\");\n    }\n    if (nameMapping == null) {\n        throw new NullPointerException(\"nameMapping should not be null\");\n    }\n    List<Object> result = new ArrayList<>();\n    for (String key : nameMapping) {\n        result.add(map.get(key));\n    }\n    return result;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2525,17 +2525,17 @@
     },
     {
       "id": "java-015",
-      "category": "Date & Time",
-      "title": "Parse Timecode String To Nanoseconds",
-      "summary": "Parse Timecode String To Nanoseconds",
-      "paraphrasedPrompt": "Write a method `fromTimecode(String time)` that parses a timecode string in the format `\"hour:minute:second\"` (where `second` may be a decimal number, e.g. `\"01:02:03.5\"`) and returns the total duration in nanoseconds. Throw an `IllegalArgumentException` if the string doesn't match that format or is empty.",
+      "category": "Math & Numeric",
+      "title": "Compute Trace Of A Sparse Matrix",
+      "summary": "Compute Trace Of A Sparse Matrix",
+      "paraphrasedPrompt": "Write a method `trace(DMatrixSparseCSC A)` that computes the trace of a sparse matrix stored in compressed sparse column (CSC) format: `trace = sum(A[i][i] for i in 0..n)` where `n = min(A.numRows, A.numCols)`. The matrix exposes these fields: `numRows`, `numCols`, `col_idx` (an `int[]` of length `numCols + 1`, where nonzero entries of column `c` occupy indices `[col_idx[c], col_idx[c+1])` in the parallel arrays below), `nz_rows` (an `int[]` of row indices for each nonzero entry), and `nz_values` (a `double[]` of the corresponding nonzero values).",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "bramp/ffmpeg-cli-wrapper",
-      "sourceUrl": "https://github.com/bramp/ffmpeg-cli-wrapper/blob/3819b155edf9132acc75bb6af66dcef1b98c64b2/src/main/java/net/bramp/ffmpeg/FFmpegUtils.java#L80-L92",
+      "sourceRepo": "lessthanoptimal/ejml",
+      "sourceUrl": "https://github.com/lessthanoptimal/ejml/blob/1444680cc487af5e866730e62f48f5f9636850d9/main/ejml-dsparse/src/org/ejml/sparse/csc/CommonOps_DSCC.java#L1818-L1835",
       "supportedLanguages": [
         "Java"
       ],
@@ -2552,19 +2552,19 @@
           "solutions": [
             {
               "solutionId": "java-015-h",
-              "code": "public static long fromTimecode(String time) {\n    checkNotEmpty(time, \"time must not be empty string\");\n    Matcher m = TIME_REGEX.matcher(time);\n    if (!m.find()) {\n      throw new IllegalArgumentException(\"invalid time '\" + time + \"'\");\n    }\n\n    long hours = Long.parseLong(m.group(1));\n    long mins = Long.parseLong(m.group(2));\n    double secs = Double.parseDouble(m.group(3));\n\n    return HOURS.toNanos(hours) + MINUTES.toNanos(mins) + (long) (SECONDS.toNanos(1) * secs);\n  }",
+              "code": "public static double trace( DMatrixSparseCSC A ) {\n        double output = 0;\n\n        int o = Math.min(A.numCols,A.numRows);\n        for (int col = 0; col < o; col++) {\n            int idx0 = A.col_idx[col];\n            int idx1 = A.col_idx[col+1];\n\n            for (int i = idx0; i < idx1; i++) {\n                if( A.nz_rows[i] == col ) {\n                    output += A.nz_values[i];\n                    break;\n                }\n            }\n        }\n\n        return output;\n    }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "bramp/ffmpeg-cli-wrapper",
-                "sourceUrl": "https://github.com/bramp/ffmpeg-cli-wrapper/blob/3819b155edf9132acc75bb6af66dcef1b98c64b2/src/main/java/net/bramp/ffmpeg/FFmpegUtils.java#L80-L92",
+                "sourceRepoOrAuthor": "lessthanoptimal/ejml",
+                "sourceUrl": "https://github.com/lessthanoptimal/ejml/blob/1444680cc487af5e866730e62f48f5f9636850d9/main/ejml-dsparse/src/org/ejml/sparse/csc/CommonOps_DSCC.java#L1818-L1835",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-015-ai",
-              "code": "private static final Pattern TIME_REGEX = Pattern.compile(\"^(\\\\d+):(\\\\d{2}):(\\\\d{2}(?:\\\\.\\\\d+)?)$\");\n\npublic static long fromTimecode(String time) {\n    if (time == null || time.isEmpty()) {\n        throw new IllegalArgumentException(\"time must not be empty string\");\n    }\n    Matcher matcher = TIME_REGEX.matcher(time);\n    if (!matcher.matches()) {\n        throw new IllegalArgumentException(\"invalid time '\" + time + \"'\");\n    }\n\n    long hours = Long.parseLong(matcher.group(1));\n    long minutes = Long.parseLong(matcher.group(2));\n    double seconds = Double.parseDouble(matcher.group(3));\n\n    return TimeUnit.HOURS.toNanos(hours)\n            + TimeUnit.MINUTES.toNanos(minutes)\n            + (long) (TimeUnit.SECONDS.toNanos(1) * seconds);\n}",
+              "code": "public static double trace(DMatrixSparseCSC A) {\n    int n = Math.min(A.numRows, A.numCols);\n    double sum = 0;\n    for (int col = 0; col < n; col++) {\n        for (int i = A.col_idx[col]; i < A.col_idx[col + 1]; i++) {\n            if (A.nz_rows[i] == col) {\n                sum += A.nz_values[i];\n                break;\n            }\n        }\n    }\n    return sum;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2811,16 +2811,16 @@
     {
       "id": "java-020",
       "category": "Data Structures",
-      "title": "Remove Duplicates And Sort String Array",
-      "summary": "Remove Duplicates And Sort String Array",
-      "paraphrasedPrompt": "Write a method `removeDuplicateStrings(String[] array)` that removes duplicate strings from an array and returns the remaining strings in natural sort order. If `array` is `null` or empty, return it unchanged.",
+      "title": "Transform Each Element Of A Multiset",
+      "summary": "Transform Each Element Of A Multiset",
+      "paraphrasedPrompt": "Write a generic method `<A, B> ImmutableMultiset<B> transformedCopy(Multiset<A> ms, Function<A, B> func)` that returns a new `Multiset` (Guava's collection type that tracks a count per distinct element) resulting from applying `func` to each distinct element of `ms`, preserving each element's count. If two or more elements are mapped to the same value by `func`, their counts should be summed in the result.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "mcxiaoke/Android-Next",
-      "sourceUrl": "https://github.com/mcxiaoke/Android-Next/blob/1bfdf99d0b81a849aa0fa6697c53ed673151ca39/core/src/main/java/com/mcxiaoke/next/utils/StringUtils.java#L1022-L1029",
+      "sourceRepo": "BBN-E/bue-common-open",
+      "sourceUrl": "https://github.com/BBN-E/bue-common-open/blob/d618652674d647867306e2e4b987a21b7c29c015/common-core-open/src/main/java/com/bbn/bue/common/collections/CollectionUtils.java#L91-L101",
       "supportedLanguages": [
         "Java"
       ],
@@ -2837,19 +2837,19 @@
           "solutions": [
             {
               "solutionId": "java-020-h",
-              "code": "public static String[] removeDuplicateStrings(String[] array) {\n        if (isEmpty(array)) {\n            return array;\n        }\n        Set<String> set = new TreeSet<String>();\n        Collections.addAll(set, array);\n        return toStringArray(set);\n    }",
+              "code": "public static <A, B> ImmutableMultiset<B> transformedCopy(Multiset<A> ms,\n      Function<A, B> func) {\n    final ImmutableMultiset.Builder<B> ret = ImmutableMultiset.builder();\n\n    for (final Multiset.Entry<A> entry : ms.entrySet()) {\n      final B transformedElement = func.apply(entry.getElement());\n      ret.addCopies(transformedElement, entry.getCount());\n    }\n\n    return ret.build();\n  }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "mcxiaoke/Android-Next",
-                "sourceUrl": "https://github.com/mcxiaoke/Android-Next/blob/1bfdf99d0b81a849aa0fa6697c53ed673151ca39/core/src/main/java/com/mcxiaoke/next/utils/StringUtils.java#L1022-L1029",
+                "sourceRepoOrAuthor": "BBN-E/bue-common-open",
+                "sourceUrl": "https://github.com/BBN-E/bue-common-open/blob/d618652674d647867306e2e4b987a21b7c29c015/common-core-open/src/main/java/com/bbn/bue/common/collections/CollectionUtils.java#L91-L101",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-020-ai",
-              "code": "public static String[] removeDuplicateStrings(String[] array) {\n    if (array == null || array.length == 0) {\n        return array;\n    }\n    TreeSet<String> unique = new TreeSet<>(Arrays.asList(array));\n    return unique.toArray(new String[0]);\n}",
+              "code": "public static <A, B> ImmutableMultiset<B> transformedCopy(Multiset<A> ms, Function<A, B> func) {\n    ImmutableMultiset.Builder<B> builder = ImmutableMultiset.builder();\n    for (Multiset.Entry<A> entry : ms.entrySet()) {\n        builder.addCopies(func.apply(entry.getElement()), entry.getCount());\n    }\n    return builder.build();\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2867,17 +2867,17 @@
     },
     {
       "id": "java-021",
-      "category": "Data Structures",
-      "title": "Check Element Absence In Varargs Array",
-      "summary": "Check Element Absence In Varargs Array",
-      "paraphrasedPrompt": "Write a generic method `<T> boolean elementIsNotContainedInArray(T element, T... values)` that returns `true` if `element` and `values` are both non-null and `values` does not contain `element`. Return `false` if either `element` or `values` is `null`, or if `values` does contain `element`.",
+      "category": "Math & Numeric",
+      "title": "Cubic Interpolation From Function And Derivative",
+      "summary": "Cubic Interpolation From Function And Derivative",
+      "paraphrasedPrompt": "Write a method `cubic2(double f0, double g0, double x0, double f1, double g1, double x1)` that performs cubic interpolation using the function value and derivative computed at two different points `(x0, f0, g0)` and `(x1, f1, g1)`, and returns the interpolated minimizer location. Use this formula (a numerically stable variant from the MINPACK-2 line-search routines): `theta = 3*(f0-f1)/(x1-x0) + g0 + g1`; `s = max(|theta|, |g0|, |g1|)`; `gamma = s * sqrt((theta/s)^2 - (g0/s)*(g1/s))`, negated if `x1 < x0`; `p = (gamma - g0) + theta`; `q = (gamma - g0) + gamma + g1`; and the result is `x0 + (p/q) * (x1 - x0)`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "camunda/camunda-bpm-platform",
-      "sourceUrl": "https://github.com/camunda/camunda-bpm-platform/blob/1a464fc887ef3760e53d6f91b9e5b871a0d77cc0/engine/src/main/java/org/camunda/bpm/engine/impl/util/CompareUtil.java#L103-L110",
+      "sourceRepo": "lessthanoptimal/ddogleg",
+      "sourceUrl": "https://github.com/lessthanoptimal/ddogleg/blob/3786bf448ba23d0e04962dd08c34fa68de276029/src/org/ddogleg/optimization/quasinewton/SearchInterpolate.java#L134-L147",
       "supportedLanguages": [
         "Java"
       ],
@@ -2894,19 +2894,19 @@
           "solutions": [
             {
               "solutionId": "java-021-h",
-              "code": "public static <T> boolean elementIsNotContainedInArray(T element, T... values) {\n    if (element != null && values != null) {\n      return elementIsNotContainedInList(element, Arrays.asList(values));\n    }\n    else {\n      return false;\n    }\n  }",
+              "code": "public static double cubic2( double f0 , double g0 , double x0 ,\n\t\t\t\t\t\t\t\t double f1 , double g1 , double x1 )\n\t{\n\t\tdouble theta = 3.0*(f0-f1)/(x1-x0) + g0 + g1;\n\t\tdouble s = Math.max(Math.abs(theta),Math.abs(g0));\n\t\ts= Math.max(s,Math.abs(g1));\n\t\tdouble gamma = s*Math.sqrt((theta/s)*(theta/s) - (g0/s)*(g1/s));\n\t\tif( x1 < x0 )\n\t\t\tgamma = -gamma;\n\t\tdouble p = (gamma-g0) + theta;\n\t\tdouble q = ((gamma-g0)+gamma) + g1;\n\n\t\treturn x0 + (p/q)*(x1-x0);\n\t}",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "camunda/camunda-bpm-platform",
-                "sourceUrl": "https://github.com/camunda/camunda-bpm-platform/blob/1a464fc887ef3760e53d6f91b9e5b871a0d77cc0/engine/src/main/java/org/camunda/bpm/engine/impl/util/CompareUtil.java#L103-L110",
+                "sourceRepoOrAuthor": "lessthanoptimal/ddogleg",
+                "sourceUrl": "https://github.com/lessthanoptimal/ddogleg/blob/3786bf448ba23d0e04962dd08c34fa68de276029/src/org/ddogleg/optimization/quasinewton/SearchInterpolate.java#L134-L147",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-021-ai",
-              "code": "public static <T> boolean elementIsNotContainedInArray(T element, T... values) {\n    if (element == null || values == null) {\n        return false;\n    }\n    return !Arrays.asList(values).contains(element);\n}",
+              "code": "public static double cubic2(double f0, double g0, double x0, double f1, double g1, double x1) {\n    double theta = 3.0 * (f0 - f1) / (x1 - x0) + g0 + g1;\n    double s = Math.max(Math.abs(theta), Math.max(Math.abs(g0), Math.abs(g1)));\n    double gamma = s * Math.sqrt((theta / s) * (theta / s) - (g0 / s) * (g1 / s));\n    if (x1 < x0) {\n        gamma = -gamma;\n    }\n    double p = (gamma - g0) + theta;\n    double q = (gamma - g0) + gamma + g1;\n    return x0 + (p / q) * (x1 - x0);\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3095,17 +3095,17 @@
     },
     {
       "id": "java-025",
-      "category": "Parsing & Conversion",
-      "title": "Coerce JSON Array Entry To Boolean",
-      "summary": "Coerce JSON Array Entry To Boolean",
-      "paraphrasedPrompt": "Write a method `getBoolean(int index)` on a JSON array class (with an existing `get(int)` accessor and a `JSONException` type already available) that returns the boolean value at `index`: if the stored value is the boolean `true`/`false`, or the string `\"true\"`/\"false\"` (case-insensitive), return the corresponding boolean. Otherwise throw a `JSONException` saying the value at that index is not a boolean.",
+      "category": "Encoding & Checksums",
+      "title": "Encode A Number Into A Fixed-Length Byte Range",
+      "summary": "Encode A Number Into A Fixed-Length Byte Range",
+      "paraphrasedPrompt": "Write a method `encodeNum(long num, byte[] data, int beginIndex, int maxBytes)` that encodes `num` into `maxBytes` big-endian bytes and writes them into `data` starting at `beginIndex`. Return the index in `data` immediately after the bytes that were written (`beginIndex + maxBytes`).",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "alkacon/opencms-core",
-      "sourceUrl": "https://github.com/alkacon/opencms-core/blob/bc104acc75d2277df5864da939a1f2de5fdee504/src/org/opencms/json/JSONArray.java#L302-L311",
+      "sourceRepo": "magro/memcached-session-manager",
+      "sourceUrl": "https://github.com/magro/memcached-session-manager/blob/716e147c9840ab10298c4d2b9edd0662058331e6/core/src/main/java/de/javakaffee/web/msm/TranscoderService.java#L500-L507",
       "supportedLanguages": [
         "Java"
       ],
@@ -3122,19 +3122,19 @@
           "solutions": [
             {
               "solutionId": "java-025-h",
-              "code": "public boolean getBoolean(int index) throws JSONException {\n\n        Object o = get(index);\n        if (o.equals(Boolean.FALSE) || ((o instanceof String) && ((String)o).equalsIgnoreCase(\"false\"))) {\n            return false;\n        } else if (o.equals(Boolean.TRUE) || ((o instanceof String) && ((String)o).equalsIgnoreCase(\"true\"))) {\n            return true;\n        }\n        throw new JSONException(\"JSONArray[\" + index + \"] is not a Boolean.\");\n    }",
+              "code": "public static int encodeNum( final long num, final byte[] data, final int beginIndex, final int maxBytes ) {\n        for ( int i = 0; i < maxBytes; i++ ) {\n            final int pos = maxBytes - i - 1;\n            final int idx = beginIndex + pos;\n            data[idx] = (byte) ( ( num >> ( 8 * i ) ) & 0xff );\n        }\n        return beginIndex + maxBytes;\n    }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "alkacon/opencms-core",
-                "sourceUrl": "https://github.com/alkacon/opencms-core/blob/bc104acc75d2277df5864da939a1f2de5fdee504/src/org/opencms/json/JSONArray.java#L302-L311",
+                "sourceRepoOrAuthor": "magro/memcached-session-manager",
+                "sourceUrl": "https://github.com/magro/memcached-session-manager/blob/716e147c9840ab10298c4d2b9edd0662058331e6/core/src/main/java/de/javakaffee/web/msm/TranscoderService.java#L500-L507",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-025-ai",
-              "code": "public boolean getBoolean(int index) throws JSONException {\n    Object value = get(index);\n    if (value instanceof Boolean) {\n        return (Boolean) value;\n    }\n    if (value instanceof String) {\n        String str = (String) value;\n        if (str.equalsIgnoreCase(\"true\")) {\n            return true;\n        }\n        if (str.equalsIgnoreCase(\"false\")) {\n            return false;\n        }\n    }\n    throw new JSONException(\"JSONArray[\" + index + \"] is not a Boolean.\");\n}",
+              "code": "public static int encodeNum(long num, byte[] data, int beginIndex, int maxBytes) {\n    for (int i = 0; i < maxBytes; i++) {\n        int index = beginIndex + maxBytes - 1 - i;\n        data[index] = (byte) ((num >> (8 * i)) & 0xff);\n    }\n    return beginIndex + maxBytes;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
