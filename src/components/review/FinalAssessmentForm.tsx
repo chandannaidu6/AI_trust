@@ -14,16 +14,6 @@ const SLOT_COLORS: Record<SlotLabel, { card: string; btn: string; active: string
     btn:    'border-sky-200     dark:border-sky-700     bg-white dark:bg-slate-800 text-sky-700     dark:text-sky-300     hover:bg-sky-50     dark:hover:bg-sky-950',
     active: 'bg-sky-600     text-white border-sky-600     shadow-sm',
   },
-  C: {
-    card:   'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200',
-    btn:    'border-emerald-200 dark:border-emerald-700 bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950',
-    active: 'bg-emerald-600 text-white border-emerald-600 shadow-sm',
-  },
-  D: {
-    card:   'bg-amber-50   dark:bg-amber-950/50   border-amber-200   dark:border-amber-800   text-amber-800   dark:text-amber-200',
-    btn:    'border-amber-200   dark:border-amber-700   bg-white dark:bg-slate-800 text-amber-700   dark:text-amber-300   hover:bg-amber-50   dark:hover:bg-amber-950',
-    active: 'bg-amber-600   text-white border-amber-600   shadow-sm',
-  },
 };
 
 interface FinalAssessmentFormProps {
@@ -38,7 +28,7 @@ function RankRow({ pos, current, onChange }: {
   current:  SlotLabel | undefined;
   onChange: (slot: SlotLabel) => void;
 }) {
-  const labels = ['1st — Best', '2nd', '3rd', '4th — Worst'];
+  const labels = ['1st — Best', '2nd — Worst'];
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-20 shrink-0">
@@ -71,7 +61,7 @@ function RankRow({ pos, current, onChange }: {
 export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: FinalAssessmentFormProps) {
   const [bestChoice,  setBestChoice]  = useState<SlotLabel | null>(existing?.bestChoice ?? null);
   const [ranking,     setRanking]     = useState<(SlotLabel | undefined)[]>(
-    existing?.ranking ?? [undefined, undefined, undefined, undefined],
+    existing?.ranking ?? SLOT_LABELS.map(() => undefined),
   );
   const [explanation, setExplanation] = useState(existing?.explanation ?? '');
   const [saved,       setSaved]       = useState(!!existing);
@@ -85,7 +75,7 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
     setSaved(false);
   };
 
-  const rankingComplete = ranking.every(Boolean) && new Set(ranking).size === 4;
+  const rankingComplete = ranking.every(Boolean) && new Set(ranking).size === SLOT_LABELS.length;
   const valid = bestChoice !== null && rankingComplete && explanation.trim().length > 0;
 
   const handleSubmit = (e: FormEvent) => {
@@ -118,7 +108,7 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
             Your ratings at a glance
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {SLOT_LABELS.map(slot => {
               const r = ratings[slot];
               if (!r) return null;
@@ -176,7 +166,7 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
           {/* Ranking */}
           <fieldset className="space-y-2 border-0 p-0 m-0">
             <legend className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-              Rank all four solutions
+              Rank both solutions
               <span className="text-xs text-slate-400 dark:text-slate-500 font-normal ml-2">
                 Click a letter at each position
               </span>

@@ -50,7 +50,7 @@ export default function CategoryQuestionListPage() {
             </span>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{category}</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
-              Select a question to begin reviewing its 4 unlabeled solutions.
+              Select a question to begin reviewing its 2 unlabeled solutions.
             </p>
           </div>
           {!loading && questions.length > 0 && (

@@ -62,17 +62,17 @@ Information about the specific question and language the participant reviewed.
 
 | Field           | Type     | Description                                                                   |
 |-----------------|----------|-------------------------------------------------------------------------------|
-| `category`      | string   | Problem category chosen: `Arrays`, `Strings`, or `Hashes`                    |
-| `questionId`    | string   | Dataset question identifier (e.g. `arr-001`)                                  |
+| `category`      | string   | Problem category chosen: `String Processing`, `Data Structures`, `Parsing & Conversion`, `Math & Numeric`, `Encoding & Checksums`, or `Date & Time` |
+| `questionId`    | string   | Dataset question identifier (e.g. `py-001`, `java-014`)                       |
 | `questionTitle` | string   | Human-readable question title                                                 |
-| `language`      | string   | Programming language selected for review                                      |
+| `language`      | string   | Programming language of the question (`Python` or `Java`; each question is single-language) |
 | `startedAt`     | string   | ISO-8601 timestamp of when the review session started                         |
-| `solutionOrder` | string[] | Array of 4 solutionIds, indexed by slot position. Index 0 = slot A, 1 = B, 2 = C, 3 = D. |
-| `slotMapping`   | object   | Map from slot label to solutionId: `{ "A": "arr-001-h-a", "B": "arr-001-ai-r", … }` |
+| `solutionOrder` | string[] | Array of 2 solutionIds, indexed by slot position. Index 0 = slot A, 1 = B.    |
+| `slotMapping`   | object   | Map from slot label to solutionId: `{ "A": "py-001-h", "B": "py-001-ai" }`    |
 
 ### Decoding `solutionOrder` / `slotMapping`
 
-The slot labels (A, B, C, D) are positional only and carry no information about origin. To determine whether a given slot was human-written or AI-generated, join `solutionId` against the `_hidden` metadata in `study-dataset.json` using the `solutionId` as key:
+The slot labels (A, B) are positional only and carry no information about origin. To determine whether a given slot was human-written or AI-generated, join `solutionId` against the `_hidden` metadata in `study-dataset.json` using the `solutionId` as key:
 
 ```
 solutionId → study-dataset.json → questions[*].solutionsByLanguage[lang].solutions[*]
@@ -87,14 +87,12 @@ This join is performed by the researcher **after** data collection. It is never 
 
 ## `ratings`
 
-A map from slot label (`A`, `B`, `C`, `D`) to the participant's review of that slot.
+A map from slot label (`A`, `B`) to the participant's review of that slot.
 
 ```json
 {
   "A": { … },
-  "B": { … },
-  "C": { … },
-  "D": { … }
+  "B": { … }
 }
 ```
 
@@ -114,15 +112,15 @@ Each slot entry:
 
 ## `finalAssessment`
 
-Submitted only after all 4 slots have been rated. Will be `null` if the participant did not complete the final assessment step.
+Submitted only after both slots have been rated. Will be `null` if the participant did not complete the final assessment step.
 
 | Field                    | Type       | Description                                                    |
 |--------------------------|------------|----------------------------------------------------------------|
-| `bestChoice`             | string     | Slot label the participant would approve in a real review (A–D) |
+| `bestChoice`             | string     | Slot label the participant would approve in a real review (A or B) |
 | `bestChoiceSolutionId`   | string     | solutionId corresponding to `bestChoice`                       |
-| `ranking`                | string[]   | 4-element array from best to worst, e.g. `["C","A","D","B"]`   |
+| `ranking`                | string[]   | 2-element array from best to worst, e.g. `["B","A"]`           |
 | `rankingSolutionIds`     | string[]   | solutionIds in ranking order (same index as `ranking`)          |
-| `rankingSummary`         | string     | Human-readable ranking string, e.g. `C > A > D > B`            |
+| `rankingSummary`         | string     | Human-readable ranking string, e.g. `B > A`                    |
 | `explanation`            | string     | Free-text explanation of what influenced judgment (may be empty) |
 
 ---
@@ -156,15 +154,13 @@ The CSV export flattens the above into one row. Columns in order:
 | `slotA_bugConcern`              | `ratings.A.bugConcern`                         |
 | `slotA_notes`                   | `ratings.A.notes`                              |
 | `slotB_solutionId` … `slotB_notes` | (same pattern for B)                       |
-| `slotC_solutionId` … `slotC_notes` | (same pattern for C)                       |
-| `slotD_solutionId` … `slotD_notes` | (same pattern for D)                       |
 | `bestChoice`                    | `finalAssessment.bestChoice`                   |
 | `bestChoiceSolutionId`          | `finalAssessment.bestChoiceSolutionId`         |
 | `rankingSummary`                | `finalAssessment.rankingSummary`               |
 | `rankingSolutionIds`            | `finalAssessment.rankingSolutionIds` (semicolon-separated) |
 | `explanation`                   | `finalAssessment.explanation`                  |
 
-Total: **43 columns** per participant row.
+Total: **34 columns** per participant row.
 
 ---
 
@@ -196,7 +192,7 @@ for q in dataset["questions"]:
             hidden_index[sol["solutionId"]] = sol["_hidden"]
 
 # Example: get origin for a slot
-origin = hidden_index["arr-001-h-a"]["origin"]  # "human" or "ai"
+origin = hidden_index["py-001-h"]["origin"]  # "human" or "ai"
 ```
 
 Keep `study-dataset.json` on the researcher's machine only. Do not share it with participants.

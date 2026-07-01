@@ -16,7 +16,7 @@ import {
   SheetSubmitStatus,
 } from '../utils/export';
 
-const SLOT_COLOR = { A: 'violet', B: 'sky', C: 'emerald', D: 'amber' } as const;
+const SLOT_COLOR = { A: 'violet', B: 'sky' } as const;
 
 export default function CompletionPage() {
   const navigate = useNavigate();

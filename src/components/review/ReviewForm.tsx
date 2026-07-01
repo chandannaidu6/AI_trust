@@ -6,8 +6,6 @@ import { Button } from '../ui/Button';
 const SLOT_ACCENT: Record<SlotLabel, string> = {
   A: 'border-violet-200 dark:border-violet-800',
   B: 'border-sky-200     dark:border-sky-800',
-  C: 'border-emerald-200 dark:border-emerald-800',
-  D: 'border-amber-200   dark:border-amber-800',
 };
 
 const ACCEPT_OPTIONS: {

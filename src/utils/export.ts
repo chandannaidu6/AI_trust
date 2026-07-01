@@ -39,7 +39,7 @@ export interface ExportPayload {
     questionTitle: string;
     language: string;
     startedAt: string;               // ISO-8601
-    solutionOrder: string[];         // solutionId at positions [A, B, C, D]
+    solutionOrder: string[];         // solutionId at positions [A, B]
     slotMapping: Record<string, string>;
     solutionLabels: Record<string, string>;
   };

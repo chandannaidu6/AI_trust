@@ -7,8 +7,6 @@ import { toHighlightLang } from '../../utils/language';
 const SLOT_BADGE: Record<SlotLabel, string> = {
   A: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
   B: 'bg-sky-500/20    text-sky-300    border-sky-500/30',
-  C: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  D: 'bg-amber-500/20  text-amber-300  border-amber-500/30',
 };
 
 interface CodeViewerProps {

@@ -17,31 +17,33 @@ import { allRated } from '../utils/helpers';
 const LANGUAGES = ['Python', 'Java'];
 
 // Progress bar for rated-solutions count
+const TOTAL_SLOTS = SLOT_LABELS.length;
+
 function RatingProgress({ rated }: { rated: number }) {
   return (
     <div
       role="progressbar"
       aria-valuenow={rated}
       aria-valuemin={0}
-      aria-valuemax={4}
-      aria-label={`${rated} of 4 solutions rated`}
+      aria-valuemax={TOTAL_SLOTS}
+      aria-label={`${rated} of ${TOTAL_SLOTS} solutions rated`}
       className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Progress</span>
         <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-          {rated} / 4 solutions rated
+          {rated} / {TOTAL_SLOTS} solutions rated
         </span>
       </div>
       <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
         <div
           className="h-full bg-indigo-500 rounded-full transition-all duration-300"
-          style={{ width: `${(rated / 4) * 100}%` }}
+          style={{ width: `${(rated / TOTAL_SLOTS) * 100}%` }}
         />
       </div>
-      {rated < 4 && (
+      {rated < TOTAL_SLOTS && (
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
-          {4 - rated} more to go before the final assessment unlocks.
+          {TOTAL_SLOTS - rated} more to go before the final assessment unlocks.
         </p>
       )}
     </div>

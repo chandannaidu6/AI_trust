@@ -21,9 +21,9 @@ export function ratedCount(ratings: Partial<Record<SlotLabel, SlotRating>>): num
   return SLOT_LABELS.filter(s => !!ratings[s]).length;
 }
 
-/** All 4 slots rated? */
+/** All slots rated? */
 export function allRated(ratings: Partial<Record<SlotLabel, SlotRating>>): boolean {
-  return ratedCount(ratings) === 4;
+  return ratedCount(ratings) === SLOT_LABELS.length;
 }
 
 /** Download an object as a JSON file. */

@@ -10,14 +10,6 @@ const SLOT_STYLES: Record<SlotLabel, { base: string; active: string }> = {
     base:   'border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300 dark:hover:bg-sky-900',
     active: 'border-sky-500 bg-sky-600 text-white shadow-md',
   },
-  C: {
-    base:   'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 dark:hover:bg-emerald-900',
-    active: 'border-emerald-500 bg-emerald-600 text-white shadow-md',
-  },
-  D: {
-    base:   'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-900',
-    active: 'border-amber-500 bg-amber-600 text-white shadow-md',
-  },
 };
 
 interface SolutionSwitcherProps {
@@ -57,15 +49,15 @@ export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwit
           Solutions
         </span>
         <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">
-          {rated} / 4 rated
+          {rated} / {SLOT_LABELS.length} rated
         </span>
       </div>
 
-      {/* Tab buttons — 2-col on mobile, 4-col on sm+ */}
+      {/* Tab buttons — 2 columns */}
       <div
         role="tablist"
         aria-label="Solution tabs"
-        className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+        className="grid grid-cols-2 gap-2"
       >
         {SLOT_LABELS.map((slot, idx) => {
           const isActive = slot === activeSlot;

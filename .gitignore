@@ -24,3 +24,6 @@ Thumbs.db
 npm-debug.log*
 
 .vercel
+
+# Raw CodeSearchNet dumps (multi-GB, local dataset-building input only)
+csn_*.jsonl

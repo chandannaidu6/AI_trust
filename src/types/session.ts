@@ -2,8 +2,8 @@ import { StudyQuestion } from './dataset';
 
 // ─── Slot labels ──────────────────────────────────────────────────────────────
 
-export type SlotLabel = 'A' | 'B' | 'C' | 'D';
-export const SLOT_LABELS: SlotLabel[] = ['A', 'B', 'C', 'D'];
+export type SlotLabel = 'A' | 'B';
+export const SLOT_LABELS: SlotLabel[] = ['A', 'B'];
 
 // ─── A single solution as the UI sees it (no _hidden) ────────────────────────
 
@@ -28,11 +28,11 @@ export interface SlotRating {
   briefExplanation: string;
 }
 
-// ─── Final assessment after reviewing all 4 slots ────────────────────────────
+// ─── Final assessment after reviewing both slots ─────────────────────────────
 
 export interface FinalAssessment {
   bestChoice: SlotLabel;
-  ranking: SlotLabel[];    // [1st, 2nd, 3rd, 4th]
+  ranking: SlotLabel[];    // [1st, 2nd]
   explanation: string;
 }
 
@@ -59,7 +59,7 @@ export interface ParticipantProfile {
 export interface ReviewSession {
   question: StudyQuestion;
   language: string;
-  slots: UISlot[];                                       // randomised A/B/C/D
+  slots: UISlot[];                                       // randomised A/B
   slotRatings: Partial<Record<SlotLabel, SlotRating>>;
   finalAssessment: FinalAssessment | null;
   activeSlot: SlotLabel;

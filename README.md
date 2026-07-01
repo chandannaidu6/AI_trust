@@ -47,14 +47,14 @@ The production preview runs at **http://localhost:4173**.
 ```
 Landing page
   → Background survey (skill level, languages, role, review habits, AI familiarity)
-  → Category selection (Arrays · Strings · Hashes)
-  → Question list (10 questions per category)
+  → Category selection (String Processing · Data Structures · Parsing & Conversion · Math & Numeric · Encoding & Checksums · Date & Time)
+  → Question list (question count varies per category)
   → Question review
-      ├─ Choose language (Python · Java · C · C++)
-      ├─ Solutions A / B / C / D  (order randomised per participant)
+      ├─ Question is single-language (Python or Java)
+      ├─ Solutions A / B  (order randomised per participant)
       ├─ Code viewer (syntax-highlighted)
-      ├─ Rate each solution: Trust · Correctness · Readability · Bug concern · Notes
-      └─ Final assessment: best choice + ranking + explanation (unlocked after all 4 rated)
+      ├─ Rate each solution across several dimensions (see src/types/session.ts for the current fields)
+      └─ Final assessment: best choice + ranking + explanation (unlocked after both rated)
   → Completion — download JSON or CSV, or copy to clipboard
 ```
 
@@ -62,7 +62,7 @@ Landing page
 
 ## Dataset
 
-The app reads `public/data/study-dataset.json`. This file contains 30 questions × 4 languages × 4 solutions (480 solutions total).
+The app reads `public/data/study-dataset.json`. This file contains 60 questions (30 Python + 30 Java, sourced from CodeSearchNet), each with 2 solutions — 1 human, 1 AI (120 solutions total).
 
 If you regenerate the dataset, copy the output here:
 

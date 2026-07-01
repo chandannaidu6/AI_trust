@@ -3,7 +3,7 @@ import {
 } from 'react';
 import {
   AppState, ParticipantProfile, ReviewSession,
-  SlotLabel, SlotRating, FinalAssessment, StudyQuestion, UISlot,
+  SlotLabel, SlotRating, FinalAssessment, StudyQuestion, UISlot, SLOT_LABELS,
 } from '../types';
 import { shuffleForSession } from '../utils/randomize';
 import { generateId } from '../utils/helpers';
@@ -39,13 +39,13 @@ function reducer(state: AppState, action: Action): AppState {
       const { question, language } = action.payload;
       const pid = state.participant?.id ?? generateId();
 
-      // Pick the 4 solutions for this language and shuffle them
+      // Pick the solutions for this language and shuffle them
       const block = question.solutionsByLanguage[language];
       if (!block) return state;
 
       const shuffled = shuffleForSession(block.solutions, pid, question.id, language);
 
-      const slots: UISlot[] = (['A', 'B', 'C', 'D'] as SlotLabel[]).map((label, i) => ({
+      const slots: UISlot[] = SLOT_LABELS.map((label, i) => ({
         label,
         solutionId: shuffled[i].solutionId,
         code: shuffled[i].code,
