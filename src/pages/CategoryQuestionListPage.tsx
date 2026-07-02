@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -6,6 +6,10 @@ import { QuestionCard } from '../components/question/QuestionCard';
 import { useStudy } from '../state/StudyContext';
 import { loadCategory } from '../data/loader';
 import { StudyQuestion } from '../types';
+
+function scrollKey(category: string) {
+  return `questionListScroll:${category}`;
+}
 
 export default function CategoryQuestionListPage() {
   const { category } = useParams<{ category: string }>();
@@ -15,6 +19,7 @@ export default function CategoryQuestionListPage() {
   const [questions, setQuestions] = useState<StudyQuestion[]>([]);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState('');
+  const restoredRef = useRef(false);
 
   if (!state.participant) return <Navigate to="/participant" replace />;
 
@@ -28,10 +33,33 @@ export default function CategoryQuestionListPage() {
     if (!category) return;
     setLoading(true);
     setError('');
+    restoredRef.current = false;
     loadCategory(category)
       .then(setQuestions)
       .catch(() => setError('Failed to load questions. Make sure study-dataset.json is in /public/data/.'))
       .finally(() => setLoading(false));
+  }, [category]);
+
+  // Restore scroll position once the list has rendered, so returning from a
+  // question's review page (or from browser back) lands where the participant left off.
+  useEffect(() => {
+    if (loading || error || !category || restoredRef.current) return;
+    restoredRef.current = true;
+    const saved = sessionStorage.getItem(scrollKey(category));
+    if (saved) {
+      window.scrollTo(0, parseInt(saved, 10));
+    }
+  }, [loading, error, category]);
+
+  // Remember scroll position whenever we leave this page.
+  useEffect(() => {
+    if (!category) return;
+    const save = () => sessionStorage.setItem(scrollKey(category), String(window.scrollY));
+    window.addEventListener('beforeunload', save);
+    return () => {
+      save();
+      window.removeEventListener('beforeunload', save);
+    };
   }, [category]);
 
   return (

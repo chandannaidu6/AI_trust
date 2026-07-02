@@ -273,13 +273,17 @@ export default function CompletionPage() {
           </div>
         </section>
 
-        {/* ── Restart ─────────────────────────────────────────────────────── */}
-        <div className="flex items-center gap-3 pb-12">
+        {/* ── Review another / Restart ───────────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-3 pb-12">
+          <Button size="lg" onClick={() => navigate('/categories')}>
+            Review another question
+          </Button>
           <Button variant="ghost" onClick={handleRestart}>
             Start a new session
           </Button>
-          <p className="text-xs text-slate-300 dark:text-slate-600">
-            This will clear all current session data.
+          <p className="text-xs text-slate-300 dark:text-slate-600 basis-full sm:basis-auto">
+            "Start a new session" clears your participant profile too — use "Review another
+            question" to keep reviewing as the same participant.
           </p>
         </div>
 
