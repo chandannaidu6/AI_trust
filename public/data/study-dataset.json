@@ -170,7 +170,7 @@
             },
             {
               "solutionId": "py-003-ai",
-              "code": "from collections import OrderedDict\n\ndef kvp_convert(input_coll):\n    if isinstance(input_coll, OrderedDict):\n        return input_coll\n    result = OrderedDict()\n    for item in input_coll:\n        if isinstance(item, tuple):\n            result[item[0]] = item[1]\n        else:\n            result[item] = None\n    return result",
+              "code": "def kvp_convert(input_coll):\n    if isinstance(input_coll, OrderedDict):\n        return input_coll\n    result = OrderedDict()\n    for item in input_coll:\n        if isinstance(item, tuple):\n            result[item[0]] = item[1]\n        else:\n            result[item] = None\n    return result",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -227,7 +227,7 @@
             },
             {
               "solutionId": "py-004-ai",
-              "code": "def makeSequenceRelative(absVSequence):\n    if len(absVSequence) < 2 or len(set(absVSequence)) == 1:\n        raise ValueError(\"absVSequence must have at least two distinct values\")\n\n    minV = min(absVSequence)\n    maxV = max(absVSequence)\n    relativeSeq = [(value - minV) / (maxV - minV) for value in absVSequence]\n\n    return relativeSeq, minV, maxV",
+              "code": "def makeSequenceRelative(absVSequence):\n    if len(absVSequence) < 2 or len(set(absVSequence)) == 1:\n        raise ValueError(\"absVSequence must have at least two distinct values\")\n\n    minV, maxV = min(absVSequence), max(absVSequence)\n    relativeSeq = list(map(lambda v: (v - minV) / (maxV - minV), absVSequence))\n\n    return relativeSeq, minV, maxV",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -255,7 +255,7 @@
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
       "sourceRepo": "kathyxchen/crosstalk-correction",
-      "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/master/utils.py",
+      "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/eac11d54b39ea7ec301b54f8e498adce91713223/crosstalk_correction/crosstalk_correction.py#L201-L216",
       "supportedLanguages": [
         "Python"
       ],
@@ -278,7 +278,7 @@
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "kathyxchen/crosstalk-correction",
-                "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/master/utils.py",
+                "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/eac11d54b39ea7ec301b54f8e498adce91713223/crosstalk_correction/crosstalk_correction.py#L201-L216",
                 "selectionNotes": ""
               }
             },
@@ -569,7 +569,7 @@
             },
             {
               "solutionId": "py-010-ai",
-              "code": "import decimal\n\ndef format_value(value):\n    value = decimal.Decimal(str(value))\n    if value == value.to_integral_value():\n        return int(value)\n    return float(round(value, 1))",
+              "code": "def format_value(value):\n    value = decimal.Decimal(str(value))\n    if value == value.to_integral_value():\n        return int(value)\n    return float(round(value, 1))",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -647,7 +647,7 @@
       "category": "Math & Numeric",
       "title": "Compute Misclassification Cost",
       "summary": "Compute Misclassification Cost",
-      "paraphrasedPrompt": "Write a function `calc_cost(y, yhat, cost_matrix)` that computes the average misclassification cost given ground-truth labels `y`, predicted labels `yhat`, and a `cost_matrix` where `cost_matrix[i][j]` is the cost of the ground truth being class `i` but predicted as class `j`. `y` and `yhat` are equal-length sequences of class indices. Return the mean cost over all predictions.",
+      "paraphrasedPrompt": "Write a function `calc_cost(y, yhat, cost_matrix)` that computes the average misclassification cost given ground-truth labels `y`, predicted labels `yhat`, and a `cost_matrix` where `cost_matrix[i][j]` is the cost of the ground truth being class `i` but predicted as class `j`. `y` and `yhat` are equal-length sequences of class indices, and `cost_matrix` is a 2D numpy array. Return the mean cost over all predictions.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
@@ -683,7 +683,7 @@
             },
             {
               "solutionId": "py-012-ai",
-              "code": "import numpy as np\n\ndef calc_cost(y, yhat, cost_matrix):\n    y = list(y)\n    yhat = list(yhat)\n    costs = [cost_matrix[true][pred] for true, pred in zip(y, yhat)]\n    return float(np.mean(costs))",
+              "code": "def calc_cost(y, yhat, cost_matrix):\n    y = list(y)\n    yhat = list(yhat)\n    costs = [cost_matrix[true][pred] for true, pred in zip(y, yhat)]\n    return float(np.mean(costs))",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -740,7 +740,7 @@
             },
             {
               "solutionId": "py-013-ai",
-              "code": "import numpy as np\n\ndef find_minmax(lims, olims):\n    try:\n        a1, a2 = lims\n        b1, b2 = olims\n        return (float(np.nanmin([a1, b1])), float(np.nanmax([a2, b2])))\n    except Exception:\n        return (np.nan, np.nan)",
+              "code": "def find_minmax(lims, olims):\n    try:\n        a1, a2 = lims\n        b1, b2 = olims\n        return (float(np.nanmin([a1, b1])), float(np.nanmax([a2, b2])))\n    except Exception:\n        return (np.nan, np.nan)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -797,7 +797,7 @@
             },
             {
               "solutionId": "py-014-ai",
-              "code": "def truncate(string, maxchar):\n    if maxchar < 4:\n        raise ValueError(\"maxchar must be >= 4\")\n    if len(string) <= maxchar:\n        return string\n    return string[:maxchar - 3] + \"...\"",
+              "code": "def truncate(string, maxchar):\n    if maxchar < 4:\n        raise ValueError(\"maxchar must be >= 4\")\n    return string if len(string) <= maxchar else string[:maxchar - 3] + \"...\"",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -815,17 +815,17 @@
     },
     {
       "id": "py-015",
-      "category": "Encoding & Checksums",
-      "title": "Decode Byte Array Into Integer Array",
-      "summary": "Decode Byte Array Into Integer Array",
-      "paraphrasedPrompt": "Write a function `convert_bytes_to_ints(in_bytes, num)` that decodes a byte array into an array of big-endian signed integers, where each integer is encoded using exactly `num` bytes. Return the resulting integer array.",
+      "category": "Data Structures",
+      "title": "Find MST Containing A Stroke Index",
+      "summary": "Find MST Containing A Stroke Index",
+      "paraphrasedPrompt": "Write a function `find_split_node(mst_wood, i)` that searches a list of minimum-spanning-tree dicts `mst_wood` (each with a `'strokes'` list) for the one containing stroke index `i`, and returns a tuple `(mst_index, node_index)`: the index of the matching MST within `mst_wood`, and the index of `i` within that MST's `'strokes'` list. Raise `ValueError` if `i` isn't found in any MST.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "rcsb/mmtf-python",
-      "sourceUrl": "https://github.com/rcsb/mmtf-python/blob/899bb877ca1b32a9396803d38c5bf38a2520754e/mmtf/converters/numpy_converters.py#L7-L15",
+      "sourceRepo": "MartinThoma/hwrt",
+      "sourceUrl": "https://github.com/MartinThoma/hwrt/blob/725c21a3d0f5a30b8492cbc184b3688ceb364e1c/hwrt/segmentation/segmentation.py#L765-L781",
       "supportedLanguages": [
         "Python"
       ],
@@ -842,19 +842,19 @@
           "solutions": [
             {
               "solutionId": "py-015-h",
-              "code": "def convert_bytes_to_ints(in_bytes, num):\n    dt = numpy.dtype('>i' + str(num))\n    return numpy.frombuffer(in_bytes, dt)",
+              "code": "def find_split_node(mst_wood, i):\n    for mst_index, mst in enumerate(mst_wood):\n        if i in mst['strokes']:\n            return (mst_index, mst['strokes'].index(i))\n    raise ValueError('%i was not found as stroke index.' % i)",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "rcsb/mmtf-python",
-                "sourceUrl": "https://github.com/rcsb/mmtf-python/blob/899bb877ca1b32a9396803d38c5bf38a2520754e/mmtf/converters/numpy_converters.py#L7-L15",
+                "sourceRepoOrAuthor": "MartinThoma/hwrt",
+                "sourceUrl": "https://github.com/MartinThoma/hwrt/blob/725c21a3d0f5a30b8492cbc184b3688ceb364e1c/hwrt/segmentation/segmentation.py#L765-L781",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-015-ai",
-              "code": "import numpy\n\ndef convert_bytes_to_ints(in_bytes, num):\n    dtype = numpy.dtype(\">i\" + str(num))\n    return numpy.frombuffer(in_bytes, dtype=dtype)",
+              "code": "def find_split_node(mst_wood, i):\n    matches = [\n        (mst_index, mst['strokes'].index(i))\n        for mst_index, mst in enumerate(mst_wood)\n        if i in mst['strokes']\n    ]\n    if not matches:\n        raise ValueError('stroke index %i was not found' % i)\n    return matches[0]",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -968,7 +968,7 @@
             },
             {
               "solutionId": "py-017-ai",
-              "code": "import base64\nimport struct\n\ndef decode_ints(message):\n    binary = base64.b64decode(message)\n    count = len(binary) // 4\n    return struct.unpack('<{}i'.format(count), binary)",
+              "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    count = len(binary) // 4\n    return struct.unpack('<{}i'.format(count), binary)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1082,7 +1082,7 @@
             },
             {
               "solutionId": "py-019-ai",
-              "code": "import numpy as np\n\ndef masks(list_of_index_lists, n):\n    result = []\n    for indices in list_of_index_lists:\n        mask = np.zeros(n, dtype=bool)\n        mask[indices] = True\n        result.append(mask)\n    return np.array(result)",
+              "code": "def masks(list_of_index_lists, n):\n    return np.array([\n        np.isin(np.arange(n), indices) for indices in list_of_index_lists\n    ])",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1157,17 +1157,17 @@
     },
     {
       "id": "py-021",
-      "category": "String Processing",
-      "title": "Append Unique Terminator To Each String",
-      "summary": "Append Unique Terminator To Each String",
-      "paraphrasedPrompt": "Write a function `make_unique_endings(strings_collection)` that returns a new list where each string in `strings_collection` has a unique terminating character appended to it (a different character for each string in the collection, based on its position). This is needed so that no string in the collection is a prefix of another once built into a generalized suffix structure. Use a private-use Unicode code point range as the source of terminator characters, incrementing by one for each successive string.",
+      "category": "Data Structures",
+      "title": "Sort A Dict By Key Or Value",
+      "summary": "Sort A Dict By Key Or Value",
+      "paraphrasedPrompt": "Write a function `rank_dict(dict, key=lambda t: t[1], as_tuple=False)` that sorts a dict by a given key function (sorting by value by default), and returns the result as an `OrderedDict`. If `as_tuple` is `True`, return the sorted `(key, value)` pairs as a tuple instead of an `OrderedDict`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "mikhaildubov/AST-text-analysis",
-      "sourceUrl": "https://github.com/mikhaildubov/AST-text-analysis/blob/055ad8d2492c100bbbaa25309ec1074bdf1dfaa5/east/asts/utils.py#L25-L40",
+      "sourceRepo": "jaredLunde/vital-tools",
+      "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L45-L56",
       "supportedLanguages": [
         "Python"
       ],
@@ -1184,19 +1184,19 @@
           "solutions": [
             {
               "solutionId": "py-021-h",
-              "code": "UNICODE_SPECIAL_SYMBOLS_START = 0xF0000\n\ndef make_unique_endings(strings_collection):\n    res = []\n    for i in range(len(strings_collection)):\n        hex_code = hex(UNICODE_SPECIAL_SYMBOLS_START+i)\n        hex_code = r\"\\U\" + \"0\" * (8 - len(hex_code) + 2) + hex_code[2:]\n        res.append(strings_collection[i] + hex_code.decode(\"unicode-escape\"))\n    return res",
+              "code": "def rank_dict(dict, key=lambda t: t[1], as_tuple=False):\n    sorted_list = sorted(dict.items(), key=key)\n    return OrderedDict(sorted_list) if not as_tuple else tuple(sorted_list)",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "mikhaildubov/AST-text-analysis",
-                "sourceUrl": "https://github.com/mikhaildubov/AST-text-analysis/blob/055ad8d2492c100bbbaa25309ec1074bdf1dfaa5/east/asts/utils.py#L25-L40",
+                "sourceRepoOrAuthor": "jaredLunde/vital-tools",
+                "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L45-L56",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-021-ai",
-              "code": "UNICODE_SPECIAL_SYMBOLS_START = 0xF0000\n\ndef make_unique_endings(strings_collection):\n    result = []\n    for i, s in enumerate(strings_collection):\n        terminator = chr(UNICODE_SPECIAL_SYMBOLS_START + i)\n        result.append(s + terminator)\n    return result",
+              "code": "def rank_dict(mapping, key=lambda item: item[1], as_tuple=False):\n    items = sorted(mapping.items(), key=key)\n    if as_tuple:\n        return tuple(items)\n    return OrderedDict(items)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1253,7 +1253,7 @@
             },
             {
               "solutionId": "py-022-ai",
-              "code": "import uuid\n\ndef bytes_to_uuid_list(byte_array):\n    return [\n        uuid.UUID(bytes=bytes(byte_array[i:i + 16]))\n        for i in range(0, len(byte_array), 16)\n    ]",
+              "code": "def bytes_to_uuid_list(byte_array):\n    return [\n        uuid.UUID(bytes=bytes(byte_array[i:i + 16]))\n        for i in range(0, len(byte_array), 16)\n    ]",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1274,7 +1274,7 @@
       "category": "Encoding & Checksums",
       "title": "Compute ISBN-13 Check Digit",
       "summary": "Compute ISBN-13 Check Digit",
-      "paraphrasedPrompt": "Write a function `get_isbn13_checksum(isbn)` that computes the final ISBN-13 check digit. `isbn` is the first 12 digits (as a string or list of single-digit values). Multiply the digits alternately by 1 and 3 (i.e. weights `1,3,1,3,...`), sum the products, take the sum modulo 10, and return `10 - (sum % 10)` unless that remainder is 0, in which case return 0.",
+      "paraphrasedPrompt": "Write a function `get_isbn13_checksum(isbn)` that computes the final ISBN-13 check digit. `isbn` is the first 12 digits, given as a list of single-digit integers. Multiply the digits alternately by 1 and 3 (i.e. weights `1,3,1,3,...`), sum the products, take the sum modulo 10, and return `10 - (sum % 10)` unless that remainder is 0, in which case return 0.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
@@ -1367,7 +1367,7 @@
             },
             {
               "solutionId": "py-024-ai",
-              "code": "def find_return_target(stack, target):\n    for index, frame in enumerate(stack):\n        if frame.ret_addr == target:\n            return index\n    return None",
+              "code": "def find_return_target(stack, target):\n    return next((i for i, frame in enumerate(stack) if frame.ret_addr == target), None)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1424,7 +1424,7 @@
             },
             {
               "solutionId": "py-025-ai",
-              "code": "import numpy as np\n\ndef decode_centroids(encoded, mapping):\n    decoded = []\n    for col in range(encoded.shape[1]):\n        inverse = {code: label for label, code in mapping[col].items()}\n        decoded.append([inverse[value] for value in encoded[:, col]])\n    return np.array(decoded).T",
+              "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for col in range(encoded.shape[1]):\n        inverse = {code: label for label, code in mapping[col].items()}\n        decoded.append([inverse[value] for value in encoded[:, col]])\n    return np.array(decoded).T",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1442,17 +1442,17 @@
     },
     {
       "id": "py-026",
-      "category": "Math & Numeric",
-      "title": "Compute Pooled Standard Deviation",
-      "summary": "Compute Pooled Standard Deviation",
-      "paraphrasedPrompt": "Write a function `combine_std(n, mean, std)` that computes the pooled (combined) standard deviation across several subsets, given numpy arrays of each subset's sample size `n`, sample mean `mean`, and sample standard deviation `std`. Compute the overall weighted mean, then the pooled variance as the weighted average of `(std**2 + mean**2)` minus the square of the overall mean, and return the square root of that pooled variance.",
+      "category": "Data Structures",
+      "title": "Collect Distinct Column Keys From Nested Dict",
+      "summary": "Collect Distinct Column Keys From Nested Dict",
+      "paraphrasedPrompt": "Write a function `filter_data_columns(data)` that takes a dict whose values are themselves dicts of column-name to count (the keys of the outer dict don't matter for this), and returns a sorted list of every distinct column name that appears across all of the inner dicts.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "petebachant/PXL",
-      "sourceUrl": "https://github.com/petebachant/PXL/blob/d7d06cb74422e1ac0154741351fbecea080cfcc0/pxl/timeseries.py#L156-L172",
+      "sourceRepo": "jantman/pypi-download-stats",
+      "sourceUrl": "https://github.com/jantman/pypi-download-stats/blob/44a7a6bbcd61a9e7f02bd02c52584a98183f80c5/pypi_download_stats/outputgenerator.py#L352-L367",
       "supportedLanguages": [
         "Python"
       ],
@@ -1469,19 +1469,19 @@
           "solutions": [
             {
               "solutionId": "py-026-h",
-              "code": "def combine_std(n, mean, std):\n    mean_tot = np.sum(n*mean)/np.sum(n)\n    var_tot = np.sum(n*(std**2 + mean**2))/np.sum(n) - mean_tot**2\n    return np.sqrt(var_tot)",
+              "code": "def filter_data_columns(data):\n    keys = set()\n    for dt, d in data.items():\n        for k in d:\n            keys.add(k)\n    return sorted([x for x in keys])",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "petebachant/PXL",
-                "sourceUrl": "https://github.com/petebachant/PXL/blob/d7d06cb74422e1ac0154741351fbecea080cfcc0/pxl/timeseries.py#L156-L172",
+                "sourceRepoOrAuthor": "jantman/pypi-download-stats",
+                "sourceUrl": "https://github.com/jantman/pypi-download-stats/blob/44a7a6bbcd61a9e7f02bd02c52584a98183f80c5/pypi_download_stats/outputgenerator.py#L352-L367",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-026-ai",
-              "code": "import numpy as np\n\ndef combine_std(n, mean, std):\n    mean_tot = np.sum(n * mean) / np.sum(n)\n    var_tot = np.sum(n * (std ** 2 + mean ** 2)) / np.sum(n) - mean_tot ** 2\n    return np.sqrt(var_tot)",
+              "code": "def filter_data_columns(data):\n    keys = set()\n    for inner in data.values():\n        keys |= set(inner)\n    return sorted(keys)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1595,7 +1595,7 @@
             },
             {
               "solutionId": "py-028-ai",
-              "code": "def find_balanced(text, start, open_c, close_c):\n    depth = 1\n    i = start\n    n = len(text)\n    while depth > 0 and i < n:\n        if text[i] == open_c:\n            depth += 1\n        elif text[i] == close_c:\n            depth -= 1\n        i += 1\n    return i",
+              "code": "def find_balanced(text, start, open_c, close_c):\n    depth = 1\n    for i in range(start, len(text)):\n        if text[i] == open_c:\n            depth += 1\n        elif text[i] == close_c:\n            depth -= 1\n        if depth == 0:\n            return i + 1\n    return len(text)",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1652,7 +1652,7 @@
             },
             {
               "solutionId": "py-029-ai",
-              "code": "import decimal\n\ndef iostats_dict(header, stats):\n    averaged = []\n    for column in zip(*stats):\n        avg = sum(column) / len(column)\n        averaged.append(float(avg.quantize(decimal.Decimal('0.01'))))\n    return dict(zip(header, averaged))",
+              "code": "def iostats_dict(header, stats):\n    averaged = []\n    for column in zip(*stats):\n        avg = sum(column) / len(column)\n        averaged.append(float(avg.quantize(decimal.Decimal('0.01'))))\n    return dict(zip(header, averaged))",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1671,16 +1671,16 @@
     {
       "id": "py-030",
       "category": "Parsing & Conversion",
-      "title": "Parse Derivative Notation String",
-      "summary": "Parse Derivative Notation String",
-      "paraphrasedPrompt": "Write a function `parse_derivative_string(string, quantity_dict)` that, assuming `string` is of the form `d(var1)d(var2)` (a derivative of `var1` with respect to `var2`), returns the tuple `(var1, var2)`. Raise `ValueError` if `string` is not in that form, or if either `var1` or `var2` is not a key in `quantity_dict`.",
+      "title": "Extract Comma-Separated Tag=Value Pairs",
+      "summary": "Extract Comma-Separated Tag=Value Pairs",
+      "paraphrasedPrompt": "Write a function `label_list_parser(url)` that extracts comma-separated `tag=value` pairs from a string. Assume every character other than `/` and `,` is a valid part of a tag or value. Return the set of matched `tag=value` substrings (an empty match should be excluded from the result).",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "atmos-python/atmos",
-      "sourceUrl": "https://github.com/atmos-python/atmos/blob/f4af8eaca23cce881bde979599d15d322fc1935e/atmos/util.py#L143-L158",
+      "sourceRepo": "ome/omego",
+      "sourceUrl": "https://github.com/ome/omego/blob/2dadbf3c6342b6c995f9e0dceaf3c0b7fab030fb/omego/artifacts.py#L327-L336",
       "supportedLanguages": [
         "Python"
       ],
@@ -1697,19 +1697,19 @@
           "solutions": [
             {
               "solutionId": "py-030-h",
-              "code": "def parse_derivative_string(string, quantity_dict):\n    match = derivative_prog.match(string)\n    if match is None:\n        raise ValueError('string is not in the form of a derivative')\n    varname = match.group(1)\n    coordname = match.group(2)\n    if (varname not in quantity_dict.keys() or\n            coordname not in quantity_dict.keys()):\n        raise ValueError('variable in string not a valid quantity')\n    return varname, coordname",
+              "code": "def label_list_parser(self, url):\n        labels = re.findall('([^/,]+=[^/,]+)', url)\n        slabels = set(labels)\n        if '' in slabels:\n            slabels.remove('')\n        return slabels",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "atmos-python/atmos",
-                "sourceUrl": "https://github.com/atmos-python/atmos/blob/f4af8eaca23cce881bde979599d15d322fc1935e/atmos/util.py#L143-L158",
+                "sourceRepoOrAuthor": "ome/omego",
+                "sourceUrl": "https://github.com/ome/omego/blob/2dadbf3c6342b6c995f9e0dceaf3c0b7fab030fb/omego/artifacts.py#L327-L336",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "py-030-ai",
-              "code": "import re\n\n_DERIVATIVE_PROG = re.compile(r\"^d\\(([^()]+)\\)d\\(([^()]+)\\)$\")\n\n\ndef parse_derivative_string(string, quantity_dict):\n    match = _DERIVATIVE_PROG.match(string)\n    if match is None:\n        raise ValueError(\"string is not in the form of a derivative\")\n    varname, coordname = match.group(1), match.group(2)\n    if varname not in quantity_dict or coordname not in quantity_dict:\n        raise ValueError(\"variable in string not a valid quantity\")\n    return varname, coordname",
+              "code": "def label_list_parser(url):\n    pairs = set(re.findall(r'[^/,]+=[^/,]+', url))\n    pairs.discard('')\n    return pairs",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1737,7 +1737,7 @@
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
       "sourceRepo": "Swagger2Markup/swagger2markup",
-      "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/master/src/main/java/io/github/swagger2markup/utils/TagUtils.java",
+      "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/da83465f19a2f8a0f1fba873b5762bca8587896b/src/main/java/io/github/swagger2markup/internal/utils/TagUtils.java#L41-L49",
       "supportedLanguages": [
         "Java"
       ],
@@ -1760,7 +1760,7 @@
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "Swagger2Markup/swagger2markup",
-                "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/master/src/main/java/io/github/swagger2markup/utils/TagUtils.java",
+                "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/da83465f19a2f8a0f1fba873b5762bca8587896b/src/main/java/io/github/swagger2markup/internal/utils/TagUtils.java#L41-L49",
                 "selectionNotes": ""
               }
             },
@@ -1844,7 +1844,7 @@
       "category": "String Processing",
       "title": "Collapse Whitespace In A Token",
       "summary": "Collapse Whitespace In A Token",
-      "paraphrasedPrompt": "Write a method `trimWhitespace(String s)` that filters whitespace out of a token string: trim leading/trailing whitespace, drop newline/tab/carriage-return characters entirely, and collapse any run of consecutive whitespace characters down to a single space (so an internal run of spaces, e.g. from a multi-word number token, is preserved as exactly one space rather than removed completely).",
+      "paraphrasedPrompt": "Write a method `trimWhitespace(String s)` that filters whitespace out of a token string: trim leading/trailing whitespace first, then drop newline/tab/carriage-return characters entirely, and drop any *run* of two or more consecutive whitespace characters entirely too. The one exception: a single, isolated whitespace character (bordered by non-whitespace on both sides) is kept as-is \u2014 e.g. so a number formatted with a single space as a separator, like `\"12 345\"`, stays `\"12 345\"`, while `\"a  b\"` (two spaces) becomes `\"ab\"`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
@@ -1880,7 +1880,7 @@
             },
             {
               "solutionId": "java-003-ai",
-              "code": "public static String trimWhitespace(String s) {\n    String str = s.trim();\n    StringBuilder result = new StringBuilder();\n    boolean lastWasSpace = false;\n    for (int i = 0; i < str.length(); i++) {\n        char c = str.charAt(i);\n        if (c == '\\n' || c == '\\t' || c == '\\r') {\n            continue;\n        }\n        if (Character.isWhitespace(c)) {\n            if (!lastWasSpace) {\n                result.append(' ');\n            }\n            lastWasSpace = true;\n        } else {\n            result.append(c);\n            lastWasSpace = false;\n        }\n    }\n    return result.toString();\n}",
+              "code": "public static String trimWhitespace(String s) {\n    String str = s.trim();\n    int n = str.length();\n    StringBuilder result = new StringBuilder();\n    int i = 0;\n    while (i < n) {\n        char c = str.charAt(i);\n        if (Character.isWhitespace(c)) {\n            int j = i;\n            while (j < n && Character.isWhitespace(str.charAt(j))) {\n                j++;\n            }\n            boolean isolated = (j - i) == 1;\n            if (isolated && c != '\\n' && c != '\\t' && c != '\\r') {\n                result.append(c);\n            }\n            i = j;\n        } else {\n            result.append(c);\n            i++;\n        }\n    }\n    return result.toString();\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2412,16 +2412,16 @@
     {
       "id": "java-013",
       "category": "Encoding & Checksums",
-      "title": "Percent-Encode A String For An API",
-      "summary": "Percent-Encode A String For An API",
-      "paraphrasedPrompt": "Write a method `normalize(String value)` that normalizes a string for use in a web service API following RFC 3986: convert the string to a UTF-8 byte array, then percent-encode every octet except the unreserved characters (`A-Z`, `a-z`, `0-9`, `-`, `_`, `.`, `~`), using uppercase hex digits in the `%XX` escapes.",
+      "title": "Read Null-Terminated String From Byte Array",
+      "summary": "Read Null-Terminated String From Byte Array",
+      "paraphrasedPrompt": "Write a method `getString(byte[] data, int offset)` that reads a string of single-byte characters from `data`, starting at `offset`. The string ends either at the end of the array, or when a zero byte is encountered (whichever comes first) \u2014 the terminating zero byte itself is not included in the result.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "baidubce/bce-sdk-java",
-      "sourceUrl": "https://github.com/baidubce/bce-sdk-java/blob/f7140f28dd82121515c88ded7bfe769a37d0ec4a/src/main/java/com/baidubce/util/HttpUtils.java#L116-L130",
+      "sourceRepo": "joniles/mpxj",
+      "sourceUrl": "https://github.com/joniles/mpxj/blob/143ea0e195da59cd108f13b3b06328e9542337e8/src/main/java/net/sf/mpxj/mpp/MPPUtility.java#L492-L510",
       "supportedLanguages": [
         "Java"
       ],
@@ -2438,19 +2438,19 @@
           "solutions": [
             {
               "solutionId": "java-013-h",
-              "code": "public static String normalize(String value) {\n        try {\n            StringBuilder builder = new StringBuilder();\n            for (byte b : value.getBytes(DEFAULT_ENCODING)) {\n                if (URI_UNRESERVED_CHARACTERS.get(b & 0xFF)) {\n                    builder.append((char) b);\n                } else {\n                    builder.append(PERCENT_ENCODED_STRINGS[b & 0xFF]);\n                }\n            }\n            return builder.toString();\n        } catch (UnsupportedEncodingException e) {\n            throw new RuntimeException(e);\n        }\n    }",
+              "code": "public static final String getString(byte[] data, int offset)\n   {\n      StringBuilder buffer = new StringBuilder();\n      char c;\n\n      for (int loop = 0; offset + loop < data.length; loop++)\n      {\n         c = (char) data[offset + loop];\n\n         if (c == 0)\n         {\n            break;\n         }\n\n         buffer.append(c);\n      }\n\n      return (buffer.toString());\n   }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "baidubce/bce-sdk-java",
-                "sourceUrl": "https://github.com/baidubce/bce-sdk-java/blob/f7140f28dd82121515c88ded7bfe769a37d0ec4a/src/main/java/com/baidubce/util/HttpUtils.java#L116-L130",
+                "sourceRepoOrAuthor": "joniles/mpxj",
+                "sourceUrl": "https://github.com/joniles/mpxj/blob/143ea0e195da59cd108f13b3b06328e9542337e8/src/main/java/net/sf/mpxj/mpp/MPPUtility.java#L492-L510",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-013-ai",
-              "code": "public static String normalize(String value) {\n    try {\n        StringBuilder result = new StringBuilder();\n        for (byte b : value.getBytes(\"UTF-8\")) {\n            int c = b & 0xFF;\n            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')\n                    || c == '-' || c == '_' || c == '.' || c == '~') {\n                result.append((char) c);\n            } else {\n                result.append('%').append(String.format(\"%02X\", c));\n            }\n        }\n        return result.toString();\n    } catch (UnsupportedEncodingException e) {\n        throw new RuntimeException(e);\n    }\n}",
+              "code": "public static String getString(byte[] data, int offset) {\n    int end = offset;\n    while (end < data.length && data[end] != 0) {\n        end++;\n    }\n    StringBuilder result = new StringBuilder(end - offset);\n    for (int i = offset; i < end; i++) {\n        result.append((char) data[i]);\n    }\n    return result.toString();\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2469,16 +2469,16 @@
     {
       "id": "java-014",
       "category": "Data Structures",
-      "title": "Count Elements Shared Between Two Arrays",
-      "summary": "Count Elements Shared Between Two Arrays",
-      "paraphrasedPrompt": "Write a method `countCommonElements(int[] arra, int[] arrb)` that returns the number of elements shared between the two arrays (both are assumed to contain sets, with no repeated values within either array). Every value that appears in both arrays counts once toward the total.",
+      "title": "Trim Array To A Maximum Capacity",
+      "summary": "Trim Array To A Maximum Capacity",
+      "paraphrasedPrompt": "Write a method `trimToCapacity(short[] array, int maxCapacity)` that ensures the given array holds no more than `maxCapacity` elements. If `array.length <= maxCapacity`, return the array unchanged (the identical reference). Otherwise, return a new array of length `maxCapacity` containing the first `maxCapacity` elements of the original.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "VoltDB/voltdb",
-      "sourceUrl": "https://github.com/VoltDB/voltdb/blob/8afc1031e475835344b5497ea9e7203bc95475ac/src/hsqldb19b3/org/hsqldb_voltpatches/lib/ArrayUtil.java#L499-L512",
+      "sourceRepo": "wellner/jcarafe",
+      "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/Arrays.java#L576-L583",
       "supportedLanguages": [
         "Java"
       ],
@@ -2495,19 +2495,19 @@
           "solutions": [
             {
               "solutionId": "java-014-h",
-              "code": "public static int countCommonElements(int[] arra, int[] arrb) {\n\n        int k = 0;\n\n        for (int i = 0; i < arra.length; i++) {\n            for (int j = 0; j < arrb.length; j++) {\n                if (arra[i] == arrb[j]) {\n                    k++;\n                }\n            }\n        }\n\n        return k;\n    }",
+              "code": "public static short[] trimToCapacity(short[] array, int maxCapacity) {\n\tif (array.length > maxCapacity) {\n\t    short oldArray[] = array;\n\t    array = new short[maxCapacity];\n\t    System.arraycopy(oldArray, 0, array, 0, maxCapacity);\n\t}\n\treturn array;\n}",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "VoltDB/voltdb",
-                "sourceUrl": "https://github.com/VoltDB/voltdb/blob/8afc1031e475835344b5497ea9e7203bc95475ac/src/hsqldb19b3/org/hsqldb_voltpatches/lib/ArrayUtil.java#L499-L512",
+                "sourceRepoOrAuthor": "wellner/jcarafe",
+                "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/Arrays.java#L576-L583",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-014-ai",
-              "code": "public static int countCommonElements(int[] arra, int[] arrb) {\n    Set<Integer> setB = new HashSet<>();\n    for (int value : arrb) {\n        setB.add(value);\n    }\n    int count = 0;\n    for (int value : arra) {\n        if (setB.contains(value)) {\n            count++;\n        }\n    }\n    return count;\n}",
+              "code": "public static short[] trimToCapacity(short[] array, int maxCapacity) {\n    if (array.length <= maxCapacity) {\n        return array;\n    }\n    return Arrays.copyOf(array, maxCapacity);\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2706,7 +2706,7 @@
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
       "sourceRepo": "lessthanoptimal/BoofCV",
-      "sourceUrl": "https://github.com/lessthanoptimal/BoofCV/blob/master/main/boofcv-ip/src/main/java/boofcv/alg/misc/Confusion.java",
+      "sourceUrl": "https://github.com/lessthanoptimal/BoofCV/blob/f01c0243da0ec086285ee722183804d5923bc3ac/main/boofcv-learning/src/main/java/boofcv/struct/learning/Confusion.java#L48-L63",
       "supportedLanguages": [
         "Java"
       ],
@@ -2729,7 +2729,7 @@
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "lessthanoptimal/BoofCV",
-                "sourceUrl": "https://github.com/lessthanoptimal/BoofCV/blob/master/main/boofcv-ip/src/main/java/boofcv/alg/misc/Confusion.java",
+                "sourceUrl": "https://github.com/lessthanoptimal/BoofCV/blob/f01c0243da0ec086285ee722183804d5923bc3ac/main/boofcv-learning/src/main/java/boofcv/struct/learning/Confusion.java#L48-L63",
                 "selectionNotes": ""
               }
             },
@@ -2868,16 +2868,16 @@
     {
       "id": "java-021",
       "category": "Math & Numeric",
-      "title": "Cubic Interpolation From Function And Derivative",
-      "summary": "Cubic Interpolation From Function And Derivative",
-      "paraphrasedPrompt": "Write a method `cubic2(double f0, double g0, double x0, double f1, double g1, double x1)` that performs cubic interpolation using the function value and derivative computed at two different points `(x0, f0, g0)` and `(x1, f1, g1)`, and returns the interpolated minimizer location. Use this formula (a numerically stable variant from the MINPACK-2 line-search routines): `theta = 3*(f0-f1)/(x1-x0) + g0 + g1`; `s = max(|theta|, |g0|, |g1|)`; `gamma = s * sqrt((theta/s)^2 - (g0/s)*(g1/s))`, negated if `x1 < x0`; `p = (gamma - g0) + theta`; `q = (gamma - g0) + gamma + g1`; and the result is `x0 + (p/q) * (x1 - x0)`.",
+      "title": "Compute Overflow-Safe L2 Norm Of A Counter",
+      "summary": "Compute Overflow-Safe L2 Norm Of A Counter",
+      "paraphrasedPrompt": "Write a generic method `<E, C extends Counter<E>> double saferL2Norm(C c)` (where `Counter` supports `keySet()` returning its keys, and `getCount(key)` returning that key's associated double value) that computes the L2 norm of the counter's values in a numerically safer way, for counters that may hold very large values: first find the maximum absolute value among all entries, then compute `maxVal * sqrt(sum((value / maxVal)^2 for each value))`. Scaling by the max before squaring avoids the overflow that summing squares of very large values directly could cause.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "lessthanoptimal/ddogleg",
-      "sourceUrl": "https://github.com/lessthanoptimal/ddogleg/blob/3786bf448ba23d0e04962dd08c34fa68de276029/src/org/ddogleg/optimization/quasinewton/SearchInterpolate.java#L134-L147",
+      "sourceRepo": "PeterisP/LVTagger",
+      "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/stats/Counters.java#L1325-L1338",
       "supportedLanguages": [
         "Java"
       ],
@@ -2894,19 +2894,19 @@
           "solutions": [
             {
               "solutionId": "java-021-h",
-              "code": "public static double cubic2( double f0 , double g0 , double x0 ,\n\t\t\t\t\t\t\t\t double f1 , double g1 , double x1 )\n\t{\n\t\tdouble theta = 3.0*(f0-f1)/(x1-x0) + g0 + g1;\n\t\tdouble s = Math.max(Math.abs(theta),Math.abs(g0));\n\t\ts= Math.max(s,Math.abs(g1));\n\t\tdouble gamma = s*Math.sqrt((theta/s)*(theta/s) - (g0/s)*(g1/s));\n\t\tif( x1 < x0 )\n\t\t\tgamma = -gamma;\n\t\tdouble p = (gamma-g0) + theta;\n\t\tdouble q = ((gamma-g0)+gamma) + g1;\n\n\t\treturn x0 + (p/q)*(x1-x0);\n\t}",
+              "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n      double value = Math.abs(c.getCount(key));\n      if (value > maxVal)\n        maxVal = value;\n    }\n    double sqrSum = 0.0;\n    for (E key : c.keySet()) {\n      double count = c.getCount(key);\n      sqrSum += Math.pow(count / maxVal, 2);\n    }\n    return maxVal * Math.sqrt(sqrSum);\n  }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "lessthanoptimal/ddogleg",
-                "sourceUrl": "https://github.com/lessthanoptimal/ddogleg/blob/3786bf448ba23d0e04962dd08c34fa68de276029/src/org/ddogleg/optimization/quasinewton/SearchInterpolate.java#L134-L147",
+                "sourceRepoOrAuthor": "PeterisP/LVTagger",
+                "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/stats/Counters.java#L1325-L1338",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-021-ai",
-              "code": "public static double cubic2(double f0, double g0, double x0, double f1, double g1, double x1) {\n    double theta = 3.0 * (f0 - f1) / (x1 - x0) + g0 + g1;\n    double s = Math.max(Math.abs(theta), Math.max(Math.abs(g0), Math.abs(g1)));\n    double gamma = s * Math.sqrt((theta / s) * (theta / s) - (g0 / s) * (g1 / s));\n    if (x1 < x0) {\n        gamma = -gamma;\n    }\n    double p = (gamma - g0) + theta;\n    double q = (gamma - g0) + gamma + g1;\n    return x0 + (p / q) * (x1 - x0);\n}",
+              "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n        maxVal = Math.max(maxVal, Math.abs(c.getCount(key)));\n    }\n    if (maxVal == 0.0) {\n        return 0.0;\n    }\n    double sumOfSquares = 0.0;\n    for (E key : c.keySet()) {\n        double scaled = c.getCount(key) / maxVal;\n        sumOfSquares += scaled * scaled;\n    }\n    return maxVal * Math.sqrt(sumOfSquares);\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3039,16 +3039,16 @@
     {
       "id": "java-024",
       "category": "Parsing & Conversion",
-      "title": "Check If String Is A Valid Integer",
-      "summary": "Check If String Is A Valid Integer",
-      "paraphrasedPrompt": "Write a method `isInt(String str)` that returns `true` if `str` is non-null and can be parsed as a base-10 `int` value, and `false` otherwise (including when `str` is `null`).",
+      "title": "Check For DELETE Keyword Case-Insensitively",
+      "summary": "Check For DELETE Keyword Case-Insensitively",
+      "paraphrasedPrompt": "Write a method `parseDeleteKeyword(char[] query, int offset)` that checks, case-insensitively, whether the 6 characters of `query` starting at `offset` spell out `\"DELETE\"`. Return `false` if there aren't at least 6 characters remaining in `query` from `offset` onward.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "phax/ph-commons",
-      "sourceUrl": "https://github.com/phax/ph-commons/blob/d28c03565f44a0b804d96028d0969f9bb38c4313/ph-commons/src/main/java/com/helger/commons/string/StringParser.java#L1565-L1578",
+      "sourceRepo": "pgjdbc/pgjdbc",
+      "sourceUrl": "https://github.com/pgjdbc/pgjdbc/blob/95ba7b261e39754674c5817695ae5ebf9a341fae/pgjdbc/src/main/java/org/postgresql/core/Parser.java#L562-L573",
       "supportedLanguages": [
         "Java"
       ],
@@ -3065,19 +3065,19 @@
           "solutions": [
             {
               "solutionId": "java-024-h",
-              "code": "public static boolean isInt (final String sStr)\n  {\n    if (sStr != null)\n      try\n      {\n        Integer.parseInt (sStr, DEFAULT_RADIX);\n        return true;\n      }\n      catch (final NumberFormatException ex)\n      {\n      }\n    return false;\n  }",
+              "code": "public static boolean parseDeleteKeyword(final char[] query, int offset) {\n    if (query.length < (offset + 6)) {\n      return false;\n    }\n\n    return (query[offset] | 32) == 'd'\n        && (query[offset + 1] | 32) == 'e'\n        && (query[offset + 2] | 32) == 'l'\n        && (query[offset + 3] | 32) == 'e'\n        && (query[offset + 4] | 32) == 't'\n        && (query[offset + 5] | 32) == 'e';\n  }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "phax/ph-commons",
-                "sourceUrl": "https://github.com/phax/ph-commons/blob/d28c03565f44a0b804d96028d0969f9bb38c4313/ph-commons/src/main/java/com/helger/commons/string/StringParser.java#L1565-L1578",
+                "sourceRepoOrAuthor": "pgjdbc/pgjdbc",
+                "sourceUrl": "https://github.com/pgjdbc/pgjdbc/blob/95ba7b261e39754674c5817695ae5ebf9a341fae/pgjdbc/src/main/java/org/postgresql/core/Parser.java#L562-L573",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-024-ai",
-              "code": "public static boolean isInt(String str) {\n    if (str == null) {\n        return false;\n    }\n    try {\n        Integer.parseInt(str, 10);\n        return true;\n    } catch (NumberFormatException e) {\n        return false;\n    }\n}",
+              "code": "public static boolean parseDeleteKeyword(char[] query, int offset) {\n    if (query.length < offset + 6) {\n        return false;\n    }\n    String word = new String(query, offset, 6).toLowerCase();\n    return word.equals(\"delete\");\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3152,17 +3152,17 @@
     },
     {
       "id": "java-026",
-      "category": "Encoding & Checksums",
-      "title": "Encode Bytes As Hex-Character Bytes",
-      "summary": "Encode Bytes As Hex-Character Bytes",
-      "paraphrasedPrompt": "Write a method `convertToHexBytes(byte[] toBeConverted)` that converts a byte array into a byte array of hex-digit ASCII characters: each input byte becomes two output bytes (the ASCII codes of its two lowercase hex digits). Throw a `NullPointerException` if the input is `null`.",
+      "category": "Data Structures",
+      "title": "Find Index Of Element By Reference Identity",
+      "summary": "Find Index Of Element By Reference Identity",
+      "paraphrasedPrompt": "Write a generic method `<T> int getIndex(List<T> l, T o)` that returns the index of the first occurrence of `o` in list `l`, using reference identity (`==`) rather than `.equals(...)` as the presence test. Return `-1` if `l` does not contain `o`.",
       "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "undertow-io/undertow",
-      "sourceUrl": "https://github.com/undertow-io/undertow/blob/87de0b856a7a4ba8faf5b659537b9af07b763263/core/src/main/java/io/undertow/util/HexConverter.java#L65-L78",
+      "sourceRepo": "PeterisP/LVTagger",
+      "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/CollectionUtils.java#L284-L293",
       "supportedLanguages": [
         "Java"
       ],
@@ -3179,19 +3179,19 @@
           "solutions": [
             {
               "solutionId": "java-026-h",
-              "code": "public static byte[] convertToHexBytes(byte[] toBeConverted) {\n        if (toBeConverted == null) {\n            throw new NullPointerException(\"Parameter to be converted can not be null\");\n        }\n\n        byte[] converted = new byte[toBeConverted.length * 2];\n        for (int i = 0; i < toBeConverted.length; i++) {\n            byte b = toBeConverted[i];\n            converted[i * 2] = HEX_BYTES[b >> 4 & 0x0F];\n            converted[i * 2 + 1] = HEX_BYTES[b & 0x0F];\n        }\n\n        return converted;\n    }",
+              "code": "public static <T> int getIndex(List<T> l, T o) {\n    int i = 0;\n    for (Object o1 : l) {\n      if (o == o1)\n        return i;\n      else\n        i++;\n    }\n    return -1;\n  }",
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "undertow-io/undertow",
-                "sourceUrl": "https://github.com/undertow-io/undertow/blob/87de0b856a7a4ba8faf5b659537b9af07b763263/core/src/main/java/io/undertow/util/HexConverter.java#L65-L78",
+                "sourceRepoOrAuthor": "PeterisP/LVTagger",
+                "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/CollectionUtils.java#L284-L293",
                 "selectionNotes": ""
               }
             },
             {
               "solutionId": "java-026-ai",
-              "code": "private static final byte[] HEX_BYTES = \"0123456789abcdef\".getBytes(StandardCharsets.US_ASCII);\n\npublic static byte[] convertToHexBytes(byte[] toBeConverted) {\n    if (toBeConverted == null) {\n        throw new NullPointerException(\"Parameter to be converted can not be null\");\n    }\n    byte[] result = new byte[toBeConverted.length * 2];\n    for (int i = 0; i < toBeConverted.length; i++) {\n        byte b = toBeConverted[i];\n        result[i * 2] = HEX_BYTES[(b >> 4) & 0x0F];\n        result[i * 2 + 1] = HEX_BYTES[b & 0x0F];\n    }\n    return result;\n}",
+              "code": "public static <T> int getIndex(List<T> l, T o) {\n    for (int i = 0; i < l.size(); i++) {\n        if (l.get(i) == o) {\n            return i;\n        }\n    }\n    return -1;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3362,7 +3362,7 @@
             },
             {
               "solutionId": "java-029-ai",
-              "code": "public static int calculateBindLength(int bindCount) {\n    int totalLength = 0;\n    int placeholderLength = 2;\n    int countAtThisLength = 9;\n\n    while (bindCount > 0) {\n        int used = Math.min(countAtThisLength, bindCount);\n        totalLength += placeholderLength * used;\n        bindCount -= used;\n        placeholderLength++;\n        countAtThisLength *= 10;\n    }\n    return totalLength;\n}",
+              "code": "public static int calculateBindLength(int bindCount) {\n    if (bindCount <= 0) {\n        return 0;\n    }\n    int digits = String.valueOf(bindCount).length();\n    int total = 0;\n    int lowerBound = 1;\n    for (int d = 1; d <= digits; d++) {\n        int upperBound = (int) Math.min(bindCount, Math.pow(10, d) - 1);\n        int count = upperBound - lowerBound + 1;\n        total += count * (1 + d);\n        lowerBound = upperBound + 1;\n    }\n    return total;\n}",
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
