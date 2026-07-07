@@ -7,14 +7,10 @@ import { useStudy } from '../state/StudyContext';
 import { loadCategory } from '../data/loader';
 import { StudyQuestion } from '../types';
 
-function scrollKey(category: string) {
-  return `questionListScroll:${category}`;
-}
-
 export default function CategoryQuestionListPage() {
   const { category } = useParams<{ category: string }>();
   const navigate = useNavigate();
-  const { state, setCategory } = useStudy();
+  const { state, setCategory, setLastViewedQuestion } = useStudy();
 
   const [questions, setQuestions] = useState<StudyQuestion[]>([]);
   const [loading,   setLoading]   = useState(true);
@@ -40,27 +36,21 @@ export default function CategoryQuestionListPage() {
       .finally(() => setLoading(false));
   }, [category]);
 
-  // Restore scroll position once the list has rendered, so returning from a
-  // question's review page (or from browser back) lands where the participant left off.
+  // Scroll back to the last question the participant opened in this category (if any),
+  // so returning from a question's review page lands on that same question, not the top.
   useEffect(() => {
-    if (loading || error || !category || restoredRef.current) return;
+    if (loading || error || !category || restoredRef.current || questions.length === 0) return;
     restoredRef.current = true;
-    const saved = sessionStorage.getItem(scrollKey(category));
-    if (saved) {
-      window.scrollTo(0, parseInt(saved, 10));
-    }
-  }, [loading, error, category]);
+    const lastId = state.lastViewedQuestion[category];
+    if (!lastId) return;
+    const el = document.getElementById(`question-card-${lastId}`);
+    el?.scrollIntoView({ block: 'center' });
+  }, [loading, error, category, questions, state.lastViewedQuestion]);
 
-  // Remember scroll position whenever we leave this page.
-  useEffect(() => {
-    if (!category) return;
-    const save = () => sessionStorage.setItem(scrollKey(category), String(window.scrollY));
-    window.addEventListener('beforeunload', save);
-    return () => {
-      save();
-      window.removeEventListener('beforeunload', save);
-    };
-  }, [category]);
+  const handleSelectQuestion = (q: StudyQuestion) => {
+    if (category) setLastViewedQuestion(category, q.id);
+    navigate(`/review/${category}/${q.id}`);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
@@ -107,7 +97,7 @@ export default function CategoryQuestionListPage() {
                 key={q.id}
                 question={q}
                 index={i}
-                onClick={() => navigate(`/review/${category}/${q.id}`)}
+                onClick={() => handleSelectQuestion(q)}
               />
             ))}
           </div>

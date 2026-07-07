@@ -74,4 +74,9 @@ export interface AppState {
   participant: ParticipantProfile | null;
   selectedCategory: string | null;
   review: ReviewSession | null;
+  /** In-progress (possibly unsubmitted) review sessions, keyed by `${questionId}::${language}`,
+   *  so navigating away and back to the same question restores prior answers for this session. */
+  reviewsByQuestion: Record<string, ReviewSession>;
+  /** Last question opened per category, so the question list can scroll back to it. */
+  lastViewedQuestion: Record<string, string>;
 }

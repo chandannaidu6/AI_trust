@@ -10,6 +10,7 @@ interface QuestionCardProps {
 export function QuestionCard({ question, index, onClick }: QuestionCardProps) {
   return (
     <button
+      id={`question-card-${question.id}`}
       onClick={onClick}
       className="w-full text-left bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700
                  rounded-xl p-5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600

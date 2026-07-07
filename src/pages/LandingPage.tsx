@@ -31,7 +31,7 @@ const STEPS = [
       </svg>
     ),
     title: 'Review Code',
-    desc: 'Read 4 unlabeled solutions and rate each one independently.',
+    desc: 'Read 2 unlabeled solutions and rate each one independently.',
   },
   {
     icon: (
@@ -71,8 +71,9 @@ export default function LandingPage() {
               <span className="text-indigo-600 dark:text-indigo-400">AI-Generated Code</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
-              A blind code review experiment. You will evaluate solutions to well-known
-              programming problems — without knowing which were written by humans and which by AI.
+              A blind code review experiment. You will evaluate real functions pulled from
+              open-source Python and Java projects — without knowing which solution was written
+              by a human developer and which by AI.
             </p>
           </div>
 
@@ -103,7 +104,7 @@ export default function LandingPage() {
             </svg>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               <strong className="text-slate-700 dark:text-slate-300">Blind study design.</strong>{' '}
-              Solutions are labeled A, B, C, D only. No solution is marked as human-written
+              Solutions are labeled A and B only. No solution is marked as human-written
               or AI-generated. Evaluate code quality on its own merits.
             </p>
           </div>

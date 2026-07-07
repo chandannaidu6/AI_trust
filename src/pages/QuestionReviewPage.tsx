@@ -12,7 +12,7 @@ import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestion } from '../data/loader';
 import { StudyQuestion, SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS } from '../types';
-import { allRated } from '../utils/helpers';
+import { allRated, reviewSessionKey } from '../utils/helpers';
 
 const LANGUAGES = ['Python', 'Java'];
 
@@ -76,6 +76,22 @@ export default function QuestionReviewPage() {
       .catch(() => setError('Failed to load question data.'))
       .finally(() => setLoading(false));
   }, [questionId]);
+
+  // If this question was already started earlier in the session (language picked,
+  // possibly with some ratings already given), resume it instead of showing the
+  // language picker again.
+  useEffect(() => {
+    if (!question || langPicked) return;
+    for (const lang of question.supportedLanguages) {
+      if (state.reviewsByQuestion[reviewSessionKey(question.id, lang)]) {
+        setLanguage(lang);
+        setLangPicked(true);
+        startReview(question, lang);
+        break;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question]);
 
   const handleLanguagePick = (lang: string) => {
     if (!question) return;

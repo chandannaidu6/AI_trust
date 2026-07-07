@@ -5,6 +5,11 @@ export function generateId(): string {
   return 's-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
 }
 
+/** Key for storing/looking up an in-progress review session for a question+language pair. */
+export function reviewSessionKey(questionId: string, language: string): string {
+  return `${questionId}::${language}`;
+}
+
 /** Average of the five 1–10 rating dimensions. */
 export function avgRating(r: SlotRating): number {
   return (

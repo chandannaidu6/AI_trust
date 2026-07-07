@@ -6,7 +6,7 @@ import {
   SlotLabel, SlotRating, FinalAssessment, StudyQuestion, UISlot, SLOT_LABELS,
 } from '../types';
 import { shuffleForSession } from '../utils/randomize';
-import { generateId } from '../utils/helpers';
+import { generateId, reviewSessionKey } from '../utils/helpers';
 
 // ─── Action types ─────────────────────────────────────────────────────────────
 
@@ -17,6 +17,7 @@ type Action =
   | { type: 'SET_ACTIVE_SLOT'; payload: SlotLabel }
   | { type: 'RATE_SLOT'; payload: { slot: SlotLabel; rating: SlotRating } }
   | { type: 'SUBMIT_ASSESSMENT'; payload: FinalAssessment }
+  | { type: 'SET_LAST_VIEWED_QUESTION'; payload: { category: string; questionId: string } }
   | { type: 'RESET' };
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -25,7 +26,19 @@ const initial: AppState = {
   participant: null,
   selectedCategory: null,
   review: null,
+  reviewsByQuestion: {},
+  lastViewedQuestion: {},
 };
+
+/** Write the (possibly updated) active review session back into the per-question store. */
+function withReview(state: AppState, review: ReviewSession): AppState {
+  const key = reviewSessionKey(review.question.id, review.language);
+  return {
+    ...state,
+    review,
+    reviewsByQuestion: { ...state.reviewsByQuestion, [key]: review },
+  };
+}
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -37,6 +50,15 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'START_REVIEW': {
       const { question, language } = action.payload;
+
+      // If this question+language was already started in this session (submitted or
+      // not), resume it as-is instead of wiping out prior ratings/assessment.
+      const existingKey = reviewSessionKey(question.id, language);
+      const existing = state.reviewsByQuestion[existingKey];
+      if (existing) {
+        return { ...state, review: existing };
+      }
+
       const pid = state.participant?.id ?? generateId();
 
       // Pick the solutions for this language and shuffle them
@@ -77,33 +99,35 @@ function reducer(state: AppState, action: Action): AppState {
         solutionLabels,
       };
 
-      return { ...state, review: session };
+      return withReview(state, session);
     }
 
     case 'SET_ACTIVE_SLOT': {
       if (!state.review) return state;
-      return { ...state, review: { ...state.review, activeSlot: action.payload } };
+      return withReview(state, { ...state.review, activeSlot: action.payload });
     }
 
     case 'RATE_SLOT': {
       if (!state.review) return state;
-      return {
-        ...state,
-        review: {
-          ...state.review,
-          slotRatings: {
-            ...state.review.slotRatings,
-            [action.payload.slot]: action.payload.rating,
-          },
+      return withReview(state, {
+        ...state.review,
+        slotRatings: {
+          ...state.review.slotRatings,
+          [action.payload.slot]: action.payload.rating,
         },
-      };
+      });
     }
 
     case 'SUBMIT_ASSESSMENT': {
       if (!state.review) return state;
+      return withReview(state, { ...state.review, finalAssessment: action.payload });
+    }
+
+    case 'SET_LAST_VIEWED_QUESTION': {
+      const { category, questionId } = action.payload;
       return {
         ...state,
-        review: { ...state.review, finalAssessment: action.payload },
+        lastViewedQuestion: { ...state.lastViewedQuestion, [category]: questionId },
       };
     }
 
@@ -125,6 +149,7 @@ interface StudyContextValue {
   setActiveSlot: (slot: SlotLabel) => void;
   rateSlot: (slot: SlotLabel, rating: SlotRating) => void;
   submitAssessment: (a: FinalAssessment) => void;
+  setLastViewedQuestion: (category: string, questionId: string) => void;
   reset: () => void;
 }
 
@@ -141,10 +166,15 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   const rateSlot        = useCallback((slot: SlotLabel, rating: SlotRating) =>
     dispatch({ type: 'RATE_SLOT', payload: { slot, rating } }), []);
   const submitAssessment = useCallback((a: FinalAssessment)    => dispatch({ type: 'SUBMIT_ASSESSMENT', payload: a }), []);
+  const setLastViewedQuestion = useCallback((category: string, questionId: string) =>
+    dispatch({ type: 'SET_LAST_VIEWED_QUESTION', payload: { category, questionId } }), []);
   const reset           = useCallback(()                       => dispatch({ type: 'RESET' }), []);
 
   return (
-    <StudyContext.Provider value={{ state, setParticipant, setCategory, startReview, setActiveSlot, rateSlot, submitAssessment, reset }}>
+    <StudyContext.Provider value={{
+      state, setParticipant, setCategory, startReview, setActiveSlot, rateSlot,
+      submitAssessment, setLastViewedQuestion, reset,
+    }}>
       {children}
     </StudyContext.Provider>
   );
