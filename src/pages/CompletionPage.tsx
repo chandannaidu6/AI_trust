@@ -186,10 +186,6 @@ export default function CompletionPage() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-xs text-slate-500 dark:text-slate-400">Best:</span>
                   <Badge color={SLOT_COLOR[assessment.bestChoice]}>Solution {assessment.bestChoice}</Badge>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Ranking:</span>
-                  <span className="text-xs font-mono font-semibold text-slate-700 dark:text-slate-200">
-                    {assessment.ranking.join(' › ')}
-                  </span>
                 </div>
                 {assessment.explanation && (
                   <p className="text-xs text-slate-500 dark:text-slate-400 italic border-l-2 border-slate-200 dark:border-slate-600 pl-3 leading-relaxed">

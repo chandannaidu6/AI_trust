@@ -48,10 +48,6 @@ export interface ExportPayload {
     bestChoice: SlotLabel;
     bestChoiceSolutionId: string;
     bestChoiceOriginLabel: string;
-    ranking: SlotLabel[];
-    rankingSolutionIds: string[];
-    rankingOriginLabels: string[];
-    rankingSummary: string;
     explanation: string;
   } | null;
 }
@@ -126,10 +122,6 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
           bestChoice: fa.bestChoice,
           bestChoiceSolutionId: slotMapping[fa.bestChoice],
           bestChoiceOriginLabel: labels[slotMapping[fa.bestChoice]] ?? '',
-          ranking: fa.ranking,
-          rankingSolutionIds: fa.ranking.map(s => slotMapping[s]),
-          rankingOriginLabels: fa.ranking.map(s => labels[slotMapping[s]] ?? ''),
-          rankingSummary: fa.ranking.join(' > '),
           explanation: fa.explanation,
         }
       : null,
@@ -234,9 +226,6 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   r['bestChoice']            = p.finalAssessment?.bestChoice ?? '';
   r['bestChoiceSolutionId']  = p.finalAssessment?.bestChoiceSolutionId ?? '';
   r['bestChoiceOriginLabel'] = p.finalAssessment?.bestChoiceOriginLabel ?? '';
-  r['rankingSummary']        = p.finalAssessment?.rankingSummary ?? '';
-  r['rankingSolutionIds']    = p.finalAssessment?.rankingSolutionIds ?? '';
-  r['rankingOriginLabels']   = p.finalAssessment?.rankingOriginLabels ?? '';
   r['explanation']           = p.finalAssessment?.explanation ?? '';
   return r;
 }

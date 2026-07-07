@@ -53,7 +53,10 @@ function RatingProgress({ rated }: { rated: number }) {
 export default function QuestionReviewPage() {
   const { category, questionId } = useParams<{ category: string; questionId: string }>();
   const navigate = useNavigate();
-  const { state, startReview, setActiveSlot, rateSlot, submitAssessment } = useStudy();
+  const {
+    state, startReview, setActiveSlot, rateSlot, submitAssessment,
+    updateDraftRating, updateDraftAssessment,
+  } = useStudy();
 
   const [question,   setQuestion]   = useState<StudyQuestion | null>(null);
   const [loading,    setLoading]    = useState(true);
@@ -214,6 +217,8 @@ export default function QuestionReviewPage() {
               <ReviewForm
                 slot={activeSlot}
                 existing={ratings[activeSlot]}
+                draft={review?.draftRatings[activeSlot]}
+                onDraftChange={rating => updateDraftRating(activeSlot, rating)}
                 onSubmit={handleRate}
               />
             )}
@@ -222,6 +227,8 @@ export default function QuestionReviewPage() {
               <FinalAssessmentForm
                 ratings={ratings as Record<SlotLabel, SlotRating>}
                 existing={review.finalAssessment}
+                draft={review.draftAssessment}
+                onDraftChange={updateDraftAssessment}
                 onSubmit={handleAssessment}
                 onNext={handleFinish}
               />

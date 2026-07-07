@@ -1,7 +1,8 @@
 import { useState, FormEvent } from 'react';
-import { SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS } from '../../types';
+import { SlotLabel, SlotRating, FinalAssessment, DraftAssessment, SLOT_LABELS } from '../../types';
 import { avgRating } from '../../utils/helpers';
 import { Button } from '../ui/Button';
+import { VoiceTextArea } from '../ui/VoiceTextArea';
 
 const SLOT_COLORS: Record<SlotLabel, { card: string; btn: string; active: string }> = {
   A: {
@@ -19,69 +20,35 @@ const SLOT_COLORS: Record<SlotLabel, { card: string; btn: string; active: string
 interface FinalAssessmentFormProps {
   ratings:  Partial<Record<SlotLabel, SlotRating>>;
   existing?: FinalAssessment | null;
+  draft?: DraftAssessment | null;
+  onDraftChange: (draft: DraftAssessment) => void;
   onSubmit: (a: FinalAssessment) => void;
   onNext:   () => void;
 }
 
-function RankRow({ pos, current, onChange }: {
-  pos:      number;
-  current:  SlotLabel | undefined;
-  onChange: (slot: SlotLabel) => void;
-}) {
-  const labels = ['1st — Best', '2nd — Worst'];
-  return (
-    <div className="flex items-center gap-3 flex-wrap">
-      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-20 shrink-0">
-        {labels[pos]}
-      </span>
-      <div className="flex gap-2">
-        {SLOT_LABELS.map(slot => (
-          <button
-            key={slot}
-            type="button"
-            aria-pressed={current === slot}
-            aria-label={`Rank ${slot} as ${labels[pos]}`}
-            onClick={() => onChange(slot)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md border transition-all
-              focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-              dark:focus-visible:ring-offset-slate-900
-              ${current === slot ? SLOT_COLORS[slot].active : SLOT_COLORS[slot].btn}`}
-          >
-            {slot}
-          </button>
-        ))}
-      </div>
-      {current && (
-        <span className="text-xs text-slate-400 dark:text-slate-500">Solution {current}</span>
-      )}
-    </div>
-  );
-}
-
-export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: FinalAssessmentFormProps) {
-  const [bestChoice,  setBestChoice]  = useState<SlotLabel | null>(existing?.bestChoice ?? null);
-  const [ranking,     setRanking]     = useState<(SlotLabel | undefined)[]>(
-    existing?.ranking ?? SLOT_LABELS.map(() => undefined),
-  );
-  const [explanation, setExplanation] = useState(existing?.explanation ?? '');
+export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, onSubmit, onNext }: FinalAssessmentFormProps) {
+  const [bestChoice,  setBestChoice]  = useState<SlotLabel | null>(existing?.bestChoice ?? draft?.bestChoice ?? null);
+  const [explanation, setExplanation] = useState(existing?.explanation ?? draft?.explanation ?? '');
   const [saved,       setSaved]       = useState(!!existing);
 
-  const setRankPos = (pos: number, slot: SlotLabel) => {
-    const next = [...ranking];
-    const prev = next.indexOf(slot);
-    if (prev !== -1) next[prev] = undefined;
-    next[pos] = slot;
-    setRanking(next);
+  const valid = bestChoice !== null && explanation.trim().length > 0;
+
+  const handleBestChoice = (slot: SlotLabel) => {
+    setBestChoice(slot);
     setSaved(false);
+    onDraftChange({ bestChoice: slot, explanation });
   };
 
-  const rankingComplete = ranking.every(Boolean) && new Set(ranking).size === SLOT_LABELS.length;
-  const valid = bestChoice !== null && rankingComplete && explanation.trim().length > 0;
+  const handleExplanation = (text: string) => {
+    setExplanation(text);
+    setSaved(false);
+    onDraftChange({ bestChoice, explanation: text });
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!valid) return;
-    onSubmit({ bestChoice: bestChoice!, ranking: ranking as SlotLabel[], explanation });
+    onSubmit({ bestChoice: bestChoice!, explanation });
     setSaved(true);
   };
 
@@ -151,7 +118,7 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
                   type="button"
                   role="radio"
                   aria-checked={bestChoice === slot}
-                  onClick={() => { setBestChoice(slot); setSaved(false); }}
+                  onClick={() => handleBestChoice(slot)}
                   className={`flex-1 py-2.5 text-sm font-semibold rounded-lg border transition-all
                     focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
                     dark:focus-visible:ring-offset-slate-900
@@ -163,37 +130,21 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
             </div>
           </fieldset>
 
-          {/* Ranking */}
-          <fieldset className="space-y-2 border-0 p-0 m-0">
-            <legend className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-              Rank both solutions
-              <span className="text-xs text-slate-400 dark:text-slate-500 font-normal ml-2">
-                Click a letter at each position
-              </span>
-            </legend>
-            <div className="space-y-2.5 pt-1">
-              {ranking.map((slot, pos) => (
-                <RankRow key={pos} pos={pos} current={slot} onChange={s => setRankPos(pos, s)} />
-              ))}
-            </div>
-          </fieldset>
-
-          {/* Explanation */}
+          {/* Explanation (spoken) */}
           <div className="space-y-1.5">
             <label htmlFor="final-explanation" className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-              What most influenced your judgment?{' '}
+              Why are you accepting this solution?{' '}
               <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
             </label>
-            <textarea
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              Speak your answer naturally — click record and explain your reasoning out loud.
+            </p>
+            <VoiceTextArea
               id="final-explanation"
               value={explanation}
-              onChange={e => { setExplanation(e.target.value); setSaved(false); }}
+              onChange={handleExplanation}
               placeholder="e.g. variable naming, edge case handling, algorithm clarity, code length…"
               rows={3}
-              className="w-full text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5
-                         text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800
-                         placeholder:text-slate-300 dark:placeholder:text-slate-500
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -205,8 +156,7 @@ export function FinalAssessmentForm({ ratings, existing, onSubmit, onNext }: Fin
             {!valid && (
               <p className="text-xs text-slate-400 dark:text-slate-500">
                 {!bestChoice ? 'Choose a best solution. ' : ''}
-                {!rankingComplete ? 'Complete the ranking. ' : ''}
-                {bestChoice && rankingComplete && !explanation.trim() ? 'Add an explanation.' : ''}
+                {bestChoice && !explanation.trim() ? 'Add an explanation.' : ''}
               </p>
             )}
             {saved && (

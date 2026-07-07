@@ -32,7 +32,12 @@ export interface SlotRating {
 
 export interface FinalAssessment {
   bestChoice: SlotLabel;
-  ranking: SlotLabel[];    // [1st, 2nd]
+  explanation: string;
+}
+
+/** In-progress (not yet submitted) final assessment answers. */
+export interface DraftAssessment {
+  bestChoice: SlotLabel | null;
   explanation: string;
 }
 
@@ -66,6 +71,9 @@ export interface ReviewSession {
   startedAt: Date;
   /** Maps solutionId → human-readable origin label, e.g. "human 1" / "LLM concise" */
   solutionLabels: Record<string, string>;
+  /** Unsaved in-progress form values, kept so navigating away and back doesn't lose them. */
+  draftRatings: Partial<Record<SlotLabel, SlotRating>>;
+  draftAssessment: DraftAssessment | null;
 }
 
 // ─── Full in-memory app state ─────────────────────────────────────────────────

@@ -48,17 +48,22 @@ const DEFAULT: SlotRating = {
 interface ReviewFormProps {
   slot:      SlotLabel;
   existing?: SlotRating;
+  draft?: SlotRating;
+  onDraftChange: (rating: SlotRating) => void;
   onSubmit:  (rating: SlotRating) => void;
 }
 
-export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
-  const [form,  setForm]  = useState<SlotRating>(existing ?? DEFAULT);
+export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: ReviewFormProps) {
+  const [form,  setForm]  = useState<SlotRating>(existing ?? draft ?? DEFAULT);
   const [saved, setSaved] = useState(!!existing);
 
+  // Only resync when switching slots — not on every keystroke, or a draft
+  // auto-save would fight with in-progress typing.
   useEffect(() => {
-    setForm(existing ?? DEFAULT);
+    setForm(existing ?? draft ?? DEFAULT);
     setSaved(!!existing);
-  }, [slot, existing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slot]);
 
   const numericComplete =
     form.readability > 0 &&
@@ -71,8 +76,10 @@ export function ReviewForm({ slot, existing, onSubmit }: ReviewFormProps) {
   const valid = numericComplete && form.acceptDecision !== null && form.briefExplanation.trim().length > 0;
 
   const set = <K extends keyof SlotRating>(key: K, val: SlotRating[K]) => {
-    setForm(f => ({ ...f, [key]: val }));
+    const next = { ...form, [key]: val };
+    setForm(next);
     setSaved(false);
+    onDraftChange(next);
   };
 
   const handleSubmit = (e: FormEvent) => {

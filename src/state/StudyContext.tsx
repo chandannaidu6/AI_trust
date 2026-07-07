@@ -3,7 +3,7 @@ import {
 } from 'react';
 import {
   AppState, ParticipantProfile, ReviewSession,
-  SlotLabel, SlotRating, FinalAssessment, StudyQuestion, UISlot, SLOT_LABELS,
+  SlotLabel, SlotRating, FinalAssessment, DraftAssessment, StudyQuestion, UISlot, SLOT_LABELS,
 } from '../types';
 import { shuffleForSession } from '../utils/randomize';
 import { generateId, reviewSessionKey } from '../utils/helpers';
@@ -17,6 +17,8 @@ type Action =
   | { type: 'SET_ACTIVE_SLOT'; payload: SlotLabel }
   | { type: 'RATE_SLOT'; payload: { slot: SlotLabel; rating: SlotRating } }
   | { type: 'SUBMIT_ASSESSMENT'; payload: FinalAssessment }
+  | { type: 'UPDATE_DRAFT_RATING'; payload: { slot: SlotLabel; rating: SlotRating } }
+  | { type: 'UPDATE_DRAFT_ASSESSMENT'; payload: DraftAssessment }
   | { type: 'SET_LAST_VIEWED_QUESTION'; payload: { category: string; questionId: string } }
   | { type: 'RESET' };
 
@@ -97,6 +99,8 @@ function reducer(state: AppState, action: Action): AppState {
         activeSlot: 'A',
         startedAt: new Date(),
         solutionLabels,
+        draftRatings: {},
+        draftAssessment: null,
       };
 
       return withReview(state, session);
@@ -121,6 +125,22 @@ function reducer(state: AppState, action: Action): AppState {
     case 'SUBMIT_ASSESSMENT': {
       if (!state.review) return state;
       return withReview(state, { ...state.review, finalAssessment: action.payload });
+    }
+
+    case 'UPDATE_DRAFT_RATING': {
+      if (!state.review) return state;
+      return withReview(state, {
+        ...state.review,
+        draftRatings: {
+          ...state.review.draftRatings,
+          [action.payload.slot]: action.payload.rating,
+        },
+      });
+    }
+
+    case 'UPDATE_DRAFT_ASSESSMENT': {
+      if (!state.review) return state;
+      return withReview(state, { ...state.review, draftAssessment: action.payload });
     }
 
     case 'SET_LAST_VIEWED_QUESTION': {
@@ -149,6 +169,8 @@ interface StudyContextValue {
   setActiveSlot: (slot: SlotLabel) => void;
   rateSlot: (slot: SlotLabel, rating: SlotRating) => void;
   submitAssessment: (a: FinalAssessment) => void;
+  updateDraftRating: (slot: SlotLabel, rating: SlotRating) => void;
+  updateDraftAssessment: (a: DraftAssessment) => void;
   setLastViewedQuestion: (category: string, questionId: string) => void;
   reset: () => void;
 }
@@ -166,6 +188,10 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   const rateSlot        = useCallback((slot: SlotLabel, rating: SlotRating) =>
     dispatch({ type: 'RATE_SLOT', payload: { slot, rating } }), []);
   const submitAssessment = useCallback((a: FinalAssessment)    => dispatch({ type: 'SUBMIT_ASSESSMENT', payload: a }), []);
+  const updateDraftRating = useCallback((slot: SlotLabel, rating: SlotRating) =>
+    dispatch({ type: 'UPDATE_DRAFT_RATING', payload: { slot, rating } }), []);
+  const updateDraftAssessment = useCallback((a: DraftAssessment) =>
+    dispatch({ type: 'UPDATE_DRAFT_ASSESSMENT', payload: a }), []);
   const setLastViewedQuestion = useCallback((category: string, questionId: string) =>
     dispatch({ type: 'SET_LAST_VIEWED_QUESTION', payload: { category, questionId } }), []);
   const reset           = useCallback(()                       => dispatch({ type: 'RESET' }), []);
@@ -173,7 +199,7 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   return (
     <StudyContext.Provider value={{
       state, setParticipant, setCategory, startReview, setActiveSlot, rateSlot,
-      submitAssessment, setLastViewedQuestion, reset,
+      submitAssessment, updateDraftRating, updateDraftAssessment, setLastViewedQuestion, reset,
     }}>
       {children}
     </StudyContext.Provider>
