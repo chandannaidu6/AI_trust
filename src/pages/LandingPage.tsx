@@ -72,7 +72,7 @@ export default function LandingPage() {
             </h1>
             <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
               A blind code review experiment. You will evaluate real functions pulled from
-              open-source Python and Java projects — without knowing which solution was written
+              open-source Python and Java projects, without knowing which solution was written
               by a human developer and which by AI.
             </p>
           </div>

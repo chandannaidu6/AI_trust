@@ -64,7 +64,7 @@ export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, o
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
-          All solutions reviewed — Final Assessment
+          All solutions reviewed: Final Assessment
         </span>
       </div>
 
@@ -96,7 +96,7 @@ export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, o
                     r.acceptDecision === 'no'  ? 'text-red-500 dark:text-red-400' :
                     'text-amber-600 dark:text-amber-400'
                   }`}>
-                    {r.acceptDecision === 'yes' ? '✓ Approve' : r.acceptDecision === 'no' ? '✗ Reject' : r.acceptDecision === 'needs_changes' ? '~ Changes' : '—'}
+                    {r.acceptDecision === 'yes' ? '✓ Approve' : r.acceptDecision === 'no' ? '✗ Reject' : '~ Changes'}
                   </div>
                 </div>
               );
@@ -137,7 +137,7 @@ export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, o
               <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
             </label>
             <p className="text-xs text-slate-400 dark:text-slate-500">
-              Speak your answer naturally — click record and explain your reasoning out loud.
+              Speak your answer naturally. Click record and explain your reasoning out loud.
             </p>
             <VoiceTextArea
               id="final-explanation"
