@@ -41,7 +41,7 @@ const STEPS = [
       </svg>
     ),
     title: 'Final Assessment',
-    desc: 'Choose the best solution and rank both.',
+    desc: 'Choose the best solution and explain your reasoning aloud.',
   },
 ];
 
