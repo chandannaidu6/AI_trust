@@ -12,8 +12,8 @@ type RecognitionState = 'idle' | 'recording' | 'unsupported' | 'denied';
 
 /**
  * Free, browser-native speech-to-text (Web Speech API — no API key, no cost).
- * Falls back to a plain editable textarea when unsupported or denied, so the
- * study never gets blocked by browser/mic limitations.
+ * The textarea is read-only — the only way to fill it in is by recording, so
+ * participants can't just type a canned answer instead of speaking one.
  */
 export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: VoiceTextAreaProps) {
   const [state, setState] = useState<RecognitionState>('idle');
@@ -99,25 +99,26 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
         )}
         {state === 'denied' && (
           <span className="text-xs text-red-500 dark:text-red-400">
-            Microphone access denied — you can type your answer instead.
+            Microphone access denied. Please allow microphone access and try recording again.
           </span>
         )}
         {state === 'unsupported' && (
           <span className="text-xs text-slate-400 dark:text-slate-500">
-            Voice input isn't supported in this browser — please type your answer.
+            Voice input isn't supported in this browser. Please try Chrome or Edge to answer this question.
           </span>
         )}
       </div>
       <textarea
         id={id}
         value={value}
-        onChange={e => onChange(e.target.value)}
+        readOnly
         placeholder={placeholder}
         rows={rows}
+        aria-readonly="true"
         className="w-full text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5
-                   text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800
+                   text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/60
                    placeholder:text-slate-300 dark:placeholder:text-slate-500
-                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none cursor-default"
       />
     </div>
   );
