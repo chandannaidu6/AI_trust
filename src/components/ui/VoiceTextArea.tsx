@@ -70,6 +70,13 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     setState('idle');
   };
 
+  const clearText = () => {
+    recognitionRef.current?.stop();
+    baseTextRef.current = '';
+    onChange('');
+    setState('idle');
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
@@ -89,6 +96,22 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
                 d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
             </svg>
             {state === 'recording' ? 'Stop recording' : 'Record your answer'}
+          </button>
+        )}
+        {value.trim().length > 0 && (
+          <button
+            type="button"
+            onClick={clearText}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors
+              bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-400
+              hover:border-red-300 hover:text-red-600 dark:hover:text-red-400
+              focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9.5 4h5a1 1 0 011 1v2h-7V5a1 1 0 011-1z" />
+            </svg>
+            Clear &amp; re-record
           </button>
         )}
         {state === 'recording' && (
