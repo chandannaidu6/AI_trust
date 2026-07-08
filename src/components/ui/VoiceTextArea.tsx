@@ -97,9 +97,17 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     // multiple times. Recomputing the full finalized text each time is
     // idempotent regardless of what Android replays.
     let sessionFinal = '';
+    let sessionStartedAt = Date.now();
+    // Consecutive sessions that ended almost instantly — a sign the browser
+    // is failing to start recognition at all (seen on some Mac browsers),
+    // not just a normal mobile pause cutoff. Left unchecked, "restart
+    // transparently" turns into a rapid on/off loop that never records
+    // anything (the mic indicator flickers) with no visible feedback.
+    let quickFailStreak = 0;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
+      quickFailStreak = 0;
       let finalText = '';
       let interimText = '';
       for (let i = 0; i < event.results.length; i++) {
@@ -116,6 +124,13 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
         intentionalStopRef.current = true;
         setState('denied');
+      } else if (event.error === 'audio-capture') {
+        // No working microphone is available (e.g. the system's selected
+        // input device is disconnected) — restarting can't fix this, so
+        // don't loop forever silently retrying.
+        intentionalStopRef.current = true;
+        setErrorMessage('No working microphone was found. Check your system\'s audio input device and try again.');
+        setState('error');
       }
       // Other errors (e.g. "no-speech", "network") are recovered by the
       // auto-restart in onend below, so they're not treated as fatal here.
@@ -131,9 +146,20 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
         setState('idle');
         return;
       }
+
+      const sessionDurationMs = Date.now() - sessionStartedAt;
+      quickFailStreak = sessionDurationMs < 300 ? quickFailStreak + 1 : 0;
+      if (quickFailStreak >= 3) {
+        intentionalStopRef.current = true;
+        setErrorMessage('Speech recognition isn\'t responding in this browser. Please try Chrome, or check your microphone.');
+        setState('error');
+        return;
+      }
+
       // Not a user-initiated stop — the browser cut us off (common on
       // mobile). Restart transparently so recording keeps going.
       try {
+        sessionStartedAt = Date.now();
         recognition.start();
       } catch {
         setState('idle');
@@ -211,8 +237,19 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch {
-      setState('denied');
+    } catch (err) {
+      const name = err instanceof Error ? err.name : '';
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        setState('denied');
+      } else if (name === 'NotFoundError' || name === 'NotReadableError' || name === 'OverconstrainedError') {
+        // No working microphone is available (e.g. the system's selected
+        // input device is disconnected), rather than permission being denied.
+        setErrorMessage('No working microphone was found. Check your system\'s audio input device and try again.');
+        setState('error');
+      } else {
+        setErrorMessage(err instanceof Error ? err.message : 'Could not access the microphone.');
+        setState('error');
+      }
       return;
     }
     streamRef.current = stream;
