@@ -15,7 +15,8 @@ type EngineState =
   | 'transcribing'
   | 'loading-model'
   | 'denied'
-  | 'unsupported';
+  | 'unsupported'
+  | 'error';
 
 type Mode = 'native' | 'whisper' | 'unsupported';
 
@@ -48,6 +49,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
   const modeRef = useRef<Mode>('unsupported');
   const [state, setState] = useState<EngineState>('idle');
   const [modelProgress, setModelProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Native Web Speech API refs
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,50 +164,79 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
   const getWorker = () => {
     if (!workerRef.current) {
-      workerRef.current = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
+      const worker = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
+      // Covers failures the worker itself can't catch and postMessage back
+      // (e.g. the module failing to load/evaluate at all).
+      worker.addEventListener('error', (event: ErrorEvent) => {
+        setErrorMessage(event.message || 'The speech model failed to load.');
+        setState('error');
+      });
+      workerRef.current = worker;
     }
     return workerRef.current;
   };
 
   const transcribeWhisperRecording = async () => {
-    const blob = new Blob(chunksRef.current, { type: mediaRecorderRef.current?.mimeType });
-    const worker = getWorker();
-    const pcm = await blobToWhisperPCM(blob);
-    const prefix = value ? value.trim() + ' ' : '';
+    try {
+      const blob = new Blob(chunksRef.current, { type: mediaRecorderRef.current?.mimeType });
+      const worker = getWorker();
+      const pcm = await blobToWhisperPCM(blob);
+      const prefix = value ? value.trim() + ' ' : '';
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleMessage = (event: MessageEvent<any>) => {
-      const msg = event.data;
-      if (msg.type === 'progress' && typeof msg.progress === 'number') {
-        setState('loading-model');
-        setModelProgress(msg.progress);
-      } else if (msg.type === 'result') {
-        onChange((prefix + msg.text).trim());
-        setState('idle');
-        worker.removeEventListener('message', handleMessage);
-      } else if (msg.type === 'error') {
-        setState('idle');
-        worker.removeEventListener('message', handleMessage);
-      }
-    };
-    worker.addEventListener('message', handleMessage);
-    worker.postMessage({ type: 'transcribe', audio: pcm }, [pcm.buffer]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleMessage = (event: MessageEvent<any>) => {
+        const msg = event.data;
+        if (msg.type === 'progress' && typeof msg.progress === 'number') {
+          setState('loading-model');
+          setModelProgress(msg.progress);
+        } else if (msg.type === 'result') {
+          onChange((prefix + msg.text).trim());
+          setState('idle');
+          worker.removeEventListener('message', handleMessage);
+        } else if (msg.type === 'error') {
+          setErrorMessage(msg.message || 'Transcription failed.');
+          setState('error');
+          worker.removeEventListener('message', handleMessage);
+        }
+      };
+      worker.addEventListener('message', handleMessage);
+      worker.postMessage({ type: 'transcribe', audio: pcm }, [pcm.buffer]);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Could not process the recording.');
+      setState('error');
+    }
   };
 
   const startWhisperRecording = async () => {
+    let stream: MediaStream;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      const recorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-      recorder.onstop = () => { transcribeWhisperRecording(); };
-      mediaRecorderRef.current = recorder;
-      recorder.start();
-      setState('recording');
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch {
       setState('denied');
+      return;
     }
+    streamRef.current = stream;
+
+    // Safari (including iOS) doesn't support the same mimeTypes Chrome does —
+    // pick the first one it actually supports instead of assuming a default.
+    const mimeType = ['audio/mp4', 'audio/webm', 'audio/ogg']
+      .find(t => window.MediaRecorder.isTypeSupported?.(t));
+    let recorder: MediaRecorder;
+    try {
+      recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    } catch (err) {
+      stream.getTracks().forEach(t => t.stop());
+      setErrorMessage(err instanceof Error ? err.message : 'Recording isn\'t supported in this browser.');
+      setState('error');
+      return;
+    }
+
+    chunksRef.current = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+    recorder.onstop = () => { transcribeWhisperRecording(); };
+    mediaRecorderRef.current = recorder;
+    recorder.start();
+    setState('recording');
   };
 
   const stopWhisperRecording = () => {
@@ -305,6 +336,11 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
         {state === 'unsupported' && (
           <span className="text-xs text-slate-400 dark:text-slate-500">
             Voice input isn't supported on this device.
+          </span>
+        )}
+        {state === 'error' && (
+          <span className="text-xs text-red-500 dark:text-red-400">
+            {errorMessage || 'Something went wrong recording your answer.'} Please try recording again.
           </span>
         )}
       </div>

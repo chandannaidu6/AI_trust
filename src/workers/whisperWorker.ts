@@ -8,6 +8,15 @@ import { pipeline, env } from '@xenova/transformers';
 // never look for locally-hosted model files.
 env.allowLocalModels = false;
 
+// onnxruntime-web defaults to multi-threaded WASM, which requires
+// SharedArrayBuffer — only available when the page is served with
+// Cross-Origin-Opener-Policy/Cross-Origin-Embedder-Policy headers. This
+// static deployment doesn't set those, so without this, the runtime can fail
+// to initialize entirely on browsers that enforce the restriction (this is
+// what broke transcription on iOS Safari). Single-threaded is slower but
+// works with zero server configuration.
+env.backends.onnx.wasm.numThreads = 1;
+
 type WorkerRequest =
   | { type: 'load' }
   | { type: 'transcribe'; audio: Float32Array };
