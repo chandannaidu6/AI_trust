@@ -28,6 +28,11 @@ function detectMode(): Mode {
   return 'unsupported';
 }
 
+// Tagged so it's easy to filter in DevTools (console filter: "[VoiceTextArea]").
+function logVoiceError(context: string, detail: unknown) {
+  console.error(`[VoiceTextArea] ${context}`, detail);
+}
+
 /**
  * Free, browser-native speech-to-text. The textarea is read-only — the only
  * way to fill it in is by recording, so participants can't just type a
@@ -65,6 +70,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
   useEffect(() => {
     modeRef.current = detectMode();
+    console.info('[VoiceTextArea] detected mode:', modeRef.current);
     if (modeRef.current === 'unsupported') setState('unsupported');
     return () => {
       intentionalStopRef.current = true;
@@ -85,10 +91,16 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     const SpeechRecognition = getSpeechRecognitionCtor();
     if (!SpeechRecognition) return null;
 
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    let recognition;
+    try {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+    } catch (err) {
+      logVoiceError('new SpeechRecognition() construction/setup threw', err);
+      return null;
+    }
 
     // Text finalized so far *within the current start/stop cycle*. Rebuilt
     // from scratch on every event rather than appended incrementally: Android
@@ -108,19 +120,24 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
       quickFailStreak = 0;
-      let finalText = '';
-      let interimText = '';
-      for (let i = 0; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalText += transcript + ' ';
-        else interimText += transcript;
+      try {
+        let finalText = '';
+        let interimText = '';
+        for (let i = 0; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalText += transcript + ' ';
+          else interimText += transcript;
+        }
+        sessionFinal = finalText;
+        onChange((baseTextRef.current + sessionFinal + interimText).trim());
+      } catch (err) {
+        logVoiceError('native recognition.onresult parsing threw', err);
       }
-      sessionFinal = finalText;
-      onChange((baseTextRef.current + sessionFinal + interimText).trim());
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onerror = (event: any) => {
+      logVoiceError('native recognition.onerror', event.error);
       if (event.error === 'not-allowed' || event.error === 'permission-denied') {
         intentionalStopRef.current = true;
         setState('denied');
@@ -150,6 +167,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       const sessionDurationMs = Date.now() - sessionStartedAt;
       quickFailStreak = sessionDurationMs < 300 ? quickFailStreak + 1 : 0;
       if (quickFailStreak >= 3) {
+        logVoiceError('native recognition — gave up after repeated instant-end restarts', { sessionDurationMs });
         intentionalStopRef.current = true;
         setErrorMessage('Speech recognition isn\'t responding in this browser. Please try Chrome, or check your microphone.');
         setState('error');
@@ -161,7 +179,8 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       try {
         sessionStartedAt = Date.now();
         recognition.start();
-      } catch {
+      } catch (err) {
+        logVoiceError('native recognition.start() threw on restart', err);
         setState('idle');
       }
     };
@@ -171,18 +190,32 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
   const startNativeRecording = () => {
     const recognition = createRecognition();
-    if (!recognition) { setState('unsupported'); return; }
+    if (!recognition) {
+      logVoiceError('createRecognition() returned null despite native mode being detected', null);
+      setState('unsupported');
+      return;
+    }
 
     intentionalStopRef.current = false;
     baseTextRef.current = value ? value.trim() + ' ' : '';
     recognitionRef.current = recognition;
-    recognition.start();
-    setState('recording');
+    try {
+      recognition.start();
+      setState('recording');
+    } catch (err) {
+      logVoiceError('native recognition.start() threw on initial start', err);
+      setState('error');
+      setErrorMessage(err instanceof Error ? err.message : 'Could not start recording.');
+    }
   };
 
   const stopNativeRecording = () => {
     intentionalStopRef.current = true;
-    recognitionRef.current?.stop();
+    try {
+      recognitionRef.current?.stop();
+    } catch (err) {
+      logVoiceError('native recognition.stop() threw', err);
+    }
     setState('idle');
   };
 
@@ -190,10 +223,17 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
   const getWorker = () => {
     if (!workerRef.current) {
-      const worker = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
+      let worker: Worker;
+      try {
+        worker = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
+      } catch (err) {
+        logVoiceError('new Worker(whisperWorker) construction threw', err);
+        throw err;
+      }
       // Covers failures the worker itself can't catch and postMessage back
       // (e.g. the module failing to load/evaluate at all).
       worker.addEventListener('error', (event: ErrorEvent) => {
+        logVoiceError('whisper worker crashed', event);
         setErrorMessage(event.message || 'The speech model failed to load.');
         setState('error');
       });
@@ -220,6 +260,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
           setState('idle');
           worker.removeEventListener('message', handleMessage);
         } else if (msg.type === 'error') {
+          logVoiceError('whisper transcription failed', msg.message);
           setErrorMessage(msg.message || 'Transcription failed.');
           setState('error');
           worker.removeEventListener('message', handleMessage);
@@ -228,6 +269,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       worker.addEventListener('message', handleMessage);
       worker.postMessage({ type: 'transcribe', audio: pcm }, [pcm.buffer]);
     } catch (err) {
+      logVoiceError('whisper recording could not be decoded/sent for transcription', err);
       setErrorMessage(err instanceof Error ? err.message : 'Could not process the recording.');
       setState('error');
     }
@@ -238,6 +280,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
+      logVoiceError('getUserMedia failed', err);
       const name = err instanceof Error ? err.name : '';
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
         setState('denied');
@@ -262,6 +305,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     try {
       recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
     } catch (err) {
+      logVoiceError('MediaRecorder construction failed', err);
       stream.getTracks().forEach(t => t.stop());
       setErrorMessage(err instanceof Error ? err.message : 'Recording isn\'t supported in this browser.');
       setState('error');
@@ -272,12 +316,23 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     recorder.onstop = () => { transcribeWhisperRecording(); };
     mediaRecorderRef.current = recorder;
-    recorder.start();
-    setState('recording');
+    try {
+      recorder.start();
+      setState('recording');
+    } catch (err) {
+      logVoiceError('MediaRecorder.start() threw', err);
+      stream.getTracks().forEach(t => t.stop());
+      setErrorMessage(err instanceof Error ? err.message : 'Could not start recording.');
+      setState('error');
+    }
   };
 
   const stopWhisperRecording = () => {
-    mediaRecorderRef.current?.stop();
+    try {
+      mediaRecorderRef.current?.stop();
+    } catch (err) {
+      logVoiceError('MediaRecorder.stop() threw', err);
+    }
     streamRef.current?.getTracks().forEach(t => t.stop());
     setState('transcribing');
   };
@@ -296,8 +351,12 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
   const clearText = () => {
     intentionalStopRef.current = true;
-    recognitionRef.current?.stop();
-    mediaRecorderRef.current?.stop();
+    try {
+      recognitionRef.current?.stop();
+      mediaRecorderRef.current?.stop();
+    } catch (err) {
+      logVoiceError('teardown on clear threw', err);
+    }
     streamRef.current?.getTracks().forEach(t => t.stop());
     baseTextRef.current = '';
     onChange('');

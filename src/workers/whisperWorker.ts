@@ -58,6 +58,10 @@ ctx.addEventListener('message', async (event: MessageEvent<WorkerRequest>) => {
       ctx.postMessage({ type: 'result', text: (text ?? '').trim() });
     }
   } catch (err) {
+    // Logged here (not just on the main thread) so the full error/stack is
+    // visible in DevTools right where it happened — Worker console output
+    // shows up in the same console as the main thread.
+    console.error('[whisperWorker]', msg.type, err);
     ctx.postMessage({ type: 'error', message: err instanceof Error ? err.message : String(err) });
   }
 });

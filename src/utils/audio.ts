@@ -10,7 +10,8 @@ export async function blobToWhisperPCM(blob: Blob): Promise<Float32Array> {
   try {
     audioBuffer = await decodeCtx.decodeAudioData(arrayBuffer);
   } finally {
-    decodeCtx.close();
+    // Swallow close() failures so they don't mask a real decodeAudioData error.
+    decodeCtx.close().catch(() => {});
   }
 
   const offlineCtx = new OfflineAudioContext(
