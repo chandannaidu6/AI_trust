@@ -12,9 +12,7 @@ import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestion } from '../data/loader';
 import { StudyQuestion, SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS } from '../types';
-import { allRated, reviewSessionKey } from '../utils/helpers';
-
-const LANGUAGES = ['Python', 'Java'];
+import { allRated } from '../utils/helpers';
 
 // Progress bar for rated-solutions count
 const TOTAL_SLOTS = SLOT_LABELS.length;
@@ -61,8 +59,7 @@ export default function QuestionReviewPage() {
   const [question,   setQuestion]   = useState<StudyQuestion | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState('');
-  const [language,   setLanguage]   = useState('');
-  const [langPicked, setLangPicked] = useState(false);
+  const [started,    setStarted]    = useState(false);
 
   if (!state.participant) return <Navigate to="/participant" replace />;
 
@@ -80,29 +77,18 @@ export default function QuestionReviewPage() {
       .finally(() => setLoading(false));
   }, [questionId]);
 
-  // If this question was already started earlier in the session (language picked,
-  // possibly with some ratings already given), resume it instead of showing the
-  // language picker again.
+  // Every question supports exactly one language, so there's nothing to ask —
+  // start (or resume, if already begun this session) automatically.
   useEffect(() => {
-    if (!question || langPicked) return;
-    for (const lang of question.supportedLanguages) {
-      if (state.reviewsByQuestion[reviewSessionKey(question.id, lang)]) {
-        setLanguage(lang);
-        setLangPicked(true);
-        startReview(question, lang);
-        break;
-      }
-    }
+    if (!question || started) return;
+    const lang = question.supportedLanguages[0];
+    if (!lang) return;
+    setStarted(true);
+    startReview(question, lang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question]);
 
-  const handleLanguagePick = (lang: string) => {
-    if (!question) return;
-    setLanguage(lang);
-    setLangPicked(true);
-    startReview(question, lang);
-  };
-
+  const language       = question?.supportedLanguages[0] ?? '';
   const review        = state.review;
   const activeSlot    = review?.activeSlot ?? 'A';
   const ratings       = review?.slotRatings ?? {};
@@ -141,11 +127,9 @@ export default function QuestionReviewPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-3">
             <p className="text-red-600 dark:text-red-400 text-sm">{error || 'Question not found.'}</p>
-            {!langPicked && (
-              <Button variant="secondary" onClick={() => navigate(`/categories/${category}`)}>
-                ← Back to questions
-              </Button>
-            )}
+            <Button variant="secondary" onClick={() => navigate(`/categories/${category}`)}>
+              ← Back to questions
+            </Button>
           </div>
         </div>
       </div>
@@ -154,39 +138,13 @@ export default function QuestionReviewPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-      <Header step={4} back={`/categories/${category}`} />
+      <Header step={4} back={`/categories/${category}/${question.difficulty}`} />
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-4">
 
         <ProblemStatement question={question} language={language || '—'} />
 
-        {/* Language picker */}
-        {!langPicked && (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm px-5 py-5">
-            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">
-              Choose the language to review
-            </p>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Select language">
-              {LANGUAGES.filter(l => question.supportedLanguages.includes(l)).map(lang => (
-                <button
-                  key={lang}
-                  onClick={() => handleLanguagePick(lang)}
-                  className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600
-                             bg-white dark:bg-slate-800 text-sm font-semibold
-                             text-slate-700 dark:text-slate-200
-                             hover:border-indigo-400 hover:text-indigo-700 hover:bg-indigo-50
-                             dark:hover:border-indigo-500 dark:hover:text-indigo-300 dark:hover:bg-indigo-950
-                             transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-                             dark:focus-visible:ring-offset-slate-900"
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {langPicked && review && (
+        {review && (
           <>
             <SolutionSwitcher
               activeSlot={activeSlot}

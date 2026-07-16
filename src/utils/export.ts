@@ -27,11 +27,9 @@ export interface ExportPayload {
     id: string;
     skillLevel: string;
     yearsExperience: string;
-    primaryLanguages: string[];
     role: string;
     reviewFrequency: string;
     aiFamiliarity: string;
-    languageConfidence: number;
   };
   session: {
     category: string;
@@ -100,11 +98,9 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
       id: participant.id,
       skillLevel: participant.skillLevel,
       yearsExperience: participant.yearsExperience,
-      primaryLanguages: participant.primaryLanguages,
       role: participant.role,
       reviewFrequency: participant.reviewFrequency,
       aiFamiliarity: participant.aiFamiliarity,
-      languageConfidence: participant.languageConfidence,
     },
     session: {
       category: selectedCategory ?? '',
@@ -196,11 +192,9 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   // participant
   r['skillLevel']         = p.participant.skillLevel;
   r['yearsExperience']    = p.participant.yearsExperience;
-  r['primaryLanguages']   = p.participant.primaryLanguages;
   r['role']               = p.participant.role;
   r['reviewFrequency']    = p.participant.reviewFrequency;
   r['aiFamiliarity']      = p.participant.aiFamiliarity;
-  r['languageConfidence'] = p.participant.languageConfidence;
   // session
   r['category']           = p.session.category;
   r['questionId']         = p.session.questionId;

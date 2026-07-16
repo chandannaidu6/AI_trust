@@ -4,6 +4,7 @@ import {
 import {
   AppState, ParticipantProfile, ReviewSession,
   SlotLabel, SlotRating, FinalAssessment, DraftAssessment, StudyQuestion, UISlot, SLOT_LABELS,
+  Difficulty,
 } from '../types';
 import { shuffleForSession } from '../utils/randomize';
 import { generateId, reviewSessionKey } from '../utils/helpers';
@@ -30,6 +31,7 @@ const initial: AppState = {
   review: null,
   reviewsByQuestion: {},
   lastViewedQuestion: {},
+  completedDifficulties: {},
 };
 
 /** Write the (possibly updated) active review session back into the per-question store. */
@@ -124,7 +126,12 @@ function reducer(state: AppState, action: Action): AppState {
 
     case 'SUBMIT_ASSESSMENT': {
       if (!state.review) return state;
-      return withReview(state, { ...state.review, finalAssessment: action.payload });
+      const withUpdatedReview = withReview(state, { ...state.review, finalAssessment: action.payload });
+      const difficulty = state.review.question.difficulty as Difficulty;
+      return {
+        ...withUpdatedReview,
+        completedDifficulties: { ...state.completedDifficulties, [difficulty]: true },
+      };
     }
 
     case 'UPDATE_DRAFT_RATING': {

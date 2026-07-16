@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
+import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestions } from '../data/loader';
+import { DIFFICULTIES } from '../types';
 
 const CATEGORY_META: Record<string, {
   icon: JSX.Element;
@@ -158,6 +160,9 @@ export default function CategorySelectionPage() {
     navigate(`/categories/${id}`);
   };
 
+  const doneCount = DIFFICULTIES.filter(d => state.completedDifficulties[d]).length;
+  const allDone = doneCount === DIFFICULTIES.length;
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
       <Header step={2} back="/participant" />
@@ -165,9 +170,19 @@ export default function CategorySelectionPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Choose a Category</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
-            Select the problem category you want to review.
+            Select the problem category you want to review. You'll review exactly one Easy, one
+            Medium, and one Hard question in total — {doneCount} of 3 done so far.
           </p>
         </div>
+
+        {allDone && (
+          <div className="mb-6 flex items-center gap-3 flex-wrap bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-xl px-5 py-4">
+            <p className="text-sm text-green-700 dark:text-green-300 flex-1 min-w-[200px]">
+              You've completed all 3 required reviews (Easy, Medium, and Hard). Thank you!
+            </p>
+            <Button size="sm" onClick={() => navigate('/complete')}>Go to summary</Button>
+          </div>
+        )}
 
         {loading && (
           <div className="flex items-center justify-center py-24 text-slate-400 dark:text-slate-500 gap-2">

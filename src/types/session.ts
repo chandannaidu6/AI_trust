@@ -52,11 +52,9 @@ export interface ParticipantProfile {
   id: string;
   skillLevel: SkillLevel;
   yearsExperience: string;
-  primaryLanguages: string[];
   role: Role;
   reviewFrequency: ReviewFrequency;
   aiFamiliarity: AIFamiliarity;
-  languageConfidence: number; // 1–5 for the chosen review language
 }
 
 // ─── Active review session (single question, in-memory only) ─────────────────
@@ -76,6 +74,11 @@ export interface ReviewSession {
   draftAssessment: DraftAssessment | null;
 }
 
+// ─── Difficulty gating ─────────────────────────────────────────────────────────
+
+export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+export const DIFFICULTIES: Difficulty[] = ['Easy', 'Medium', 'Hard'];
+
 // ─── Full in-memory app state ─────────────────────────────────────────────────
 
 export interface AppState {
@@ -87,4 +90,9 @@ export interface AppState {
   reviewsByQuestion: Record<string, ReviewSession>;
   /** Last question opened per category, so the question list can scroll back to it. */
   lastViewedQuestion: Record<string, string>;
+  /** Difficulties whose final assessment has been submitted, study-wide (not
+   *  per-category) — once a difficulty is done, it's locked everywhere: a
+   *  participant reviews exactly one Easy, one Medium, and one Hard question
+   *  total, drawn from any category. */
+  completedDifficulties: Partial<Record<Difficulty, boolean>>;
 }

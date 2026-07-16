@@ -5,10 +5,10 @@ import { PageContainer } from '../components/layout/PageContainer';
 import { QuestionCard } from '../components/question/QuestionCard';
 import { useStudy } from '../state/StudyContext';
 import { loadCategory } from '../data/loader';
-import { StudyQuestion } from '../types';
+import { StudyQuestion, Difficulty } from '../types';
 
 export default function CategoryQuestionListPage() {
-  const { category } = useParams<{ category: string }>();
+  const { category, difficulty } = useParams<{ category: string; difficulty: string }>();
   const navigate = useNavigate();
   const { state, setCategory, setLastViewedQuestion } = useStudy();
 
@@ -19,22 +19,28 @@ export default function CategoryQuestionListPage() {
 
   if (!state.participant) return <Navigate to="/participant" replace />;
 
+  // This difficulty was already used up (in this or another category) — it's
+  // no longer available, so send the participant back to the difficulty picker.
+  if (difficulty && state.completedDifficulties[difficulty as Difficulty]) {
+    return <Navigate to={`/categories/${category}`} replace />;
+  }
+
   // Sync category into context
   useEffect(() => {
     if (category && state.selectedCategory !== category) setCategory(category);
   }, [category, state.selectedCategory, setCategory]);
 
-  // Load questions for this category
+  // Load questions for this category + difficulty
   useEffect(() => {
     if (!category) return;
     setLoading(true);
     setError('');
     restoredRef.current = false;
     loadCategory(category)
-      .then(setQuestions)
+      .then(qs => setQuestions(difficulty ? qs.filter(q => q.difficulty === difficulty) : qs))
       .catch(() => setError('Failed to load questions. Make sure study-dataset.json is in /public/data/.'))
       .finally(() => setLoading(false));
-  }, [category]);
+  }, [category, difficulty]);
 
   // Scroll back to the last question the participant opened in this category (if any),
   // so returning from a question's review page lands on that same question, not the top.
@@ -54,15 +60,15 @@ export default function CategoryQuestionListPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
-      <Header step={3} back="/categories" />
+      <Header step={3} back={`/categories/${category}`} />
       <PageContainer>
 
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-              Category
+              {category} · {difficulty}
             </span>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{category}</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{difficulty} questions</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
               Select a question to begin reviewing its 2 unlabeled solutions.
             </p>

@@ -2,14 +2,11 @@ import { useState, ReactNode, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
-import { OptionPicker, MultiOptionPicker } from '../components/ui/OptionPicker';
-import { ScoreButtons } from '../components/ui/ScoreButtons';
+import { OptionPicker } from '../components/ui/OptionPicker';
 import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
 import { ParticipantProfile, SkillLevel, Role, ReviewFrequency, AIFamiliarity } from '../types';
 import { generateId } from '../utils/helpers';
-
-const LANGUAGES = ['Python', 'Java', 'C', 'C++', 'JavaScript', 'TypeScript', 'Go', 'Rust', 'Swift', 'Kotlin', 'Other'];
 
 function Field({ label, description, required, children }: {
   label: string;
@@ -39,20 +36,16 @@ export default function ParticipantInfoPage() {
 
   const [skillLevel,       setSkillLevel]       = useState<SkillLevel | ''>('');
   const [yearsExperience,  setYearsExperience]  = useState('');
-  const [primaryLanguages, setPrimaryLanguages] = useState<string[]>([]);
   const [role,             setRole]             = useState<Role | ''>('');
   const [reviewFrequency,  setReviewFrequency]  = useState<ReviewFrequency | ''>('');
   const [aiFamiliarity,    setAIFamiliarity]    = useState<AIFamiliarity | ''>('');
-  const [langConfidence,   setLangConfidence]   = useState(0);
 
   const isValid =
     skillLevel !== '' &&
     yearsExperience !== '' &&
-    primaryLanguages.length > 0 &&
     role !== '' &&
     reviewFrequency !== '' &&
-    aiFamiliarity !== '' &&
-    langConfidence > 0;
+    aiFamiliarity !== '';
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -61,11 +54,9 @@ export default function ParticipantInfoPage() {
       id:                 generateId(),
       skillLevel:         skillLevel as SkillLevel,
       yearsExperience,
-      primaryLanguages,
       role:               role as Role,
       reviewFrequency:    reviewFrequency as ReviewFrequency,
       aiFamiliarity:      aiFamiliarity as AIFamiliarity,
-      languageConfidence: langConfidence,
     };
     setParticipant(profile);
     navigate('/categories');
@@ -99,7 +90,7 @@ export default function ParticipantInfoPage() {
               />
             </Field>
 
-            <Field label="Years of programming experience" required>
+            <Field label="Years of programming experience in Python and Java" required>
               <OptionPicker<string>
                 value={yearsExperience}
                 onChange={setYearsExperience}
@@ -110,19 +101,6 @@ export default function ParticipantInfoPage() {
                   { value: '6–10 years', label: '6–10 years' },
                   { value: '10+ years',  label: '10+ years' },
                 ]}
-              />
-            </Field>
-
-            <Field
-              label="Primary programming languages"
-              description="Select all that you use regularly."
-              required
-            >
-              <MultiOptionPicker<string>
-                multi
-                value={primaryLanguages}
-                onChange={setPrimaryLanguages}
-                options={LANGUAGES.map(l => ({ value: l, label: l }))}
               />
             </Field>
 
@@ -157,7 +135,7 @@ export default function ParticipantInfoPage() {
             </Field>
 
             <Field
-              label="Familiarity with AI coding assistants"
+              label="How often do you use AI coding assistants?"
               description="e.g. GitHub Copilot, ChatGPT, Claude, Cursor, Codeium"
               required
             >
@@ -165,24 +143,12 @@ export default function ParticipantInfoPage() {
                 value={aiFamiliarity}
                 onChange={setAIFamiliarity}
                 options={[
-                  { value: 'never',      label: 'Never used them' },
-                  { value: 'aware',      label: 'Aware but rarely use' },
+                  { value: 'never',      label: 'Never' },
+                  { value: 'aware',      label: 'Rarely' },
                   { value: 'occasional', label: 'Occasionally' },
                   { value: 'regular',    label: 'Regularly' },
-                  { value: 'heavy',      label: 'Daily / heavily' },
+                  { value: 'heavy',      label: 'Daily' },
                 ]}
-              />
-            </Field>
-
-            <Field
-              label="Language confidence for review"
-              description="How confident are you reviewing code in the language you'll choose? (1 = unfamiliar, 5 = expert-level)"
-              required
-            >
-              <ScoreButtons
-                label="Language confidence"
-                value={langConfidence}
-                onChange={setLangConfidence}
               />
             </Field>
 
