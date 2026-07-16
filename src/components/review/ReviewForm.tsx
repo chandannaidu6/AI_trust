@@ -124,28 +124,28 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
           <legend className="sr-only">Code quality ratings for Solution {slot}</legend>
           <ScoreButtons
             label="Readability"
-            description="How easy is this to read and follow?"
+            description="How easy is this code to visually read and navigate?"
             value={form.readability}
             onChange={v => set('readability', v)}
             max={10}
           />
           <ScoreButtons
             label="Perceived robustness"
-            description="How well does it handle edge cases?"
+            description="How confident are you that this code handles edge cases and unusual inputs correctly?"
             value={form.perceivedRobustness}
             onChange={v => set('perceivedRobustness', v)}
             max={10}
           />
           <ScoreButtons
             label="Maintenance confidence"
-            description="How confident are you modifying this later?"
+            description="How confident would you be modifying or extending this code six months from now?"
             value={form.maintenanceConfidence}
             onChange={v => set('maintenanceConfidence', v)}
             max={10}
           />
           <ScoreButtons
             label="Perceived author competence"
-            description="How skilled does the author appear?"
+            description="Based on this code alone, how skilled does the author appear to be?"
             value={form.perceivedAuthorCompetence}
             onChange={v => set('perceivedAuthorCompetence', v)}
             max={10}
@@ -155,7 +155,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
         {/* Q5: Willingness to approve 1–5 */}
         <ScoreButtons
           label="Willingness to approve"
-          description="Would you approve this in a real review? (1 = definitely not, 5 = definitely yes)"
+          description="Would you approve this code in a real code review at work? (1 = definitely not · 5 = definitely yes)"
           value={form.willingnessToApprove}
           onChange={v => set('willingnessToApprove', v)}
           max={5}
@@ -164,7 +164,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
         {/* Q6: Hidden complexity 1–10 */}
         <ScoreButtons
           label="Hidden complexity"
-          description="How much non-obvious complexity is lurking here?"
+          description="How much non-obvious complexity or subtle risk is lurking beneath the surface of this code? (Higher means worse — more hidden risk.)"
           value={form.hiddenComplexity}
           onChange={v => set('hiddenComplexity', v)}
           max={10}
@@ -205,7 +205,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
             <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            At least {MIN_EXPLANATION_LENGTH} characters — give a real reason, not just "yes" or "looks fine".
+            At least {MIN_EXPLANATION_LENGTH} characters. Give a real reason, not just "yes" or "looks fine".
           </p>
           <textarea
             id={`explanation-${slot}`}

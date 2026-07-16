@@ -15,6 +15,9 @@ export interface SlotExport {
   averageScore: number;              // mean of the five 1–10 dimensions
   acceptDecision: string;            // "yes" | "no" | "needs_changes"
   briefExplanation: string;
+  comprehensionSelectedIndex: number | null;
+  comprehensionCorrect: boolean | null;
+  comprehensionElapsedMs: number | null;
 }
 
 export interface ExportPayload {
@@ -69,6 +72,7 @@ export function buildExportPayload(
     const r = review.slotRatings[slot];
     if (r) {
       const sid = slotMapping[slot];
+      const comp = review.comprehensionAnswers[slot];
       ratings[slot] = {
         solutionId: sid,
         originLabel: labels[sid] ?? '',
@@ -81,6 +85,9 @@ export function buildExportPayload(
         averageScore: parseFloat(avgRating(r).toFixed(2)),
         acceptDecision: r.acceptDecision ?? '',
         briefExplanation: r.briefExplanation,
+        comprehensionSelectedIndex: comp?.selectedIndex ?? null,
+        comprehensionCorrect: comp?.correct ?? null,
+        comprehensionElapsedMs: comp?.elapsedMs ?? null,
       };
     }
   }
@@ -222,6 +229,9 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
     r[`slot${slot}_averageScore`]             = s?.averageScore ?? '';
     r[`slot${slot}_acceptDecision`]           = s?.acceptDecision ?? '';
     r[`slot${slot}_briefExplanation`]         = s?.briefExplanation ?? '';
+    r[`slot${slot}_comprehensionSelectedIndex`] = s?.comprehensionSelectedIndex ?? '';
+    r[`slot${slot}_comprehensionCorrect`]       = s?.comprehensionCorrect ?? '';
+    r[`slot${slot}_comprehensionElapsedMs`]     = s?.comprehensionElapsedMs ?? '';
   }
   // final assessment
   r['bestChoice']            = p.finalAssessment?.bestChoice ?? '';

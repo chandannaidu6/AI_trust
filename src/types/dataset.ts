@@ -43,7 +43,14 @@ export interface LangBlock {
 export interface RawSolution {
   solutionId: string;
   code: string;
+  comprehension: ComprehensionQuestionData;
   _hidden: HiddenMeta;
+}
+
+/** An objective "what does this code output for input X" multiple-choice check. */
+export interface ComprehensionQuestionData {
+  input: string;      // e.g. "normalize_listargument(5)" — shown to the participant
+  options: string[];  // exactly 4 answer choices; correct index lives in _hidden, never here
 }
 
 /** Present in JSON but must never be shown to participants. */
@@ -56,4 +63,5 @@ export interface HiddenMeta {
   selectionNotes: string;
   generatedBy?: string;
   generationDate?: string;
+  comprehensionCorrectIndex: number;
 }

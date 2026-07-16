@@ -45,18 +45,37 @@
             {
               "solutionId": "py-001-h",
               "code": "def normalize_listargument(arg):\n    if isinstance(arg, np.ndarray):\n        return arg.flatten()\n    if isinstance(arg, str):\n        return [arg]\n    if isinstance(arg, list) or isinstance(arg, tuple) or isinstance(arg, dict) or isinstance(arg, set):\n        return list(arg)\n    return [arg]",
+              "comprehension": {
+                "input": "normalize_listargument(5)",
+                "options": [
+                  "[5]",
+                  "5",
+                  "TypeError: 'int' object is not iterable",
+                  "[[5]]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "awacha/sastool",
                 "sourceUrl": "https://github.com/awacha/sastool/blob/deaddfa3002f3f6818697e36139633b7e30427a3/sastool/misc/utils.py#L27-L37",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-001-ai",
               "code": "def normalize_listargument(arg):\n    if isinstance(arg, np.ndarray):\n        return arg.flatten().tolist()\n    if isinstance(arg, str):\n        return [arg]\n    if isinstance(arg, (list, tuple, dict, set)):\n        return list(arg)\n    return [arg]",
+              "comprehension": {
+                "input": "normalize_listargument('hi')",
+                "options": [
+                  "['h', 'i']",
+                  "['hi']",
+                  "'hi'",
+                  "TypeError: strings are not supported"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -64,6 +83,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -102,18 +122,37 @@
             {
               "solutionId": "py-002-h",
               "code": "def getitem_in(obj, name):\n    for part in name.split('.'):\n        obj = obj[part]\n    return obj",
+              "comprehension": {
+                "input": "getitem_in({'a': {'b': 7}}, 'a.b')",
+                "options": [
+                  "{'b': 7}",
+                  "KeyError: 'b'",
+                  "7",
+                  "None"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "jaredLunde/vital-tools",
                 "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L59-L71",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-002-ai",
               "code": "def getitem_in(obj, name):\n    result = obj\n    for key in name.split('.'):\n        result = result[key]\n    return result",
+              "comprehension": {
+                "input": "getitem_in({'x': {'y': {'z': 3}}}, 'x.y.z')",
+                "options": [
+                  "3",
+                  "{'z': 3}",
+                  "KeyError: 'z'",
+                  "None"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -121,6 +160,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -159,18 +199,37 @@
             {
               "solutionId": "py-003-h",
               "code": "def kvp_convert(input_coll):\n    if isinstance(input_coll, OrderedDict):\n        return input_coll\n    else:\n        return OrderedDict((l, None) if not isinstance(l, tuple) else\n                           (l[0], l[1]) for l in input_coll)",
+              "comprehension": {
+                "input": "kvp_convert(['solo', ('k', 'v')])",
+                "options": [
+                  "OrderedDict([('solo', None), ('k', 'v')])",
+                  "OrderedDict([('solo', 'solo'), ('k', 'v')])",
+                  "OrderedDict([('k', 'v'), ('solo', None)])",
+                  "TypeError: cannot convert list to OrderedDict"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "ioos/compliance-checker",
                 "sourceUrl": "https://github.com/ioos/compliance-checker/blob/ee89c27b0daade58812489a2da3aa3b6859eafd9/compliance_checker/util.py#L38-L52",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-003-ai",
               "code": "def kvp_convert(input_coll):\n    if isinstance(input_coll, OrderedDict):\n        return input_coll\n    result = OrderedDict()\n    for item in input_coll:\n        if isinstance(item, tuple):\n            result[item[0]] = item[1]\n        else:\n            result[item] = None\n    return result",
+              "comprehension": {
+                "input": "kvp_convert([('a', 1), ('b', 2)])",
+                "options": [
+                  "OrderedDict([('a', None), ('b', None)])",
+                  "{'a': 1, 'b': 2}",
+                  "OrderedDict([('b', 2), ('a', 1)])",
+                  "OrderedDict([('a', 1), ('b', 2)])"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -178,6 +237,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -216,18 +276,37 @@
             {
               "solutionId": "py-004-h",
               "code": "def makeSequenceRelative(absVSequence):\n    if len(absVSequence) < 2 or len(set(absVSequence)) == 1:\n        raise RelativizeSequenceException(absVSequence)\n\n    minV = min(absVSequence)\n    maxV = max(absVSequence)\n    relativeSeq = [(value - minV) / (maxV - minV) for value in absVSequence]\n\n    return relativeSeq, minV, maxV",
+              "comprehension": {
+                "input": "makeSequenceRelative([0, 5, 10])",
+                "options": [
+                  "([0.0, 0.5, 1.0], 0, 10)",
+                  "([0.0, 0.5, 1.0], 10, 0)",
+                  "([0.0, 5.0, 10.0], 0, 10)",
+                  "RelativizeSequenceException"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "timmahrt/ProMo",
                 "sourceUrl": "https://github.com/timmahrt/ProMo/blob/99d9f5cc01ff328a62973c5a5da910cc905ae4d5/promo/morph_utils/morph_sequence.py#L33-L47",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-004-ai",
               "code": "def makeSequenceRelative(absVSequence):\n    if len(absVSequence) < 2 or len(set(absVSequence)) == 1:\n        raise ValueError(\"absVSequence must have at least two distinct values\")\n\n    minV, maxV = min(absVSequence), max(absVSequence)\n    relativeSeq = list(map(lambda v: (v - minV) / (maxV - minV), absVSequence))\n\n    return relativeSeq, minV, maxV",
+              "comprehension": {
+                "input": "makeSequenceRelative([2, 4, 8, 10])",
+                "options": [
+                  "([0.0, 0.25, 0.75, 1.0], 10, 2)",
+                  "([2.0, 4.0, 8.0, 10.0], 2, 10)",
+                  "([0.0, 0.25, 0.75, 1.0], 2, 10)",
+                  "([0.2, 0.4, 0.8, 1.0], 2, 10)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -235,6 +314,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -273,18 +353,37 @@
             {
               "solutionId": "py-005-h",
               "code": "def index_element_map(arr):\n    index_to_element = {}\n    for index, element in enumerate(arr):\n        index_to_element[index] = element\n    return index_to_element",
+              "comprehension": {
+                "input": "index_element_map(['a', 'b', 'c'])",
+                "options": [
+                  "{'a': 0, 'b': 1, 'c': 2}",
+                  "{1: 'a', 2: 'b', 3: 'c'}",
+                  "{0: 'a', 1: 'b'}",
+                  "{0: 'a', 1: 'b', 2: 'c'}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "kathyxchen/crosstalk-correction",
                 "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/eac11d54b39ea7ec301b54f8e498adce91713223/crosstalk_correction/crosstalk_correction.py#L201-L216",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-005-ai",
               "code": "def index_element_map(arr):\n    return {index: element for index, element in enumerate(arr)}",
+              "comprehension": {
+                "input": "index_element_map([10, 20])",
+                "options": [
+                  "{0: 10, 1: 20}",
+                  "{10: 0, 20: 1}",
+                  "{1: 10, 2: 20}",
+                  "{0: 10}"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -292,6 +391,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -330,18 +430,37 @@
             {
               "solutionId": "py-006-h",
               "code": "def strip_esc_sequence(txt):\n    if isinstance(txt, six.string_types):\n        try:\n            return txt.replace('\\033', '?')\n        except UnicodeDecodeError:\n            return txt.replace(str('\\033'), str('?'))\n    else:\n        return txt",
+              "comprehension": {
+                "input": "strip_esc_sequence('a\\x1bb')",
+                "options": [
+                  "'ab'",
+                  "'a\\x1bb'",
+                  "'a?b'",
+                  "'a\\\\033b'"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "saltstack/salt",
                 "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/output/__init__.py#L225-L236",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-006-ai",
               "code": "def strip_esc_sequence(txt):\n    if isinstance(txt, str):\n        return txt.replace('\\x1b', '?')\n    return txt",
+              "comprehension": {
+                "input": "strip_esc_sequence(42)",
+                "options": [
+                  "'42'",
+                  "42",
+                  "TypeError: expected string or bytes-like object",
+                  "'?'"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -349,6 +468,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -387,18 +507,37 @@
             {
               "solutionId": "py-007-h",
               "code": "def dictionary_to_stringlist(input_dict):\n    string_value = \"\"\n    for s in input_dict:\n        string_value += \"{0}={1},\".format(s, input_dict[s])\n    string_value = string_value[:-1]\n    return string_value",
+              "comprehension": {
+                "input": "dictionary_to_stringlist({'a': '1'})",
+                "options": [
+                  "'a=1,'",
+                  "'a:1'",
+                  "'a=1'",
+                  "IndexError: string index out of range"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "saltstack/salt",
                 "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/cloud/clouds/proxmox.py#L541-L553",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-007-ai",
               "code": "def dictionary_to_stringlist(input_dict):\n    return \",\".join(\"{0}={1}\".format(key, value) for key, value in input_dict.items())",
+              "comprehension": {
+                "input": "dictionary_to_stringlist({'a': '1', 'b': '2'})",
+                "options": [
+                  "'a=1,b=2,'",
+                  "'a:1,b:2'",
+                  "'b=2,a=1'",
+                  "'a=1,b=2'"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -406,6 +545,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -444,18 +584,37 @@
             {
               "solutionId": "py-008-h",
               "code": "def merge_map(a, b):\n    if isinstance(a, list) and isinstance(b, list):\n        return a + b\n\n    if not isinstance(a, dict) or not isinstance(b, dict):\n        return b\n\n    for key in b:\n        a[key] = merge_map(a[key], b[key]) if key in a else b[key]\n    return a",
+              "comprehension": {
+                "input": "merge_map({'a': 1}, {'b': 2})",
+                "options": [
+                  "{'b': 2}",
+                  "{'a': 1}",
+                  "{'a': 1, 'b': 2}",
+                  "TypeError: unsupported merge"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "cloudtools/stacker",
                 "sourceUrl": "https://github.com/cloudtools/stacker/blob/ad6013a03a560c46ba3c63c4d153336273e6da5d/stacker/util.py#L220-L234",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-008-ai",
               "code": "def merge_map(a, b):\n    if isinstance(a, list) and isinstance(b, list):\n        return a + b\n\n    if not isinstance(a, dict) or not isinstance(b, dict):\n        return b\n\n    result = dict(a)\n    for key, value in b.items():\n        if key in result:\n            result[key] = merge_map(result[key], value)\n        else:\n            result[key] = value\n    return result",
+              "comprehension": {
+                "input": "merge_map([1, 2], [3, 4])",
+                "options": [
+                  "[3, 4, 1, 2]",
+                  "[3, 4]",
+                  "[1, 2]",
+                  "[1, 2, 3, 4]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -463,6 +622,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -501,18 +661,37 @@
             {
               "solutionId": "py-009-h",
               "code": "def to_reddit_list(arg):\n    if (isinstance(arg, six.string_types) or not (\n            hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\"))):\n        return six.text_type(arg)\n    else:\n        return ','.join(six.text_type(a) for a in arg)",
+              "comprehension": {
+                "input": "to_reddit_list(['a', 'b', 3])",
+                "options": [
+                  "['a', 'b', 3]",
+                  "'a, b, 3'",
+                  "TypeError: sequence item 2: expected str instance, int found",
+                  "'a,b,3'"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "michael-lazar/rtv",
                 "sourceUrl": "https://github.com/michael-lazar/rtv/blob/ccef2af042566ad384977028cf0bde01bc524dda/rtv/packages/praw/internal.py#L249-L260",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-009-ai",
               "code": "def to_reddit_list(arg):\n    if isinstance(arg, str) or not (hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\")):\n        return str(arg)\n    return ','.join(str(item) for item in arg)",
+              "comprehension": {
+                "input": "to_reddit_list('hi')",
+                "options": [
+                  "'h,i'",
+                  "['h', 'i']",
+                  "'hi'",
+                  "TypeError: 'str' object is not callable"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -520,6 +699,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -558,18 +738,37 @@
             {
               "solutionId": "py-010-h",
               "code": "def format_value(value):\n    value = decimal.Decimal(str(value))\n    if int(value) == value:\n        return int(value)\n\n    return float(round(value, 1))",
+              "comprehension": {
+                "input": "format_value(5.0)",
+                "options": [
+                  "5.0",
+                  "5.1",
+                  "5",
+                  "TypeError: unsupported operand type(s)"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "openstack/horizon",
                 "sourceUrl": "https://github.com/openstack/horizon/blob/5601ea9477323e599d9b766fcac1f8be742935b2/horizon/utils/functions.py#L179-L189",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-010-ai",
               "code": "def format_value(value):\n    value = decimal.Decimal(str(value))\n    if value == value.to_integral_value():\n        return int(value)\n    return float(round(value, 1))",
+              "comprehension": {
+                "input": "format_value(5.26)",
+                "options": [
+                  "5.2",
+                  "5",
+                  "5.26",
+                  "5.3"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -577,6 +776,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -615,18 +815,37 @@
             {
               "solutionId": "py-011-h",
               "code": "def checksum_identity_card_number(characters):\n    weights_for_check_digit = [7, 3, 1, 0, 7, 3, 1, 7, 3]\n    check_digit = 0\n\n    for i in range(3):\n        check_digit += weights_for_check_digit[i] * (ord(characters[i]) - 55)\n\n    for i in range(4, 9):\n        check_digit += weights_for_check_digit[i] * characters[i]\n\n    check_digit %= 10\n\n    return check_digit",
+              "comprehension": {
+                "input": "checksum_identity_card_number(['A', 'B', 'C', 1, 2, 3, 4, 5, 6])",
+                "options": [
+                  "5",
+                  "4",
+                  "6",
+                  "9"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "joke2k/faker",
                 "sourceUrl": "https://github.com/joke2k/faker/blob/965824b61132e52d92d1a6ce470396dbbe01c96c/faker/providers/person/pl_PL/__init__.py#L6-L21",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-011-ai",
               "code": "def checksum_identity_card_number(characters):\n    weights = [7, 3, 1, 0, 7, 3, 1, 7, 3]\n    total = sum(weights[i] * (ord(characters[i]) - 55) for i in range(3))\n    total += sum(weights[i] * characters[i] for i in range(4, 9))\n    return total % 10",
+              "comprehension": {
+                "input": "checksum_identity_card_number(['X', 'Y', 'Z', 9, 8, 7, 6, 5, 4])",
+                "options": [
+                  "7",
+                  "9",
+                  "8",
+                  "2"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -634,6 +853,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -672,18 +892,37 @@
             {
               "solutionId": "py-012-h",
               "code": "def calc_cost(y, yhat, cost_matrix):\n    return np.mean(cost_matrix[list(y), list(yhat)])",
+              "comprehension": {
+                "input": "calc_cost(y=[0, 1], yhat=[0, 1], cost_matrix=[[0, 1], [2, 0]])",
+                "options": [
+                  "1.5",
+                  "0.0",
+                  "1.0",
+                  "2.0"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "ntucllab/libact",
                 "sourceUrl": "https://github.com/ntucllab/libact/blob/e37e9ed6c36febe701d84b2d495c958ab02f0bc8/libact/utils/__init__.py#L41-L52",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "py-012-ai",
               "code": "def calc_cost(y, yhat, cost_matrix):\n    y = list(y)\n    yhat = list(yhat)\n    costs = [cost_matrix[true][pred] for true, pred in zip(y, yhat)]\n    return float(np.mean(costs))",
+              "comprehension": {
+                "input": "calc_cost(y=[0, 1], yhat=[1, 0], cost_matrix=[[0, 1], [2, 0]])",
+                "options": [
+                  "0.0",
+                  "1.0",
+                  "1.5",
+                  "3.0"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -691,6 +930,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -729,18 +969,37 @@
             {
               "solutionId": "py-013-h",
               "code": "def find_minmax(lims, olims):\n    try:\n        limzip = zip(list(lims), list(olims), [np.nanmin, np.nanmax])\n        limits = tuple([float(fn([l, ol])) for l, ol, fn in limzip])\n    except:\n        limits = (np.NaN, np.NaN)\n    return limits",
+              "comprehension": {
+                "input": "find_minmax((1, 5), (0, 3))",
+                "options": [
+                  "(1.0, 3.0)",
+                  "(0.0, 3.0)",
+                  "(0.0, 5.0)",
+                  "(1.0, 5.0)"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "pyviz/holoviews",
                 "sourceUrl": "https://github.com/pyviz/holoviews/blob/ae0dd2f3de448b0ca5e9065aabd6ef8d84c7e655/holoviews/core/util.py#L883-L894",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-013-ai",
               "code": "def find_minmax(lims, olims):\n    try:\n        a1, a2 = lims\n        b1, b2 = olims\n        return (float(np.nanmin([a1, b1])), float(np.nanmax([a2, b2])))\n    except Exception:\n        return (np.nan, np.nan)",
+              "comprehension": {
+                "input": "find_minmax((2, 10), (4, 8))",
+                "options": [
+                  "(4.0, 8.0)",
+                  "(2.0, 8.0)",
+                  "(4.0, 10.0)",
+                  "(2.0, 10.0)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -748,6 +1007,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -786,18 +1046,37 @@
             {
               "solutionId": "py-014-h",
               "code": "def truncate(string, maxchar):\n    if maxchar < 4:\n        raise TruncateError(\"Maxchar must be > 3\")\n\n    if len(string) <= maxchar:\n        return string\n    else:\n        return string[:maxchar - 3] + \"...\"",
+              "comprehension": {
+                "input": "truncate('hello world', 8)",
+                "options": [
+                  "'hello wo...'",
+                  "'hello world'",
+                  "'hello...'",
+                  "TruncateError: Maxchar must be > 3"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "ChrisCummins/labm8",
                 "sourceUrl": "https://github.com/ChrisCummins/labm8/blob/dd10d67a757aefb180cb508f86696f99440c94f5/text.py#L55-L81",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-014-ai",
               "code": "def truncate(string, maxchar):\n    if maxchar < 4:\n        raise ValueError(\"maxchar must be >= 4\")\n    return string if len(string) <= maxchar else string[:maxchar - 3] + \"...\"",
+              "comprehension": {
+                "input": "truncate('abcdefgh', 6)",
+                "options": [
+                  "'abcdef'",
+                  "'abc...'",
+                  "'abcd...'",
+                  "'abcdefgh'"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -805,6 +1084,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -843,18 +1123,37 @@
             {
               "solutionId": "py-015-h",
               "code": "def find_split_node(mst_wood, i):\n    for mst_index, mst in enumerate(mst_wood):\n        if i in mst['strokes']:\n            return (mst_index, mst['strokes'].index(i))\n    raise ValueError('%i was not found as stroke index.' % i)",
+              "comprehension": {
+                "input": "find_split_node([{'strokes': [1, 2]}, {'strokes': [3, 4]}], 3)",
+                "options": [
+                  "(0, 0)",
+                  "(1, 1)",
+                  "(0, 1)",
+                  "(1, 0)"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "MartinThoma/hwrt",
                 "sourceUrl": "https://github.com/MartinThoma/hwrt/blob/725c21a3d0f5a30b8492cbc184b3688ceb364e1c/hwrt/segmentation/segmentation.py#L765-L781",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-015-ai",
               "code": "def find_split_node(mst_wood, i):\n    matches = [\n        (mst_index, mst['strokes'].index(i))\n        for mst_index, mst in enumerate(mst_wood)\n        if i in mst['strokes']\n    ]\n    if not matches:\n        raise ValueError('stroke index %i was not found' % i)\n    return matches[0]",
+              "comprehension": {
+                "input": "find_split_node([{'strokes': [5, 6, 7]}], 6)",
+                "options": [
+                  "(0, 2)",
+                  "(1, 1)",
+                  "(0, 1)",
+                  "ValueError: stroke index not found"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -862,6 +1161,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -900,18 +1200,37 @@
             {
               "solutionId": "py-016-h",
               "code": "def stable_format_dict(d):\n    inner = ', '.join('{}: {}'.format(repr(k)[1:]\n                                      if repr(k).startswith(u\"u'\") or repr(k).startswith(u'u\"')\n                                      else repr(k),\n                                      v)\n                      for k, v in sorted(d.items()))\n    return '{%s}' % inner",
+              "comprehension": {
+                "input": "stable_format_dict({'b': 2, 'a': 1})",
+                "options": [
+                  "\"{'b': 2, 'a': 1}\"",
+                  "\"{a: 1, b: 2}\"",
+                  "\"{'a': 1, 'b': 2}\"",
+                  "KeyError: sort failed"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "bpython/curtsies",
                 "sourceUrl": "https://github.com/bpython/curtsies/blob/223e42b97fbf6c86b479ed4f0963a067333c5a63/curtsies/formatstring.py#L67-L76",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-016-ai",
               "code": "def stable_format_dict(d):\n    parts = []\n    for key, value in sorted(d.items()):\n        key_repr = repr(key)\n        if key_repr.startswith(\"u'\") or key_repr.startswith('u\"'):\n            key_repr = key_repr[1:]\n        parts.append(\"{}: {}\".format(key_repr, value))\n    return \"{%s}\" % \", \".join(parts)",
+              "comprehension": {
+                "input": "stable_format_dict({'z': 1, 'a': 2, 'm': 3})",
+                "options": [
+                  "\"{'z': 1, 'a': 2, 'm': 3}\"",
+                  "\"{'a': 2, 'm': 3, 'z': 1}\"",
+                  "\"{'m': 3, 'a': 2, 'z': 1}\"",
+                  "\"{'a': 2, 'z': 1, 'm': 3}\""
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -919,6 +1238,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -957,18 +1277,37 @@
             {
               "solutionId": "py-017-h",
               "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    return struct.unpack('<' + ('i' * (len(binary) // 4)), binary)",
+              "comprehension": {
+                "input": "decode_ints(base64_of_int32_le([1, 2]))",
+                "options": [
+                  "(1, 2, 0)",
+                  "(2, 1)",
+                  "(1, 2)",
+                  "struct.error: unpack requires a buffer"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "dwavesystems/dwave-cloud-client",
                 "sourceUrl": "https://github.com/dwavesystems/dwave-cloud-client/blob/df3221a8385dc0c04d7b4d84f740bf3ad6706230/dwave/cloud/coders.py#L144-L152",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-017-ai",
               "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    count = len(binary) // 4\n    return struct.unpack('<{}i'.format(count), binary)",
+              "comprehension": {
+                "input": "decode_ints(base64_of_int32_le([1000]))",
+                "options": [
+                  "(1000,)",
+                  "1000",
+                  "(1,)",
+                  "(100,)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -976,6 +1315,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1014,18 +1354,37 @@
             {
               "solutionId": "py-018-h",
               "code": "def timedelta_total_minutes(td, strict=False):\n    minutes, seconds = divmod(td.days * 24 * 3600 + td.seconds, 60)\n    if seconds or td.microseconds:\n        if strict:\n            raise ValueError(\n                \"%r is not an integral multiple of 60 seconds\", td)\n        if seconds > 30 or (seconds == 30 and td.microseconds > 0):\n            minutes += 1\n    return minutes",
+              "comprehension": {
+                "input": "timedelta_total_minutes(timedelta(minutes=5, seconds=31))",
+                "options": [
+                  "5",
+                  "6",
+                  "5.5",
+                  "ValueError: not an integral multiple of 60 seconds"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "dairiki/python-libtcd",
                 "sourceUrl": "https://github.com/dairiki/python-libtcd/blob/c9d1fd3f30e3088f125bf05fb592f30daf9de51d/libtcd/util.py#L10-L24",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "py-018-ai",
               "code": "def timedelta_total_minutes(td, strict=False):\n    total_seconds = td.days * 24 * 3600 + td.seconds\n    minutes, seconds = divmod(total_seconds, 60)\n    if seconds or td.microseconds:\n        if strict:\n            raise ValueError(\"%r is not an integral multiple of 60 seconds\" % (td,))\n        if seconds > 30 or (seconds == 30 and td.microseconds > 0):\n            minutes += 1\n    return minutes",
+              "comprehension": {
+                "input": "timedelta_total_minutes(timedelta(minutes=2, seconds=45))",
+                "options": [
+                  "2",
+                  "3",
+                  "2.75",
+                  "ValueError: not an integral multiple of 60 seconds"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1033,6 +1392,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1071,18 +1431,37 @@
             {
               "solutionId": "py-019-h",
               "code": "def masks(list_of_index_lists, n):\n    for il,l in enumerate(list_of_index_lists):\n        mask = np.zeros(n,dtype=bool)\n        mask[l] = True\n        list_of_index_lists[il] = mask\n    masks = np.array(list_of_index_lists)\n    return masks",
+              "comprehension": {
+                "input": "masks([[0, 2]], n=4)",
+                "options": [
+                  "[[True, True, False, False]]",
+                  "[[False, True, False, True]]",
+                  "[[True, False, True, False]]",
+                  "[[True, False, True]]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "theislab/scanpy",
                 "sourceUrl": "https://github.com/theislab/scanpy/blob/9e4e5ee02e04cf618872d9b098e24f0542e8b227/scanpy/utils.py#L786-L802",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-019-ai",
               "code": "def masks(list_of_index_lists, n):\n    return np.array([\n        np.isin(np.arange(n), indices) for indices in list_of_index_lists\n    ])",
+              "comprehension": {
+                "input": "masks([[1]], n=3)",
+                "options": [
+                  "[[True, False, False]]",
+                  "[[False, True, False]]",
+                  "[[False, False, True]]",
+                  "[[False, True]]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1090,6 +1469,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1128,18 +1508,37 @@
             {
               "solutionId": "py-020-h",
               "code": "def scrub_dict(d):\n    if type(d) is dict:\n        return dict(\n            (k, scrub_dict(v)) for k, v in d.iteritems() if v and scrub_dict(v)\n        )\n    elif type(d) is list:\n        return [\n            scrub_dict(v) for v in d if v and scrub_dict(v)\n        ]\n    else:\n        return d",
+              "comprehension": {
+                "input": "scrub_dict({'a': '', 'b': 1, 'c': {}})",
+                "options": [
+                  "{'b': 1}",
+                  "{'a': '', 'b': 1, 'c': {}}",
+                  "AttributeError: 'dict' object has no attribute 'iteritems'",
+                  "{}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "blockstack/python-utilitybelt",
                 "sourceUrl": "https://github.com/blockstack/python-utilitybelt/blob/13d3502aa1a486c9d775ad2c551fb8e7e48b0d96/utilitybelt/dicts.py#L29-L42",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-020-ai",
               "code": "def scrub_dict(d):\n    if isinstance(d, dict):\n        return {k: scrub_dict(v) for k, v in d.items() if v and scrub_dict(v)}\n    if isinstance(d, list):\n        return [scrub_dict(v) for v in d if v and scrub_dict(v)]\n    return d",
+              "comprehension": {
+                "input": "scrub_dict({'x': None, 'y': [1, 2], 'z': []})",
+                "options": [
+                  "{'y': [1, 2]}",
+                  "{'x': None, 'y': [1, 2], 'z': []}",
+                  "{}",
+                  "{'y': [1, 2], 'z': []}"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1147,6 +1546,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1185,18 +1585,37 @@
             {
               "solutionId": "py-021-h",
               "code": "def rank_dict(dict, key=lambda t: t[1], as_tuple=False):\n    sorted_list = sorted(dict.items(), key=key)\n    return OrderedDict(sorted_list) if not as_tuple else tuple(sorted_list)",
+              "comprehension": {
+                "input": "rank_dict({'a': 3, 'b': 1, 'c': 2})",
+                "options": [
+                  "OrderedDict([('a', 3), ('b', 1), ('c', 2)])",
+                  "OrderedDict([('a', 3), ('c', 2), ('b', 1)])",
+                  "OrderedDict([('b', 1), ('c', 2), ('a', 3)])",
+                  "OrderedDict([('c', 2), ('b', 1), ('a', 3)])"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "jaredLunde/vital-tools",
                 "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L45-L56",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-021-ai",
               "code": "def rank_dict(mapping, key=lambda item: item[1], as_tuple=False):\n    items = sorted(mapping.items(), key=key)\n    if as_tuple:\n        return tuple(items)\n    return OrderedDict(items)",
+              "comprehension": {
+                "input": "rank_dict({'p': 5, 'q': 2})",
+                "options": [
+                  "OrderedDict([('p', 5), ('q', 2)])",
+                  "OrderedDict([('q', 2), ('p', 5)])",
+                  "(('q', 2), ('p', 5))",
+                  "OrderedDict([('p', 2), ('q', 5)])"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1204,6 +1623,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1242,18 +1662,37 @@
             {
               "solutionId": "py-022-h",
               "code": "def bytes_to_uuid_list(byte_array):\n    result = []\n    for i in range(0, len(byte_array)//16):\n        result.append(uuid.UUID(bytes=bytes(byte_array[i*16:i*16+16])))\n    return result",
+              "comprehension": {
+                "input": "bytes_to_uuid_list(bytes(16))",
+                "options": [
+                  "[]",
+                  "[UUID('00000000-0000-0000-0000-000000000000'), UUID('00000000-0000-0000-0000-000000000000')]",
+                  "UUID('00000000-0000-0000-0000-000000000000')",
+                  "[UUID('00000000-0000-0000-0000-000000000000')]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "ronhanson/python-tbx",
                 "sourceUrl": "https://github.com/ronhanson/python-tbx/blob/87f72ae0cadecafbcd144f1e930181fba77f6b83/tbx/bytes.py#L69-L78",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-022-ai",
               "code": "def bytes_to_uuid_list(byte_array):\n    return [\n        uuid.UUID(bytes=bytes(byte_array[i:i + 16]))\n        for i in range(0, len(byte_array), 16)\n    ]",
+              "comprehension": {
+                "input": "bytes_to_uuid_list(bytes(32))",
+                "options": [
+                  "[UUID('00000000-0000-0000-0000-000000000000')]",
+                  "[UUID('00000000-0000-0000-0000-000000000000'), UUID('00000000-0000-0000-0000-000000000000')]",
+                  "IndexError: byte array length must be 16",
+                  "[]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1261,6 +1700,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1299,18 +1739,37 @@
             {
               "solutionId": "py-023-h",
               "code": "def get_isbn13_checksum(isbn):\n    multipliers = map(lambda x: int(x), list(\"13\" * 6))\n\n    rest = sum([i * x for i, x in zip(multipliers, isbn)]) % 10\n\n    if rest == 0:\n        return rest\n\n    return 10 - rest",
+              "comprehension": {
+                "input": "get_isbn13_checksum([9, 7, 8, 0, 3, 0, 6, 4, 0, 6, 1, 5])",
+                "options": [
+                  "3",
+                  "7",
+                  "0",
+                  "10"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "edeposit/isbn_validator",
                 "sourceUrl": "https://github.com/edeposit/isbn_validator/blob/d285846940a8f71bac5a4694f640c026510d9063/src/isbn_validator/isbn_validator.py#L89-L107",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "py-023-ai",
               "code": "def get_isbn13_checksum(isbn):\n    digits = [int(d) for d in isbn]\n    weights = [1, 3] * 6\n    rest = sum(w * d for w, d in zip(weights, digits)) % 10\n    return 0 if rest == 0 else 10 - rest",
+              "comprehension": {
+                "input": "get_isbn13_checksum([9, 7, 8, 1, 8, 6, 1, 9, 7, 8, 7, 6])",
+                "options": [
+                  "1",
+                  "0",
+                  "9",
+                  "10"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1318,6 +1777,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1356,18 +1816,37 @@
             {
               "solutionId": "py-024-h",
               "code": "def _find_return_target(self, target):\n        for i, frame in enumerate(self):\n            if frame.ret_addr == target:\n                return i\n        return None",
+              "comprehension": {
+                "input": "find_return_target(stack=[frame(0x100), frame(0x200), frame(0x300)], target=0x200)",
+                "options": [
+                  "0",
+                  "2",
+                  "None",
+                  "1"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "angr/angr",
                 "sourceUrl": "https://github.com/angr/angr/blob/4e2f97d56af5419ee73bdb30482c8dd8ff5f3e40/angr/state_plugins/callstack.py#L353-L366",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-024-ai",
               "code": "def find_return_target(stack, target):\n    return next((i for i, frame in enumerate(stack) if frame.ret_addr == target), None)",
+              "comprehension": {
+                "input": "find_return_target(stack=[frame(0xAAA), frame(0xBBB)], target=0xCCC)",
+                "options": [
+                  "0",
+                  "-1",
+                  "None",
+                  "IndexError"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1375,6 +1854,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1413,18 +1893,37 @@
             {
               "solutionId": "py-025-h",
               "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for ii in range(encoded.shape[1]):\n        inv_mapping = {v: k for k, v in mapping[ii].items()}\n        decoded.append(np.vectorize(inv_mapping.__getitem__)(encoded[:, ii]))\n    return np.atleast_2d(np.array(decoded)).T",
+              "comprehension": {
+                "input": "decode_centroids([[0, 1], [1, 0]], mapping=[{'x': 0, 'y': 1}, {'p': 0, 'q': 1}])",
+                "options": [
+                  "[['x', 'p'], ['y', 'q']]",
+                  "[['y', 'q'], ['x', 'p']]",
+                  "[['x', 'q'], ['y', 'p']]",
+                  "KeyError: 0"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "nicodv/kmodes",
                 "sourceUrl": "https://github.com/nicodv/kmodes/blob/cdb19fe5448aba1bf501626694bb52e68eafab45/kmodes/util/__init__.py#L54-L63",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-025-ai",
               "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for col in range(encoded.shape[1]):\n        inverse = {code: label for label, code in mapping[col].items()}\n        decoded.append([inverse[value] for value in encoded[:, col]])\n    return np.array(decoded).T",
+              "comprehension": {
+                "input": "decode_centroids([[1, 0]], mapping=[{'a': 0, 'b': 1}, {'c': 0, 'd': 1}])",
+                "options": [
+                  "[['a', 'c']]",
+                  "[['b', 'd']]",
+                  "[['b', 'c']]",
+                  "[['a', 'd']]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1432,6 +1931,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1470,18 +1970,37 @@
             {
               "solutionId": "py-026-h",
               "code": "def filter_data_columns(data):\n    keys = set()\n    for dt, d in data.items():\n        for k in d:\n            keys.add(k)\n    return sorted([x for x in keys])",
+              "comprehension": {
+                "input": "filter_data_columns({1: {'a': 2, 'b': 3}, 2: {'c': 1}})",
+                "options": [
+                  "['a', 'b', 'c']",
+                  "[1, 2]",
+                  "['c']",
+                  "['a', 'b']"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "jantman/pypi-download-stats",
                 "sourceUrl": "https://github.com/jantman/pypi-download-stats/blob/44a7a6bbcd61a9e7f02bd02c52584a98183f80c5/pypi_download_stats/outputgenerator.py#L352-L367",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-026-ai",
               "code": "def filter_data_columns(data):\n    keys = set()\n    for inner in data.values():\n        keys |= set(inner)\n    return sorted(keys)",
+              "comprehension": {
+                "input": "filter_data_columns({1: {'z': 1}, 2: {'y': 1, 'x': 1}})",
+                "options": [
+                  "['z']",
+                  "['x', 'y']",
+                  "['x', 'y', 'z']",
+                  "[1, 2]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1489,6 +2008,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1527,18 +2047,37 @@
             {
               "solutionId": "py-027-h",
               "code": "def countKey(theDict, name):\n    retval = 0\n    for key in theDict:\n        val = theDict[key]\n        if isinstance(val, dict):\n            retval += countKey(val, name)\n        else:\n            if key == name:\n                retval += 1\n    return retval",
+              "comprehension": {
+                "input": "countKey({'a': 1, 'b': {'a': 2, 'c': {'a': 3}}}, 'a')",
+                "options": [
+                  "1",
+                  "2",
+                  "4",
+                  "3"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "spacetelescope/stsci.tools",
                 "sourceUrl": "https://github.com/spacetelescope/stsci.tools/blob/9a022503ad24ca54ce83331482dfa3ff6de9f403/lib/stsci/tools/cfgpars.py#L334-L349",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "py-027-ai",
               "code": "def countKey(theDict, name):\n    count = 0\n    for key, val in theDict.items():\n        if key == name:\n            count += 1\n        if isinstance(val, dict):\n            count += countKey(val, name)\n    return count",
+              "comprehension": {
+                "input": "countKey({'x': {'x': 1}}, 'x')",
+                "options": [
+                  "1",
+                  "2",
+                  "0",
+                  "3"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1546,6 +2085,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1584,18 +2124,37 @@
             {
               "solutionId": "py-028-h",
               "code": "def find_balanced(text, start, open_c, close_c):\n    i = start\n    l = len(text)\n    count = 1\n    while count > 0 and i < l:\n        if text[i] == open_c:\n            count += 1\n        elif text[i] == close_c:\n            count -= 1\n        i += 1\n    return i",
+              "comprehension": {
+                "input": "find_balanced('ab)cd)', start=0, open_c='(', close_c=')')",
+                "options": [
+                  "2",
+                  "4",
+                  "3",
+                  "6"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "wummel/linkchecker",
                 "sourceUrl": "https://github.com/wummel/linkchecker/blob/c2ce810c3fb00b895a841a7be6b2e78c64e7b042/linkcheck/plugins/markdowncheck.py#L123-L137",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-028-ai",
               "code": "def find_balanced(text, start, open_c, close_c):\n    depth = 1\n    for i in range(start, len(text)):\n        if text[i] == open_c:\n            depth += 1\n        elif text[i] == close_c:\n            depth -= 1\n        if depth == 0:\n            return i + 1\n    return len(text)",
+              "comprehension": {
+                "input": "find_balanced('xy))z', start=0, open_c='(', close_c=')')",
+                "options": [
+                  "2",
+                  "5",
+                  "4",
+                  "3"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1603,6 +2162,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1641,18 +2201,37 @@
             {
               "solutionId": "py-029-h",
               "code": "def iostats_dict(header, stats):\n    stats = [float((sum(stat) / len(stat)).quantize(decimal.Decimal('.01'))) for stat in zip(*stats)]\n    stats = dict(zip(header, stats))\n    return stats",
+              "comprehension": {
+                "input": "iostats_dict(['r', 'w'], stats=[[1.111, 2.222], [3.333, 4.444]])  # Decimal readings",
+                "options": [
+                  "{'r': 2.2, 'w': 3.3}",
+                  "{'r': 4.44, 'w': 6.67}",
+                  "{'r': 2.22, 'w': 3.33}",
+                  "{'r': 3.33, 'w': 2.22}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "saltstack/salt",
                 "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/modules/disk.py#L796-L804",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-029-ai",
               "code": "def iostats_dict(header, stats):\n    averaged = []\n    for column in zip(*stats):\n        avg = sum(column) / len(column)\n        averaged.append(float(avg.quantize(decimal.Decimal('0.01'))))\n    return dict(zip(header, averaged))",
+              "comprehension": {
+                "input": "iostats_dict(['a'], stats=[[1], [2], [3]])  # Decimal readings",
+                "options": [
+                  "{'a': 2.0}",
+                  "{'a': 6.0}",
+                  "{'a': 1.5}",
+                  "{'a': 2}"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1660,6 +2239,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1698,18 +2278,37 @@
             {
               "solutionId": "py-030-h",
               "code": "def label_list_parser(self, url):\n        labels = re.findall('([^/,]+=[^/,]+)', url)\n        slabels = set(labels)\n        if '' in slabels:\n            slabels.remove('')\n        return slabels",
+              "comprehension": {
+                "input": "label_list_parser('a=1,b=2/c=3')",
+                "options": [
+                  "['a=1', 'b=2', 'c=3']",
+                  "{'a=1,b=2', 'c=3'}",
+                  "{'a=1', 'b=2', 'c=3'}",
+                  "{'a', 'b', 'c'}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "ome/omego",
                 "sourceUrl": "https://github.com/ome/omego/blob/2dadbf3c6342b6c995f9e0dceaf3c0b7fab030fb/omego/artifacts.py#L327-L336",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-030-ai",
               "code": "def label_list_parser(url):\n    pairs = set(re.findall(r'[^/,]+=[^/,]+', url))\n    pairs.discard('')\n    return pairs",
+              "comprehension": {
+                "input": "label_list_parser('x=9,y=8')",
+                "options": [
+                  "{'x', 'y'}",
+                  "['x=9', 'y=8']",
+                  "{'x=9,y=8'}",
+                  "{'x=9', 'y=8'}"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1717,6 +2316,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1755,18 +2355,37 @@
             {
               "solutionId": "java-001-h",
               "code": "public static Map<String, Tag> toSortedMap(List<Tag> tags, Comparator<String> comparator) {\n        Map<String, Tag> sortedMap;\n        if (comparator == null)\n            sortedMap = new LinkedHashMap<>();\n        else\n            sortedMap = new TreeMap<>(comparator);\n        tags.forEach(tag -> sortedMap.put(tag.getName(), tag));\n        return sortedMap;\n    }",
+              "comprehension": {
+                "input": "toSortedMap(tags=[Tag(\"zeta\"), Tag(\"alpha\"), Tag(\"mid\")], comparator=natural order)",
+                "options": [
+                  "[zeta, alpha, mid]",
+                  "[mid, alpha, zeta]",
+                  "[alpha, mid, zeta]",
+                  "[alpha, zeta, mid]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "Swagger2Markup/swagger2markup",
                 "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/da83465f19a2f8a0f1fba873b5762bca8587896b/src/main/java/io/github/swagger2markup/internal/utils/TagUtils.java#L41-L49",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-001-ai",
               "code": "public static Map<String, Tag> toSortedMap(List<Tag> tags, Comparator<String> comparator) {\n    Map<String, Tag> result = comparator == null ? new LinkedHashMap<>() : new TreeMap<>(comparator);\n    for (Tag tag : tags) {\n        result.put(tag.getName(), tag);\n    }\n    return result;\n}",
+              "comprehension": {
+                "input": "toSortedMap(tags=[Tag(\"b\"), Tag(\"a\")], comparator=null)",
+                "options": [
+                  "[a, b]",
+                  "[b, a]",
+                  "NullPointerException",
+                  "{} (empty map)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1774,6 +2393,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1812,18 +2432,37 @@
             {
               "solutionId": "java-002-h",
               "code": "public static String applyReplacements(CharSequence word, LinkedHashMap<String, String> replacements) {\n    StringBuilder sb = new StringBuilder(word);\n    for (final Map.Entry<String, String> e : replacements.entrySet()) {\n      String key = e.getKey();\n      int index = sb.indexOf(e.getKey());\n      while (index != -1) {\n        sb.replace(index, index + key.length(), e.getValue());\n        index = sb.indexOf(key, index + key.length());\n      }\n    }\n    return sb.toString();\n  }",
+              "comprehension": {
+                "input": "applyReplacements(\"banana\", {\"a\"->\"1\", \"1\"->\"2\"})",
+                "options": [
+                  "\"b1n1n1\"",
+                  "\"banana\"",
+                  "\"b2n2n2\"",
+                  "\"b2n1n1\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "morfologik/morfologik-stemming",
                 "sourceUrl": "https://github.com/morfologik/morfologik-stemming/blob/9d9099cc5ec4155a0eb8dfecdc23d01cbd734f6e/morfologik-stemming/src/main/java/morfologik/stemming/DictionaryLookup.java#L259-L271",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-002-ai",
               "code": "public static String applyReplacements(CharSequence word, LinkedHashMap<String, String> replacements) {\n    String result = word.toString();\n    for (Map.Entry<String, String> entry : replacements.entrySet()) {\n        result = result.replace(entry.getKey(), entry.getValue());\n    }\n    return result;\n}",
+              "comprehension": {
+                "input": "applyReplacements(\"cat\", {\"cat\"->\"dog\", \"dog\"->\"fish\"})",
+                "options": [
+                  "\"dog\"",
+                  "\"cat\"",
+                  "\"fish\"",
+                  "StackOverflowError"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1831,6 +2470,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1869,18 +2509,37 @@
             {
               "solutionId": "java-003-h",
               "code": "public static String trimWhitespace(String s) {\n    StringBuilder filter = new StringBuilder();\n    String str = s.trim();\n    for (int i = 0; i < str.length(); i++) {\n      while (str.charAt(i) <= ' ' && i < str.length() &&\n          (str.charAt(i + 1) <= ' ' || i > 1 && str.charAt(i - 1) <= ' ')) {\n        i++;\n      }\n      char c = str.charAt(i);\n      if (c != '\\n' && c != '\\t' && c != '\\r') {\n        filter.append(c);\n      }\n    }\n    return filter.toString();\n  }",
+              "comprehension": {
+                "input": "trimWhitespace(\"a  b\")",
+                "options": [
+                  "\"a b\"",
+                  "\"a  b\"",
+                  "\"ab \"",
+                  "\"ab\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "languagetool-org/languagetool",
                 "sourceUrl": "https://github.com/languagetool-org/languagetool/blob/b7a3d63883d242fb2525877c6382681c57a0a142/languagetool-core/src/main/java/org/languagetool/tools/StringTools.java#L333-L347",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-003-ai",
               "code": "public static String trimWhitespace(String s) {\n    String str = s.trim();\n    int n = str.length();\n    StringBuilder result = new StringBuilder();\n    int i = 0;\n    while (i < n) {\n        char c = str.charAt(i);\n        if (Character.isWhitespace(c)) {\n            int j = i;\n            while (j < n && Character.isWhitespace(str.charAt(j))) {\n                j++;\n            }\n            boolean isolated = (j - i) == 1;\n            if (isolated && c != '\\n' && c != '\\t' && c != '\\r') {\n                result.append(c);\n            }\n            i = j;\n        } else {\n            result.append(c);\n            i++;\n        }\n    }\n    return result.toString();\n}",
+              "comprehension": {
+                "input": "trimWhitespace(\"12 345\")",
+                "options": [
+                  "\"12345\"",
+                  "\"12 345\"",
+                  "\"12  345\"",
+                  "\"1 2345\""
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1888,6 +2547,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1926,18 +2586,37 @@
             {
               "solutionId": "java-004-h",
               "code": "public static String checksumBytesToString(byte[] digestBytes) {\n        StringBuffer hexString = new StringBuffer();\n        for (int i = 0; i < digestBytes.length; i++) {\n            String hex = Integer.toHexString(0xff & digestBytes[i]);\n            if (hex.length() == 1) {\n                hexString.append('0');\n            }\n            hexString.append(hex);\n        }\n        return hexString.toString();\n    }",
+              "comprehension": {
+                "input": "checksumBytesToString(bytes=[0x0F, 0xFF, 0x00])",
+                "options": [
+                  "\"fff00\"",
+                  "\"0FFF00\"",
+                  "\"f ff 0\"",
+                  "\"0fff00\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "duracloud/duracloud",
                 "sourceUrl": "https://github.com/duracloud/duracloud/blob/dc4f3a1716d43543cc3b2e1880605f9389849b66/common/src/main/java/org/duracloud/common/util/ChecksumUtil.java#L174-L184",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-004-ai",
               "code": "public static String checksumBytesToString(byte[] digestBytes) {\n    StringBuilder hexString = new StringBuilder();\n    for (byte digestByte : digestBytes) {\n        hexString.append(String.format(\"%02x\", digestByte & 0xff));\n    }\n    return hexString.toString();\n}",
+              "comprehension": {
+                "input": "checksumBytesToString(bytes=[0xAB, 0x01])",
+                "options": [
+                  "\"ab1\"",
+                  "\"AB01\"",
+                  "\"ab01\"",
+                  "\"ab010\""
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -1945,6 +2624,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1983,18 +2663,37 @@
             {
               "solutionId": "java-005-h",
               "code": "public static int countChildrenOf(int[] parents, int parent) {\n        int count = 0;\n        for (int i=0; i<parents.length; i++) {\n            if (parents[i] == parent) {\n                count++;\n            }\n        }\n        return count;\n    }",
+              "comprehension": {
+                "input": "countChildrenOf(parents=[0,0,1,0,2], parent=0)",
+                "options": [
+                  "2",
+                  "4",
+                  "3",
+                  "5"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "mgormley/pacaya",
                 "sourceUrl": "https://github.com/mgormley/pacaya/blob/786294cbac7cc65dbc32210c10acc32ed0c69233/src/main/java/edu/jhu/pacaya/parse/dep/ParentsArray.java#L184-L192",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-005-ai",
               "code": "public static int countChildrenOf(int[] parents, int parent) {\n    int count = 0;\n    for (int p : parents) {\n        if (p == parent) {\n            count++;\n        }\n    }\n    return count;\n}",
+              "comprehension": {
+                "input": "countChildrenOf(parents=[1,1,1,2], parent=1)",
+                "options": [
+                  "4",
+                  "2",
+                  "1",
+                  "3"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2002,6 +2701,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2040,18 +2740,37 @@
             {
               "solutionId": "java-006-h",
               "code": "public static int indexOneOf(CharSequence string, char... chars)\n  {\n    for(int i = 0; i < string.length(); ++i) {\n      for(int j = 0; j < chars.length; ++j) {\n        if(string.charAt(i) == chars[j]) {\n          return i;\n        }\n      }\n    }\n    return -1;\n  }",
+              "comprehension": {
+                "input": "indexOneOf(\"hello\", 'l', 'o')",
+                "options": [
+                  "3",
+                  "4",
+                  "0",
+                  "2"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "js-lib-com/commons",
                 "sourceUrl": "https://github.com/js-lib-com/commons/blob/f8c64482142b163487745da74feb106f0765c16b/src/main/java/js/util/Strings.java#L1412-L1422",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-006-ai",
               "code": "public static int indexOneOf(CharSequence string, char... chars) {\n    for (int i = 0; i < string.length(); i++) {\n        char c = string.charAt(i);\n        for (char candidate : chars) {\n            if (c == candidate) {\n                return i;\n            }\n        }\n    }\n    return -1;\n}",
+              "comprehension": {
+                "input": "indexOneOf(\"world\", 'z', 'r')",
+                "options": [
+                  "1",
+                  "-1",
+                  "3",
+                  "2"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2059,6 +2778,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2097,18 +2817,37 @@
             {
               "solutionId": "java-007-h",
               "code": "public static String listToString(Map<?, ?> map){\n\t\tif (map == null){\n\t\t\treturn \"null\";\n\t\t}\n\t\tTreeMap<?, ?> tm = new TreeMap<Object, Object>(map);\n\t\tStringBuilder sb = new StringBuilder();\n\t\tfor (Map.Entry<?, ?> item: tm.entrySet()){\n\t\t\tObject k = item.getKey();\n\t\t\tObject v = item.getValue();\n\t\t\tsb.append(k == null ? \"null\" : k.toString());\n\t\t\tsb.append(\"\\t= \");\n\t\t\tsb.append(v == null ? \"null\" : v.toString());\n\t\t\tsb.append('\\n');\n\t\t}\n\t\treturn sb.toString();\n\t}",
+              "comprehension": {
+                "input": "listToString({\"b\"->\"2\", \"a\"->\"1\"})",
+                "options": [
+                  "\"b\\t= 2\\na\\t= 1\\n\"",
+                  "\"a= 1\\nb= 2\\n\"",
+                  "\"a\\t= 1\\nb\\t= 2\\n\"",
+                  "\"a:1,b:2\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "james-hu/jabb-core",
                 "sourceUrl": "https://github.com/james-hu/jabb-core/blob/bceed441595c5e5195a7418795f03b69fa7b61e4/src/main/java/net/sf/jabb/util/col/MapLister.java#L41-L56",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-007-ai",
               "code": "public static String listToString(Map<?, ?> map) {\n    if (map == null) {\n        return \"null\";\n    }\n    StringBuilder sb = new StringBuilder();\n    for (Map.Entry<?, ?> entry : new TreeMap<Object, Object>(map).entrySet()) {\n        Object key = entry.getKey();\n        Object value = entry.getValue();\n        sb.append(key == null ? \"null\" : key.toString());\n        sb.append(\"\\t= \");\n        sb.append(value == null ? \"null\" : value.toString());\n        sb.append('\\n');\n    }\n    return sb.toString();\n}",
+              "comprehension": {
+                "input": "listToString({\"z\"->null})",
+                "options": [
+                  "\"z\\t= \\n\"",
+                  "NullPointerException",
+                  "\"z\\t= null\\n\"",
+                  "\"null\""
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2116,6 +2855,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2154,18 +2894,37 @@
             {
               "solutionId": "java-008-h",
               "code": "public synchronized long getCheckpointedSequence() {\n\t\tlong sequence = lastSequence;\n\t\tif(!sequences.isEmpty()) {\n\t\t\tsequence = sequences.first() - 1;\n\t\t}\n\n\t\tif(sequence > firstValueSequence) {\n\t\t\tint numToRemove = (int)(sequence - firstValueSequence);\n\t\t\tfor(int i = 0; i < numToRemove; i++) {\n\t\t\t\tvalues.remove(0);\n\t\t\t}\n\t\t\tfirstValueSequence += numToRemove;\n\t\t}\n\n\t\treturn sequence;\n\t}",
+              "comprehension": {
+                "input": "lastSequence=10, sequences={5,6,7}, firstValueSequence=2, values.size()=6",
+                "options": [
+                  "10",
+                  "5",
+                  "6",
+                  "4"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "couchbase/couchbase-lite-java-core",
                 "sourceUrl": "https://github.com/couchbase/couchbase-lite-java-core/blob/3b275642e2d2f231fd155ad9def9c5e9eff3118e/src/main/java/com/couchbase/lite/support/SequenceMap.java#L67-L83",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-008-ai",
               "code": "public synchronized long getCheckpointedSequence() {\n    long checkpoint = sequences.isEmpty() ? lastSequence : sequences.first() - 1;\n\n    int numToRemove = (int) Math.max(0, checkpoint - firstValueSequence);\n    for (int i = 0; i < numToRemove; i++) {\n        values.remove(0);\n    }\n    firstValueSequence += numToRemove;\n\n    return checkpoint;\n}",
+              "comprehension": {
+                "input": "lastSequence=6, sequences={} (empty), firstValueSequence=3, values=[300,301,302,303]",
+                "options": [
+                  "3",
+                  "7",
+                  "5",
+                  "6"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2173,6 +2932,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2211,18 +2971,37 @@
             {
               "solutionId": "java-009-h",
               "code": "public static long[] parseLongArray (String source)\n    {\n        StringTokenizer tok = new StringTokenizer(source, \",\");\n        long[] vals = new long[tok.countTokens()];\n        for (int i = 0; tok.hasMoreTokens(); i++) {\n            try {\n                vals[i] = Long.parseLong(tok.nextToken().trim());\n            } catch (NumberFormatException nfe) {\n                return null;\n            }\n        }\n        return vals;\n    }",
+              "comprehension": {
+                "input": "parseLongArray(\"5, 10, 15\")",
+                "options": [
+                  "null",
+                  "[5, 10, 15, 0]",
+                  "[5, 10]",
+                  "[5, 10, 15]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "samskivert/samskivert",
                 "sourceUrl": "https://github.com/samskivert/samskivert/blob/a64d9ef42b69819bdb2c66bddac6a64caef928b6/src/main/java/com/samskivert/util/StringUtil.java#L821-L834",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-009-ai",
               "code": "public static long[] parseLongArray(String source) {\n    String[] tokens = source.split(\",\");\n    long[] values = new long[tokens.length];\n    for (int i = 0; i < tokens.length; i++) {\n        try {\n            values[i] = Long.parseLong(tokens[i].trim());\n        } catch (NumberFormatException e) {\n            return null;\n        }\n    }\n    return values;\n}",
+              "comprehension": {
+                "input": "parseLongArray(\"7, x, 9\")",
+                "options": [
+                  "[7, 0, 9]",
+                  "null",
+                  "NumberFormatException (thrown, uncaught)",
+                  "[7, 9]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2230,6 +3009,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2268,18 +3048,37 @@
             {
               "solutionId": "java-010-h",
               "code": "public static Map<String, List<Object>> toMultivaluedMap(final Map<String, Object> seed) {\n        Validate.notNull(seed, \"seed can not be null\");\n\n        final Map<String, List<Object>> multiSeed = new LinkedHashMap<>(seed.size());\n        for (final Map.Entry<String, Object> seedEntry : seed.entrySet()) {\n            final String seedName = seedEntry.getKey();\n            final Object seedValue = seedEntry.getValue();\n            multiSeed.put(seedName, Collections.singletonList(seedValue));\n        }\n        return multiSeed;\n    }",
+              "comprehension": {
+                "input": "toMultivaluedMap({\"a\" -> 1})",
+                "options": [
+                  "{a=1}",
+                  "{a=[1, 1]}",
+                  "NullPointerException",
+                  "{a=[1]}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "apereo/person-directory",
                 "sourceUrl": "https://github.com/apereo/person-directory/blob/331200c0878aec202b8aff12a732402d6ba7681f/person-directory-impl/src/main/java/org/apereo/services/persondir/support/MultivaluedPersonAttributeUtils.java#L192-L202",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-010-ai",
               "code": "public static Map<String, List<Object>> toMultivaluedMap(Map<String, Object> seed) {\n    if (seed == null) {\n        throw new NullPointerException(\"seed can not be null\");\n    }\n    Map<String, List<Object>> result = new LinkedHashMap<>();\n    for (Map.Entry<String, Object> entry : seed.entrySet()) {\n        result.put(entry.getKey(), Collections.singletonList(entry.getValue()));\n    }\n    return result;\n}",
+              "comprehension": {
+                "input": "toMultivaluedMap({\"x\" -> \"y\", \"z\" -> 9})",
+                "options": [
+                  "{x=y, z=9}",
+                  "{x=[y, 9], z=[y, 9]}",
+                  "{x=[y], z=[9]}",
+                  "{z=[9], x=[y]} in reverse order only"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2287,6 +3086,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2325,18 +3125,37 @@
             {
               "solutionId": "java-011-h",
               "code": "public static List<Object> filterMapToList(final Map<String, ?> map, final String[] nameMapping) {\n\t\tif( map == null ) {\n\t\t\tthrow new NullPointerException(\"map should not be null\");\n\t\t} else if( nameMapping == null ) {\n\t\t\tthrow new NullPointerException(\"nameMapping should not be null\");\n\t\t}\n\n\t\tfinal List<Object> result = new ArrayList<Object>(nameMapping.length);\n\t\tfor( final String key : nameMapping ) {\n\t\t\tresult.add(map.get(key));\n\t\t}\n\t\treturn result;\n\t}",
+              "comprehension": {
+                "input": "filterMapToList({\"a\"->1, \"b\"->2}, nameMapping=[\"b\", \"a\", \"c\"])",
+                "options": [
+                  "[1, 2, null]",
+                  "[2, 1]",
+                  "[2, 1, null]",
+                  "NullPointerException"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "super-csv/super-csv",
                 "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L159-L171",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-011-ai",
               "code": "public static List<Object> filterMapToList(Map<String, ?> map, String[] nameMapping) {\n    if (map == null) {\n        throw new NullPointerException(\"map should not be null\");\n    }\n    if (nameMapping == null) {\n        throw new NullPointerException(\"nameMapping should not be null\");\n    }\n    List<Object> result = new ArrayList<>();\n    for (String key : nameMapping) {\n        result.add(map.get(key));\n    }\n    return result;\n}",
+              "comprehension": {
+                "input": "filterMapToList({\"x\"->\"hi\"}, nameMapping=[\"x\", \"y\"])",
+                "options": [
+                  "[\"hi\"]",
+                  "[\"hi\", null]",
+                  "[null, \"hi\"]",
+                  "NullPointerException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2344,6 +3163,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2382,18 +3202,37 @@
             {
               "solutionId": "java-012-h",
               "code": "public static int compare(UUID uuid1, UUID uuid2) {\n        int timeResult = Longs.compare(uuid1.timestamp(), uuid2.timestamp());\n        if (timeResult != 0) {\n            return timeResult;\n        }\n        return uuid1.compareTo(uuid2);\n    }",
+              "comprehension": {
+                "input": "compare(uuid1 with earlier timestamp, uuid2 with later timestamp)",
+                "options": [
+                  "a positive number",
+                  "zero",
+                  "a negative number",
+                  "NullPointerException"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "bazaarvoice/emodb",
                 "sourceUrl": "https://github.com/bazaarvoice/emodb/blob/97ec7671bc78b47fc2a1c11298c0c872bd5ec7fb/common/uuid/src/main/java/com/bazaarvoice/emodb/common/uuid/TimeUUIDs.java#L158-L169",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-012-ai",
               "code": "public static int compare(UUID uuid1, UUID uuid2) {\n    int result = Long.compare(uuid1.timestamp(), uuid2.timestamp());\n    if (result != 0) {\n        return result;\n    }\n    result = Integer.compare(uuid1.clockSequence(), uuid2.clockSequence());\n    if (result != 0) {\n        return result;\n    }\n    return Long.compare(uuid1.node(), uuid2.node());\n}",
+              "comprehension": {
+                "input": "compare(uuid1 with later timestamp, uuid2 with earlier timestamp)",
+                "options": [
+                  "zero",
+                  "a negative number",
+                  "IllegalArgumentException",
+                  "a positive number"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2401,6 +3240,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2439,18 +3279,37 @@
             {
               "solutionId": "java-013-h",
               "code": "public static final String getString(byte[] data, int offset)\n   {\n      StringBuilder buffer = new StringBuilder();\n      char c;\n\n      for (int loop = 0; offset + loop < data.length; loop++)\n      {\n         c = (char) data[offset + loop];\n\n         if (c == 0)\n         {\n            break;\n         }\n\n         buffer.append(c);\n      }\n\n      return (buffer.toString());\n   }",
+              "comprehension": {
+                "input": "getString(data=bytes for \"AB\\0CD\", offset=0)",
+                "options": [
+                  "\"ABCD\"",
+                  "\"AB\\u0000CD\"",
+                  "\"AB\"",
+                  "\"A\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "joniles/mpxj",
                 "sourceUrl": "https://github.com/joniles/mpxj/blob/143ea0e195da59cd108f13b3b06328e9542337e8/src/main/java/net/sf/mpxj/mpp/MPPUtility.java#L492-L510",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-013-ai",
               "code": "public static String getString(byte[] data, int offset) {\n    int end = offset;\n    while (end < data.length && data[end] != 0) {\n        end++;\n    }\n    StringBuilder result = new StringBuilder(end - offset);\n    for (int i = offset; i < end; i++) {\n        result.append((char) data[i]);\n    }\n    return result.toString();\n}",
+              "comprehension": {
+                "input": "getString(data=bytes for \"XY\\0Z\", offset=1)",
+                "options": [
+                  "\"XY\"",
+                  "\"YZ\"",
+                  "\"Y\"",
+                  "\"\" (empty string)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2458,6 +3317,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2496,18 +3356,37 @@
             {
               "solutionId": "java-014-h",
               "code": "public static short[] trimToCapacity(short[] array, int maxCapacity) {\n\tif (array.length > maxCapacity) {\n\t    short oldArray[] = array;\n\t    array = new short[maxCapacity];\n\t    System.arraycopy(oldArray, 0, array, 0, maxCapacity);\n\t}\n\treturn array;\n}",
+              "comprehension": {
+                "input": "trimToCapacity([1,2,3,4,5], maxCapacity=3)",
+                "options": [
+                  "[1, 2, 3, 4, 5]",
+                  "[3, 4, 5]",
+                  "[1, 2, 3]",
+                  "[2, 3, 4]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "wellner/jcarafe",
                 "sourceUrl": "https://github.com/wellner/jcarafe/blob/ab8b0a83dbf600fe80c27711815c90bd3055b217/jcarafe-core/src/main/java/cern/colt/Arrays.java#L576-L583",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-014-ai",
               "code": "public static short[] trimToCapacity(short[] array, int maxCapacity) {\n    if (array.length <= maxCapacity) {\n        return array;\n    }\n    return Arrays.copyOf(array, maxCapacity);\n}",
+              "comprehension": {
+                "input": "trimToCapacity([9,8,7], maxCapacity=5)",
+                "options": [
+                  "[9, 8, 7, 0, 0]",
+                  "a new array [9, 8, 7]",
+                  "the same array reference, unchanged, [9, 8, 7]",
+                  "ArrayIndexOutOfBoundsException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2515,6 +3394,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2553,18 +3433,37 @@
             {
               "solutionId": "java-015-h",
               "code": "public static double trace( DMatrixSparseCSC A ) {\n        double output = 0;\n\n        int o = Math.min(A.numCols,A.numRows);\n        for (int col = 0; col < o; col++) {\n            int idx0 = A.col_idx[col];\n            int idx1 = A.col_idx[col+1];\n\n            for (int i = idx0; i < idx1; i++) {\n                if( A.nz_rows[i] == col ) {\n                    output += A.nz_values[i];\n                    break;\n                }\n            }\n        }\n\n        return output;\n    }",
+              "comprehension": {
+                "input": "trace(2x2 sparse matrix with diagonal 5.0, 7.0)",
+                "options": [
+                  "35.0",
+                  "5.0",
+                  "7.0",
+                  "12.0"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "lessthanoptimal/ejml",
                 "sourceUrl": "https://github.com/lessthanoptimal/ejml/blob/1444680cc487af5e866730e62f48f5f9636850d9/main/ejml-dsparse/src/org/ejml/sparse/csc/CommonOps_DSCC.java#L1818-L1835",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-015-ai",
               "code": "public static double trace(DMatrixSparseCSC A) {\n    int n = Math.min(A.numRows, A.numCols);\n    double sum = 0;\n    for (int col = 0; col < n; col++) {\n        for (int i = A.col_idx[col]; i < A.col_idx[col + 1]; i++) {\n            if (A.nz_rows[i] == col) {\n                sum += A.nz_values[i];\n                break;\n            }\n        }\n    }\n    return sum;\n}",
+              "comprehension": {
+                "input": "trace(3x3 sparse matrix with diagonal 1.0, 2.0, 3.0)",
+                "options": [
+                  "6.0",
+                  "3.0",
+                  "1.0",
+                  "0.0"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2572,6 +3471,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2610,18 +3510,37 @@
             {
               "solutionId": "java-016-h",
               "code": "public static final Integer getInteger(String value)\n   {\n      Integer result;\n\n      try\n      {\n         result = Integer.valueOf(Integer.parseInt(value));\n      }\n\n      catch (Exception ex)\n      {\n         result = null;\n      }\n\n      return (result);\n   }",
+              "comprehension": {
+                "input": "getInteger(\"42\")",
+                "options": [
+                  "\"42\"",
+                  "null",
+                  "NumberFormatException",
+                  "42"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "joniles/mpxj",
                 "sourceUrl": "https://github.com/joniles/mpxj/blob/143ea0e195da59cd108f13b3b06328e9542337e8/src/main/java/net/sf/mpxj/common/NumberHelper.java#L100-L115",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-016-ai",
               "code": "public static Integer getInteger(String value) {\n    try {\n        return Integer.valueOf(value);\n    } catch (NumberFormatException | NullPointerException e) {\n        return null;\n    }\n}",
+              "comprehension": {
+                "input": "getInteger(\"abc\")",
+                "options": [
+                  "0",
+                  "NumberFormatException (thrown, uncaught)",
+                  "\"abc\"",
+                  "null"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2629,6 +3548,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2667,18 +3587,37 @@
             {
               "solutionId": "java-017-h",
               "code": "public static String[] objectListToStringArray(final List<?> objectList) {\n\t\tif( objectList == null ) {\n\t\t\treturn null;\n\t\t}\n\n\t\tfinal String[] stringArray = new String[objectList.size()];\n\t\tfor( int i = 0; i < objectList.size(); i++ ) {\n\t\t\tstringArray[i] = objectList.get(i) != null ? objectList.get(i).toString() : null;\n\t\t}\n\n\t\treturn stringArray;\n\t}",
+              "comprehension": {
+                "input": "objectListToStringArray([1, null, \"x\"])",
+                "options": [
+                  "[\"1\", \"null\", \"x\"]",
+                  "null",
+                  "[\"1\", \"x\"]",
+                  "[\"1\", null, \"x\"]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "super-csv/super-csv",
                 "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L227-L238",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-017-ai",
               "code": "public static String[] objectListToStringArray(List<?> objectList) {\n    if (objectList == null) {\n        return null;\n    }\n    String[] result = new String[objectList.size()];\n    for (int i = 0; i < objectList.size(); i++) {\n        Object element = objectList.get(i);\n        result[i] = element != null ? element.toString() : null;\n    }\n    return result;\n}",
+              "comprehension": {
+                "input": "objectListToStringArray([true, 2.5])",
+                "options": [
+                  "[\"true\", \"2.5\"]",
+                  "null",
+                  "[\"true\", \"2.50\"]",
+                  "[true, 2.5]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2686,6 +3625,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2724,18 +3664,37 @@
             {
               "solutionId": "java-018-h",
               "code": "public double computeAccuracy() {\n\t\tdouble totalCorrect = 0;\n\t\tdouble totalIncorrect = 0;\n\n\t\tfor (int i = 0; i < actualCounts.length; i++) {\n\t\t\tfor (int j = 0; j < actualCounts.length; j++) {\n\t\t\t\tif( i == j ) {\n\t\t\t\t\ttotalCorrect += matrix.get(i,j);\n\t\t\t\t} else {\n\t\t\t\t\ttotalIncorrect += matrix.get(i,j);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\treturn totalCorrect/(totalCorrect+totalIncorrect);\n\t}",
+              "comprehension": {
+                "input": "computeAccuracy() with confusion matrix [[8,2],[1,9]]",
+                "options": [
+                  "0.9",
+                  "0.5",
+                  "0.8",
+                  "0.85"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "lessthanoptimal/BoofCV",
                 "sourceUrl": "https://github.com/lessthanoptimal/BoofCV/blob/f01c0243da0ec086285ee722183804d5923bc3ac/main/boofcv-learning/src/main/java/boofcv/struct/learning/Confusion.java#L48-L63",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-018-ai",
               "code": "public double computeAccuracy() {\n    double correct = 0;\n    double total = 0;\n\n    for (int i = 0; i < actualCounts.length; i++) {\n        for (int j = 0; j < actualCounts.length; j++) {\n            double count = matrix.get(i, j);\n            total += count;\n            if (i == j) {\n                correct += count;\n            }\n        }\n    }\n\n    return correct / total;\n}",
+              "comprehension": {
+                "input": "computeAccuracy() with confusion matrix [[5,0,0],[0,3,2],[1,0,4]]",
+                "options": [
+                  "0.8",
+                  "1.0",
+                  "0.75",
+                  "0.6"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2743,6 +3702,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2781,18 +3741,37 @@
             {
               "solutionId": "java-019-h",
               "code": "public static double ratioSmallestOverLargest( double []sv ) {\n        if( sv.length == 0 )\n            return Double.NaN;\n\n        double min = sv[0];\n        double max = min;\n\n        for (int i = 1; i < sv.length; i++) {\n            double v = sv[i];\n            if( v > max )\n                max = v;\n            else if( v < min )\n                min = v;\n        }\n\n        return  min/max;\n    }",
+              "comprehension": {
+                "input": "ratioSmallestOverLargest([4.0, 2.0, 8.0])",
+                "options": [
+                  "4.0",
+                  "0.5",
+                  "0.25",
+                  "2.0"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "lessthanoptimal/ejml",
                 "sourceUrl": "https://github.com/lessthanoptimal/ejml/blob/1444680cc487af5e866730e62f48f5f9636850d9/main/ejml-ddense/src/org/ejml/dense/row/SingularOps_DDRM.java#L77-L93",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-019-ai",
               "code": "public static double ratioSmallestOverLargest(double[] sv) {\n    if (sv.length == 0) {\n        return Double.NaN;\n    }\n    double min = sv[0];\n    double max = sv[0];\n    for (double v : sv) {\n        if (v > max) {\n            max = v;\n        }\n        if (v < min) {\n            min = v;\n        }\n    }\n    return min / max;\n}",
+              "comprehension": {
+                "input": "ratioSmallestOverLargest([10.0, 3.0, 30.0])",
+                "options": [
+                  "3.0",
+                  "0.1",
+                  "0.33",
+                  "10.0"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2800,6 +3779,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2838,18 +3818,37 @@
             {
               "solutionId": "java-020-h",
               "code": "public static <A, B> ImmutableMultiset<B> transformedCopy(Multiset<A> ms,\n      Function<A, B> func) {\n    final ImmutableMultiset.Builder<B> ret = ImmutableMultiset.builder();\n\n    for (final Multiset.Entry<A> entry : ms.entrySet()) {\n      final B transformedElement = func.apply(entry.getElement());\n      ret.addCopies(transformedElement, entry.getCount());\n    }\n\n    return ret.build();\n  }",
+              "comprehension": {
+                "input": "transformedCopy(multiset{1x2, 2x3}, func=parity as \"odd\"/\"even\")",
+                "options": [
+                  "{odd x3, even x2}",
+                  "{odd x5}",
+                  "{odd x2, even x3}",
+                  "{even x5}"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "BBN-E/bue-common-open",
                 "sourceUrl": "https://github.com/BBN-E/bue-common-open/blob/d618652674d647867306e2e4b987a21b7c29c015/common-core-open/src/main/java/com/bbn/bue/common/collections/CollectionUtils.java#L91-L101",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-020-ai",
               "code": "public static <A, B> ImmutableMultiset<B> transformedCopy(Multiset<A> ms, Function<A, B> func) {\n    ImmutableMultiset.Builder<B> builder = ImmutableMultiset.builder();\n    for (Multiset.Entry<A> entry : ms.entrySet()) {\n        builder.addCopies(func.apply(entry.getElement()), entry.getCount());\n    }\n    return builder.build();\n}",
+              "comprehension": {
+                "input": "transformedCopy(multiset{5x1, 10x4}, func=x*2)",
+                "options": [
+                  "{10x1, 20x4}",
+                  "{10x4, 20x1}",
+                  "{10x5}",
+                  "{20x5}"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2857,6 +3856,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2895,18 +3895,37 @@
             {
               "solutionId": "java-021-h",
               "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n      double value = Math.abs(c.getCount(key));\n      if (value > maxVal)\n        maxVal = value;\n    }\n    double sqrSum = 0.0;\n    for (E key : c.keySet()) {\n      double count = c.getCount(key);\n      sqrSum += Math.pow(count / maxVal, 2);\n    }\n    return maxVal * Math.sqrt(sqrSum);\n  }",
+              "comprehension": {
+                "input": "saferL2Norm(counter{a:3.0, b:4.0})",
+                "options": [
+                  "7.0",
+                  "3.5",
+                  "25.0",
+                  "5.0"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "PeterisP/LVTagger",
                 "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/stats/Counters.java#L1325-L1338",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-021-ai",
               "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n        maxVal = Math.max(maxVal, Math.abs(c.getCount(key)));\n    }\n    if (maxVal == 0.0) {\n        return 0.0;\n    }\n    double sumOfSquares = 0.0;\n    for (E key : c.keySet()) {\n        double scaled = c.getCount(key) / maxVal;\n        sumOfSquares += scaled * scaled;\n    }\n    return maxVal * Math.sqrt(sumOfSquares);\n}",
+              "comprehension": {
+                "input": "saferL2Norm(counter{x:6.0, y:8.0})",
+                "options": [
+                  "14.0",
+                  "10.0",
+                  "100.0",
+                  "7.0"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2914,6 +3933,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2952,18 +3972,37 @@
             {
               "solutionId": "java-022-h",
               "code": "public String csv(String text) {\n        if (text == null || text.isEmpty()) {\n            return \"\\\"\\\"\";\n        }\n        final String str = text.trim().replace(\"\\n\", \" \");\n        if (str.length() == 0) {\n            return \"\\\"\\\"\";\n        }\n        return StringEscapeUtils.escapeCsv(str);\n    }",
+              "comprehension": {
+                "input": "csv(\"hello, world\")",
+                "options": [
+                  "\"hello, world\"",
+                  "hello, world (no quotes)",
+                  "\"\\\"hello, world\\\"\"",
+                  "\"hello\\, world\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "jeremylong/DependencyCheck",
                 "sourceUrl": "https://github.com/jeremylong/DependencyCheck/blob/6cc7690ea12e4ca1454210ceaa2e9a5523f0926c/core/src/main/java/org/owasp/dependencycheck/reporting/EscapeTool.java#L124-L133",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "java-022-ai",
               "code": "public String csv(String text) {\n    if (text == null || text.isEmpty()) {\n        return \"\\\"\\\"\";\n    }\n    String str = text.trim().replace(\"\\n\", \" \");\n    if (str.isEmpty()) {\n        return \"\\\"\\\"\";\n    }\n    if (str.indexOf(',') >= 0 || str.indexOf('\"') >= 0) {\n        return \"\\\"\" + str.replace(\"\\\"\", \"\\\"\\\"\") + \"\\\"\";\n    }\n    return str;\n}",
+              "comprehension": {
+                "input": "csv('say \"hi\"')",
+                "options": [
+                  "say \"hi\" (unchanged)",
+                  "\"say \"hi\"\" (unescaped)",
+                  "\"say \"\"hi\"\"\"",
+                  "\"\" (empty field)"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -2971,6 +4010,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3009,18 +4049,37 @@
             {
               "solutionId": "java-023-h",
               "code": "public static boolean containsAny (final char [] aInput, final char [] aSearchChars)\n  {\n    ValueEnforcer.notNull (aSearchChars, \"SearchChars\");\n\n    if (aInput != null)\n      for (final char cIn : aInput)\n        if (ArrayHelper.contains (aSearchChars, cIn))\n          return true;\n    return false;\n  }",
+              "comprehension": {
+                "input": "containsAny(input=['a','b','c'], searchChars=['x','y','c'])",
+                "options": [
+                  "false",
+                  "true",
+                  "NullPointerException",
+                  "1"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "phax/ph-commons",
                 "sourceUrl": "https://github.com/phax/ph-commons/blob/d28c03565f44a0b804d96028d0969f9bb38c4313/ph-commons/src/main/java/com/helger/commons/string/StringHelper.java#L3100-L3109",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "java-023-ai",
               "code": "public static boolean containsAny(char[] input, char[] searchChars) {\n    if (input == null) {\n        return false;\n    }\n    for (char c : input) {\n        for (char search : searchChars) {\n            if (c == search) {\n                return true;\n            }\n        }\n    }\n    return false;\n}",
+              "comprehension": {
+                "input": "containsAny(input=['p','q','r'], searchChars=['x','y','z'])",
+                "options": [
+                  "true",
+                  "NullPointerException",
+                  "false",
+                  "0"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3028,6 +4087,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3066,18 +4126,37 @@
             {
               "solutionId": "java-024-h",
               "code": "public static boolean parseDeleteKeyword(final char[] query, int offset) {\n    if (query.length < (offset + 6)) {\n      return false;\n    }\n\n    return (query[offset] | 32) == 'd'\n        && (query[offset + 1] | 32) == 'e'\n        && (query[offset + 2] | 32) == 'l'\n        && (query[offset + 3] | 32) == 'e'\n        && (query[offset + 4] | 32) == 't'\n        && (query[offset + 5] | 32) == 'e';\n  }",
+              "comprehension": {
+                "input": "parseDeleteKeyword(\"DELETE FROM\", offset=0)",
+                "options": [
+                  "false",
+                  "true",
+                  "ArrayIndexOutOfBoundsException",
+                  "\"DELETE\""
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "pgjdbc/pgjdbc",
                 "sourceUrl": "https://github.com/pgjdbc/pgjdbc/blob/95ba7b261e39754674c5817695ae5ebf9a341fae/pgjdbc/src/main/java/org/postgresql/core/Parser.java#L562-L573",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "java-024-ai",
               "code": "public static boolean parseDeleteKeyword(char[] query, int offset) {\n    if (query.length < offset + 6) {\n        return false;\n    }\n    String word = new String(query, offset, 6).toLowerCase();\n    return word.equals(\"delete\");\n}",
+              "comprehension": {
+                "input": "parseDeleteKeyword(\"UPDATE x\", offset=0)",
+                "options": [
+                  "true",
+                  "\"update\"",
+                  "false",
+                  "ArrayIndexOutOfBoundsException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3085,6 +4164,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3123,18 +4203,37 @@
             {
               "solutionId": "java-025-h",
               "code": "public static int encodeNum( final long num, final byte[] data, final int beginIndex, final int maxBytes ) {\n        for ( int i = 0; i < maxBytes; i++ ) {\n            final int pos = maxBytes - i - 1;\n            final int idx = beginIndex + pos;\n            data[idx] = (byte) ( ( num >> ( 8 * i ) ) & 0xff );\n        }\n        return beginIndex + maxBytes;\n    }",
+              "comprehension": {
+                "input": "encodeNum(num=258, data=new byte[4], beginIndex=0, maxBytes=4)",
+                "options": [
+                  "bytes = [0x02, 0x01, 0x00, 0x00], return 4",
+                  "bytes = [0x00, 0x00, 0x01, 0x02], return 4",
+                  "bytes = [0x00, 0x00, 0x01, 0x02], return 3",
+                  "bytes = [0x01, 0x02, 0x00, 0x00], return 4"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "magro/memcached-session-manager",
                 "sourceUrl": "https://github.com/magro/memcached-session-manager/blob/716e147c9840ab10298c4d2b9edd0662058331e6/core/src/main/java/de/javakaffee/web/msm/TranscoderService.java#L500-L507",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "java-025-ai",
               "code": "public static int encodeNum(long num, byte[] data, int beginIndex, int maxBytes) {\n    for (int i = 0; i < maxBytes; i++) {\n        int index = beginIndex + maxBytes - 1 - i;\n        data[index] = (byte) ((num >> (8 * i)) & 0xff);\n    }\n    return beginIndex + maxBytes;\n}",
+              "comprehension": {
+                "input": "encodeNum(num=255, data=new byte[2], beginIndex=0, maxBytes=2)",
+                "options": [
+                  "bytes = [0x00, 0xFF], return 2",
+                  "bytes = [0xFF, 0x00], return 2",
+                  "bytes = [0x00, 0xFF], return 1",
+                  "ArrayIndexOutOfBoundsException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3142,6 +4241,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3180,18 +4280,37 @@
             {
               "solutionId": "java-026-h",
               "code": "public static <T> int getIndex(List<T> l, T o) {\n    int i = 0;\n    for (Object o1 : l) {\n      if (o == o1)\n        return i;\n      else\n        i++;\n    }\n    return -1;\n  }",
+              "comprehension": {
+                "input": "getIndex(list=[\"x\", dupA, dupB], o=dupB)  # dupA/dupB are distinct objects with equal value \"dup\"",
+                "options": [
+                  "1",
+                  "-1",
+                  "0",
+                  "2"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "PeterisP/LVTagger",
                 "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/CollectionUtils.java#L284-L293",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-026-ai",
               "code": "public static <T> int getIndex(List<T> l, T o) {\n    for (int i = 0; i < l.size(); i++) {\n        if (l.get(i) == o) {\n            return i;\n        }\n    }\n    return -1;\n}",
+              "comprehension": {
+                "input": "getIndex(list=[zObj1, \"y\"], o=zObj2)  # zObj1/zObj2 distinct objects, equal value \"z\", zObj2 not in list",
+                "options": [
+                  "0",
+                  "-1",
+                  "1",
+                  "NullPointerException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3199,6 +4318,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3237,18 +4357,37 @@
             {
               "solutionId": "java-027-h",
               "code": "public static float[] parseFloatArray (String source)\n    {\n        StringTokenizer tok = new StringTokenizer(source, \",\");\n        float[] vals = new float[tok.countTokens()];\n        for (int i = 0; tok.hasMoreTokens(); i++) {\n            try {\n                vals[i] = Float.parseFloat(tok.nextToken().trim());\n            } catch (NumberFormatException nfe) {\n                return null;\n            }\n        }\n        return vals;\n    }",
+              "comprehension": {
+                "input": "parseFloatArray(\"1.5, 2.5\")",
+                "options": [
+                  "null",
+                  "[1.5, 2.5, 0.0]",
+                  "[1.5, 2.5]",
+                  "[\"1.5\", \"2.5\"]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "samskivert/samskivert",
                 "sourceUrl": "https://github.com/samskivert/samskivert/blob/a64d9ef42b69819bdb2c66bddac6a64caef928b6/src/main/java/com/samskivert/util/StringUtil.java#L844-L857",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-027-ai",
               "code": "public static float[] parseFloatArray(String source) {\n    String[] tokens = source.split(\",\");\n    float[] values = new float[tokens.length];\n    for (int i = 0; i < tokens.length; i++) {\n        try {\n            values[i] = Float.parseFloat(tokens[i].trim());\n        } catch (NumberFormatException e) {\n            return null;\n        }\n    }\n    return values;\n}",
+              "comprehension": {
+                "input": "parseFloatArray(\"1, bad\")",
+                "options": [
+                  "[1.0, 0.0]",
+                  "null",
+                  "NumberFormatException (thrown, uncaught)",
+                  "[1.0]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3256,6 +4395,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3294,18 +4434,37 @@
             {
               "solutionId": "java-028-h",
               "code": "public static int[] getTileNumber( final double lat, final double lon, final int zoom ) {\n        int xtile = (int) Math.floor((lon + 180) / 360 * (1 << zoom));\n        int ytile_osm = (int) Math.floor(\n                (1 - Math.log(Math.tan(Math.toRadians(lat)) + 1 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2 * (1 << zoom));\n        if (xtile < 0)\n            xtile = 0;\n        if (xtile >= (1 << zoom))\n            xtile = ((1 << zoom) - 1);\n        if (ytile_osm < 0)\n            ytile_osm = 0;\n        if (ytile_osm >= (1 << zoom))\n            ytile_osm = ((1 << zoom) - 1);\n        return new int[]{zoom, xtile, ytile_osm};\n    }",
+              "comprehension": {
+                "input": "getTileNumber(lat=40.7128, lon=-74.0060, zoom=10)",
+                "options": [
+                  "[10, 300, 384]",
+                  "[10, 301, 384]",
+                  "[10, 301, 385]",
+                  "[10, 302, 385]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "TheHortonMachine/hortonmachine",
                 "sourceUrl": "https://github.com/TheHortonMachine/hortonmachine/blob/d2b436bbdf951dc1fda56096a42dbc0eae4d35a5/dbs/src/main/java/org/hortonmachine/dbs/utils/MercatorUtils.java#L108-L121",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-028-ai",
               "code": "public static int[] getTileNumber(double lat, double lon, int zoom) {\n    int maxTile = 1 << zoom;\n\n    int xtile = (int) Math.floor((lon + 180) / 360 * maxTile);\n    double latRad = Math.toRadians(lat);\n    int ytile = (int) Math.floor(\n            (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * maxTile);\n\n    xtile = Math.max(0, Math.min(maxTile - 1, xtile));\n    ytile = Math.max(0, Math.min(maxTile - 1, ytile));\n\n    return new int[]{zoom, xtile, ytile};\n}",
+              "comprehension": {
+                "input": "getTileNumber(lat=51.5074, lon=-0.1278, zoom=5)",
+                "options": [
+                  "[5, 15, 10]",
+                  "[5, 16, 10]",
+                  "[5, 15, 11]",
+                  "[5, 16, 11]"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3313,6 +4472,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3351,18 +4511,37 @@
             {
               "solutionId": "java-029-h",
               "code": "public static int calculateBindLength(int bindCount) {\n    int res = 0;\n    int bindLen = 2;\n    int maxBindsOfLen = 9;\n    while (bindCount > 0) {\n      int numBinds = Math.min(maxBindsOfLen, bindCount);\n      bindCount -= numBinds;\n      res += bindLen * numBinds;\n      bindLen++;\n      maxBindsOfLen *= 10;\n    }\n    return res;\n  }",
+              "comprehension": {
+                "input": "calculateBindLength(bindCount=9)",
+                "options": [
+                  "16",
+                  "20",
+                  "9",
+                  "18"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "pgjdbc/pgjdbc",
                 "sourceUrl": "https://github.com/pgjdbc/pgjdbc/blob/95ba7b261e39754674c5817695ae5ebf9a341fae/pgjdbc/src/main/java/org/postgresql/core/NativeQuery.java#L99-L111",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-029-ai",
               "code": "public static int calculateBindLength(int bindCount) {\n    if (bindCount <= 0) {\n        return 0;\n    }\n    int digits = String.valueOf(bindCount).length();\n    int total = 0;\n    int lowerBound = 1;\n    for (int d = 1; d <= digits; d++) {\n        int upperBound = (int) Math.min(bindCount, Math.pow(10, d) - 1);\n        int count = upperBound - lowerBound + 1;\n        total += count * (1 + d);\n        lowerBound = upperBound + 1;\n    }\n    return total;\n}",
+              "comprehension": {
+                "input": "calculateBindLength(bindCount=11)",
+                "options": [
+                  "22",
+                  "27",
+                  "20",
+                  "24"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3370,6 +4549,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -3408,18 +4588,37 @@
             {
               "solutionId": "java-030-h",
               "code": "public static <K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries) {\n    List<Entry<K,V>> entriesList = new ArrayList<Map.Entry<K, V>>(entries);\n    Collections.sort(entriesList, new Comparator<Map.Entry<K, V>>() {\n      public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {\n        return e1.getKey().compareTo(e2.getKey());\n      }\n    });\n    return entriesList;\n  }",
+              "comprehension": {
+                "input": "sortedEntries([(3,\"c\"), (1,\"a\"), (2,\"b\")])",
+                "options": [
+                  "[3=c, 1=a, 2=b]",
+                  "[2=b, 1=a, 3=c]",
+                  "[1=a, 2=b, 3=c]",
+                  "[1=a, 3=c, 2=b]"
+                ]
+              },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
                 "sourceRepoOrAuthor": "PeterisP/LVTagger",
                 "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/Maps.java#L98-L106",
-                "selectionNotes": ""
+                "selectionNotes": "",
+                "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "java-030-ai",
               "code": "public static <K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries) {\n    List<Map.Entry<K, V>> entriesList = new ArrayList<>(entries);\n    entriesList.sort((e1, e2) -> e1.getKey().compareTo(e2.getKey()));\n    return entriesList;\n}",
+              "comprehension": {
+                "input": "sortedEntries([(20,\"x\"), (5,\"y\")])",
+                "options": [
+                  "[20=x, 5=y]",
+                  "[5=y, 20=x]",
+                  "[5=x, 20=y]",
+                  "ClassCastException"
+                ]
+              },
               "_hidden": {
                 "origin": "ai",
                 "variantKey": "ai1",
@@ -3427,6 +4626,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }

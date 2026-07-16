@@ -28,6 +28,14 @@ export interface SlotRating {
   briefExplanation: string;
 }
 
+// ─── Per-slot objective comprehension check ──────────────────────────────────
+
+export interface ComprehensionAnswer {
+  selectedIndex: number;
+  correct: boolean;
+  elapsedMs: number;
+}
+
 // ─── Final assessment after reviewing both slots ─────────────────────────────
 
 export interface FinalAssessment {
@@ -72,6 +80,10 @@ export interface ReviewSession {
   /** Unsaved in-progress form values, kept so navigating away and back doesn't lose them. */
   draftRatings: Partial<Record<SlotLabel, SlotRating>>;
   draftAssessment: DraftAssessment | null;
+  /** Epoch ms when the subjective rating for a slot was submitted — the comprehension
+   *  question's timer for that slot starts here and stops when it's answered. */
+  comprehensionStartedAt: Partial<Record<SlotLabel, number>>;
+  comprehensionAnswers: Partial<Record<SlotLabel, ComprehensionAnswer>>;
 }
 
 // ─── Difficulty gating ─────────────────────────────────────────────────────────

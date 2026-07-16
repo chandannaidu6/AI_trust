@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, lazy, Suspense } from 'react';
+import { useEffect, useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { ProblemStatement } from '../components/review/ProblemStatement';
@@ -7,13 +7,14 @@ const CodeViewer = lazy(() =>
   import('../components/review/CodeViewer').then(m => ({ default: m.CodeViewer }))
 );
 import { ReviewForm } from '../components/review/ReviewForm';
+import { ComprehensionQuestion } from '../components/review/ComprehensionQuestion';
 import { FinalAssessmentForm } from '../components/review/FinalAssessmentForm';
 import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestion } from '../data/loader';
 import { StudyQuestion, SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS, DIFFICULTIES } from '../types';
-import { allRated } from '../utils/helpers';
 import { buildExportPayload, submitToSheets, SheetSubmitStatus } from '../utils/export';
+import { shuffleForSession } from '../utils/randomize';
 
 // Progress bar for rated-solutions count
 const TOTAL_SLOTS = SLOT_LABELS.length;
@@ -25,13 +26,13 @@ function RatingProgress({ rated }: { rated: number }) {
       aria-valuenow={rated}
       aria-valuemin={0}
       aria-valuemax={TOTAL_SLOTS}
-      aria-label={`${rated} of ${TOTAL_SLOTS} solutions rated`}
+      aria-label={`${rated} of ${TOTAL_SLOTS} solutions fully reviewed`}
       className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3"
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Progress</span>
         <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-          {rated} / {TOTAL_SLOTS} solutions rated
+          {rated} / {TOTAL_SLOTS} solutions fully reviewed
         </span>
       </div>
       <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -42,7 +43,8 @@ function RatingProgress({ rated }: { rated: number }) {
       </div>
       {rated < TOTAL_SLOTS && (
         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5">
-          {TOTAL_SLOTS - rated} more to go before the final assessment unlocks.
+          Rate each solution, then answer its quick comprehension check, before the final
+          assessment unlocks.
         </p>
       )}
     </div>
@@ -53,7 +55,7 @@ export default function QuestionReviewPage() {
   const { category, questionId } = useParams<{ category: string; questionId: string }>();
   const navigate = useNavigate();
   const {
-    state, startReview, setActiveSlot, rateSlot, submitAssessment,
+    state, startReview, setActiveSlot, rateSlot, submitComprehensionAnswer, submitAssessment,
     updateDraftRating, updateDraftAssessment,
   } = useStudy();
 
@@ -94,15 +96,50 @@ export default function QuestionReviewPage() {
   const review        = state.review;
   const activeSlot    = review?.activeSlot ?? 'A';
   const ratings       = review?.slotRatings ?? {};
-  const ratedCount    = SLOT_LABELS.filter(s => !!ratings[s]).length;
-  const allDone       = allRated(ratings);
+  const comprehensionAnswers = review?.comprehensionAnswers ?? {};
+  const slotFullyDone = useCallback(
+    (s: SlotLabel) => !!ratings[s] && !!comprehensionAnswers[s],
+    [ratings, comprehensionAnswers],
+  );
+  const doneCount     = SLOT_LABELS.filter(slotFullyDone).length;
+  const allDone       = doneCount === SLOT_LABELS.length;
   const activeSlotData = review?.slots.find(s => s.label === activeSlot);
+
+  // The active slot's raw solution data (comprehension question + which
+  // option is correct) — not carried on the lightweight UISlot, so it's
+  // looked up from the full question by solutionId.
+  const activeRawSolution = question && activeSlotData
+    ? question.solutionsByLanguage[language]?.solutions.find(s => s.solutionId === activeSlotData.solutionId)
+    : undefined;
+
+  // Shuffle the comprehension answer options per participant, so the correct
+  // answer isn't always in the same position.
+  const comprehension = useMemo(() => {
+    if (!activeRawSolution || !state.participant || !question) return null;
+    const indices = activeRawSolution.comprehension.options.map((_, i) => i);
+    const shuffled = shuffleForSession(
+      indices, state.participant.id, `${question.id}::comprehension::${activeSlot}`, language,
+    );
+    return {
+      input: activeRawSolution.comprehension.input,
+      options: shuffled.map(i => activeRawSolution.comprehension.options[i]),
+      correctShuffledIndex: shuffled.indexOf(activeRawSolution._hidden.comprehensionCorrectIndex),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeRawSolution, state.participant?.id, question?.id, activeSlot, language]);
 
   const handleRate = useCallback((rating: SlotRating) => {
     rateSlot(activeSlot, rating);
-    const next = SLOT_LABELS.find(s => s !== activeSlot && !ratings[s]);
+    // Stay on this slot — its comprehension question comes next.
+  }, [activeSlot, rateSlot]);
+
+  const handleComprehensionSubmit = useCallback((selectedIndex: number) => {
+    if (!comprehension) return;
+    const correct = selectedIndex === comprehension.correctShuffledIndex;
+    submitComprehensionAnswer(activeSlot, selectedIndex, correct);
+    const next = SLOT_LABELS.find(s => s !== activeSlot && !slotFullyDone(s));
     if (next) setActiveSlot(next);
-  }, [activeSlot, ratings, rateSlot, setActiveSlot]);
+  }, [activeSlot, comprehension, submitComprehensionAnswer, slotFullyDone, setActiveSlot]);
 
   // Would submitting this question's assessment complete all 3 required
   // difficulties (Easy/Medium/Hard)? Computed from state *before* this
@@ -170,7 +207,7 @@ export default function QuestionReviewPage() {
             <SolutionSwitcher
               activeSlot={activeSlot}
               onSelect={setActiveSlot}
-              ratings={ratings}
+              done={{ A: slotFullyDone('A'), B: slotFullyDone('B') }}
             />
 
             {activeSlotData && (
@@ -190,15 +227,24 @@ export default function QuestionReviewPage() {
               </Suspense>
             )}
 
-            <RatingProgress rated={ratedCount} />
+            <RatingProgress rated={doneCount} />
 
-            {!allDone && (
+            {!ratings[activeSlot] && (
               <ReviewForm
                 slot={activeSlot}
                 existing={ratings[activeSlot]}
                 draft={review?.draftRatings[activeSlot]}
                 onDraftChange={rating => updateDraftRating(activeSlot, rating)}
                 onSubmit={handleRate}
+              />
+            )}
+
+            {ratings[activeSlot] && !comprehensionAnswers[activeSlot] && comprehension && (
+              <ComprehensionQuestion
+                slot={activeSlot}
+                input={comprehension.input}
+                options={comprehension.options}
+                onSubmit={handleComprehensionSubmit}
               />
             )}
 

@@ -4,7 +4,7 @@ import {
 import {
   AppState, ParticipantProfile, ReviewSession,
   SlotLabel, SlotRating, FinalAssessment, DraftAssessment, StudyQuestion, UISlot, SLOT_LABELS,
-  Difficulty,
+  Difficulty, ComprehensionAnswer,
 } from '../types';
 import { shuffleForSession } from '../utils/randomize';
 import { generateId, reviewSessionKey } from '../utils/helpers';
@@ -17,6 +17,7 @@ type Action =
   | { type: 'START_REVIEW'; payload: { question: StudyQuestion; language: string } }
   | { type: 'SET_ACTIVE_SLOT'; payload: SlotLabel }
   | { type: 'RATE_SLOT'; payload: { slot: SlotLabel; rating: SlotRating } }
+  | { type: 'SUBMIT_COMPREHENSION_ANSWER'; payload: { slot: SlotLabel; selectedIndex: number; correct: boolean } }
   | { type: 'SUBMIT_ASSESSMENT'; payload: FinalAssessment }
   | { type: 'UPDATE_DRAFT_RATING'; payload: { slot: SlotLabel; rating: SlotRating } }
   | { type: 'UPDATE_DRAFT_ASSESSMENT'; payload: DraftAssessment }
@@ -103,6 +104,8 @@ function reducer(state: AppState, action: Action): AppState {
         solutionLabels,
         draftRatings: {},
         draftAssessment: null,
+        comprehensionStartedAt: {},
+        comprehensionAnswers: {},
       };
 
       return withReview(state, session);
@@ -121,6 +124,27 @@ function reducer(state: AppState, action: Action): AppState {
           ...state.review.slotRatings,
           [action.payload.slot]: action.payload.rating,
         },
+        // The comprehension question's timer for this slot starts the moment
+        // its subjective rating is submitted (the "previous question").
+        comprehensionStartedAt: {
+          ...state.review.comprehensionStartedAt,
+          [action.payload.slot]: Date.now(),
+        },
+      });
+    }
+
+    case 'SUBMIT_COMPREHENSION_ANSWER': {
+      if (!state.review) return state;
+      const { slot, selectedIndex, correct } = action.payload;
+      const startedAt = state.review.comprehensionStartedAt[slot] ?? Date.now();
+      const answer: ComprehensionAnswer = {
+        selectedIndex,
+        correct,
+        elapsedMs: Date.now() - startedAt,
+      };
+      return withReview(state, {
+        ...state.review,
+        comprehensionAnswers: { ...state.review.comprehensionAnswers, [slot]: answer },
       });
     }
 
@@ -175,6 +199,7 @@ interface StudyContextValue {
   startReview: (question: StudyQuestion, language: string) => void;
   setActiveSlot: (slot: SlotLabel) => void;
   rateSlot: (slot: SlotLabel, rating: SlotRating) => void;
+  submitComprehensionAnswer: (slot: SlotLabel, selectedIndex: number, correct: boolean) => void;
   submitAssessment: (a: FinalAssessment) => void;
   updateDraftRating: (slot: SlotLabel, rating: SlotRating) => void;
   updateDraftAssessment: (a: DraftAssessment) => void;
@@ -194,6 +219,8 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   const setActiveSlot   = useCallback((slot: SlotLabel)        => dispatch({ type: 'SET_ACTIVE_SLOT', payload: slot }), []);
   const rateSlot        = useCallback((slot: SlotLabel, rating: SlotRating) =>
     dispatch({ type: 'RATE_SLOT', payload: { slot, rating } }), []);
+  const submitComprehensionAnswer = useCallback((slot: SlotLabel, selectedIndex: number, correct: boolean) =>
+    dispatch({ type: 'SUBMIT_COMPREHENSION_ANSWER', payload: { slot, selectedIndex, correct } }), []);
   const submitAssessment = useCallback((a: FinalAssessment)    => dispatch({ type: 'SUBMIT_ASSESSMENT', payload: a }), []);
   const updateDraftRating = useCallback((slot: SlotLabel, rating: SlotRating) =>
     dispatch({ type: 'UPDATE_DRAFT_RATING', payload: { slot, rating } }), []);
@@ -206,6 +233,7 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   return (
     <StudyContext.Provider value={{
       state, setParticipant, setCategory, startReview, setActiveSlot, rateSlot,
+      submitComprehensionAnswer,
       submitAssessment, updateDraftRating, updateDraftAssessment, setLastViewedQuestion, reset,
     }}>
       {children}

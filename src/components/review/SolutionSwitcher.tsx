@@ -1,5 +1,5 @@
 import { useRef, KeyboardEvent } from 'react';
-import { SlotLabel, SlotRating, SLOT_LABELS } from '../../types';
+import { SlotLabel, SLOT_LABELS } from '../../types';
 
 const SLOT_STYLES: Record<SlotLabel, { base: string; active: string }> = {
   A: {
@@ -15,11 +15,12 @@ const SLOT_STYLES: Record<SlotLabel, { base: string; active: string }> = {
 interface SolutionSwitcherProps {
   activeSlot: SlotLabel;
   onSelect: (slot: SlotLabel) => void;
-  ratings: Partial<Record<SlotLabel, SlotRating>>;
+  /** Whether each slot's rating *and* comprehension check are both done. */
+  done: Partial<Record<SlotLabel, boolean>>;
 }
 
-export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwitcherProps) {
-  const rated = SLOT_LABELS.filter(s => !!ratings[s]).length;
+export function SolutionSwitcher({ activeSlot, onSelect, done }: SolutionSwitcherProps) {
+  const doneCount = SLOT_LABELS.filter(s => !!done[s]).length;
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Arrow-key navigation through tabs
@@ -49,7 +50,7 @@ export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwit
           Solutions
         </span>
         <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">
-          {rated} / {SLOT_LABELS.length} rated
+          {doneCount} / {SLOT_LABELS.length} done
         </span>
       </div>
 
@@ -61,7 +62,7 @@ export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwit
       >
         {SLOT_LABELS.map((slot, idx) => {
           const isActive = slot === activeSlot;
-          const isRated  = !!ratings[slot];
+          const isDone   = !!done[slot];
           const style    = SLOT_STYLES[slot];
           return (
             <button
@@ -69,7 +70,7 @@ export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwit
               ref={el => { btnRefs.current[idx] = el; }}
               role="tab"
               aria-selected={isActive}
-              aria-label={`Solution ${slot}${isRated ? ', rated' : ', not yet rated'}`}
+              aria-label={`Solution ${slot}${isDone ? ', fully reviewed' : ', not yet fully reviewed'}`}
               tabIndex={isActive ? 0 : -1}
               onKeyDown={e => handleKeyDown(e, idx)}
               onClick={() => onSelect(slot)}
@@ -79,7 +80,7 @@ export function SolutionSwitcher({ activeSlot, onSelect, ratings }: SolutionSwit
                           ${isActive ? style.active : style.base}`}
             >
               <span>Solution {slot}</span>
-              {isRated && (
+              {isDone && (
                 <span
                   className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0
                               ${isActive ? 'bg-white/25' : 'bg-green-500'}`}
