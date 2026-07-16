@@ -47,6 +47,9 @@ export function FinalAssessmentForm({
   };
 
   const handleExplanation = (text: string) => {
+    // A no-op update (e.g. a stray late event from the voice recorder) must
+    // never undo an already-submitted assessment.
+    if (text === explanation) return;
     setExplanation(text);
     setSaved(false);
     onDraftChange({ bestChoice, explanation: text });

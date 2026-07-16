@@ -119,6 +119,11 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     recognition.onresult = (event: any) => {
+      // The browser doesn't stop instantly when .stop() is called — it can
+      // still fire one more result afterward. Ignore it once the user has
+      // intentionally stopped, or a late result can land after (and undo)
+      // a submission made right after clicking "Stop recording".
+      if (intentionalStopRef.current) return;
       quickFailStreak = 0;
       try {
         let finalText = '';

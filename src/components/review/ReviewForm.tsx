@@ -34,6 +34,8 @@ const ACCEPT_OPTIONS: {
   },
 ];
 
+const MIN_EXPLANATION_LENGTH = 25;
+
 const DEFAULT: SlotRating = {
   readability:               0,
   perceivedRobustness:       0,
@@ -73,7 +75,9 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
     form.willingnessToApprove > 0 &&
     form.hiddenComplexity > 0;
 
-  const valid = numericComplete && form.acceptDecision !== null && form.briefExplanation.trim().length > 0;
+  const explanationLength = form.briefExplanation.trim().length;
+  const explanationValid = explanationLength >= MIN_EXPLANATION_LENGTH;
+  const valid = numericComplete && form.acceptDecision !== null && explanationValid;
 
   const set = <K extends keyof SlotRating>(key: K, val: SlotRating[K]) => {
     const next = { ...form, [key]: val };
@@ -200,6 +204,9 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
             Briefly explain why you would or would not accept this code{' '}
             <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            At least {MIN_EXPLANATION_LENGTH} characters — give a real reason, not just "yes" or "looks fine".
+          </p>
           <textarea
             id={`explanation-${slot}`}
             value={form.briefExplanation}
@@ -212,6 +219,9 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
                        focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                        resize-none"
           />
+          <p className={`text-xs text-right ${explanationValid ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
+            {explanationLength} / {MIN_EXPLANATION_LENGTH} characters minimum
+          </p>
         </div>
 
         {/* Submit */}
@@ -223,7 +233,10 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {!numericComplete && 'Complete all ratings. '}
               {numericComplete && !form.acceptDecision && 'Choose accept/reject. '}
-              {numericComplete && form.acceptDecision && !form.briefExplanation.trim() && 'Add a brief explanation.'}
+              {numericComplete && form.acceptDecision && !explanationValid &&
+                (explanationLength === 0
+                  ? 'Add a brief explanation.'
+                  : `Add ${MIN_EXPLANATION_LENGTH - explanationLength} more character${MIN_EXPLANATION_LENGTH - explanationLength === 1 ? '' : 's'} to your explanation.`)}
             </p>
           )}
         </div>

@@ -185,7 +185,7 @@ export default function CompletionPage() {
           <div className="px-5 py-4 space-y-3">
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
               Your responses were already sent to the study's Google Sheet as you completed each
-              review. These buttons just give you a personal copy — your data is held in memory
+              review. These buttons just give you a personal copy. Your data is held in memory
               only and will be lost when you close or refresh this page.
             </p>
 
