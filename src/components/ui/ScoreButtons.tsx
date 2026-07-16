@@ -42,18 +42,15 @@ export function ScoreButtons({
     ? 'w-8 h-8 rounded-md text-xs font-semibold border transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-slate-900'
     : 'w-10 h-10 rounded-lg text-sm font-semibold border transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900';
 
+  const question = description || label;
+
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{label}</span>
-        {description && (
-          <span className="text-xs text-slate-400 dark:text-slate-500 text-right">{description}</span>
-        )}
-      </div>
+      <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{question}</p>
       <div
         className="flex gap-1 flex-wrap"
         role="radiogroup"
-        aria-label={label}
+        aria-label={question}
         aria-required="true"
       >
         {range.map((n, idx) => (
@@ -77,7 +74,7 @@ export function ScoreButtons({
           </button>
         ))}
         <span className="text-xs text-slate-400 dark:text-slate-500 self-center ml-1 tabular-nums">
-          {value > 0 ? `${value}/${max}` : `—/${max}`}
+          {value > 0 ? `${value}/${max}` : `-/${max}`}
         </span>
       </div>
     </div>

@@ -16,7 +16,7 @@ const ACCEPT_OPTIONS: {
 }[] = [
   {
     value: 'yes',
-    label: 'Yes — approve',
+    label: 'Yes, approve',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-green-400 hover:text-green-700',
     activeCls:   'border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 ring-2 ring-green-200 dark:ring-green-800 ring-offset-1',
   },
@@ -28,7 +28,7 @@ const ACCEPT_OPTIONS: {
   },
   {
     value: 'no',
-    label: 'No — reject',
+    label: 'No, reject',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-700',
     activeCls:   'border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 ring-2 ring-red-200 dark:ring-red-800 ring-offset-1',
   },
@@ -164,7 +164,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
         {/* Q6: Hidden complexity 1–10 */}
         <ScoreButtons
           label="Hidden complexity"
-          description="How much non-obvious complexity or subtle risk is lurking beneath the surface of this code? (Higher means worse — more hidden risk.)"
+          description="How much non-obvious complexity or subtle risk is lurking beneath the surface of this code? (Higher means worse: more hidden risk.)"
           value={form.hiddenComplexity}
           onChange={v => set('hiddenComplexity', v)}
           max={10}

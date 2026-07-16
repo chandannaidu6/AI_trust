@@ -171,7 +171,7 @@ export function FinalAssessmentForm({
             )}
             {saved && isFinalReview && (
               <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                {submitting ? 'Saving your responses…' : 'All done — redirecting to your summary…'}
+                {submitting ? 'Saving your responses…' : 'All done. Redirecting to your summary…'}
               </p>
             )}
             {saved && !isFinalReview && (

@@ -19,7 +19,7 @@ export function ProblemStatement({ question, language }: ProblemStatementProps) 
         </span>
         <Badge color="green">{question.difficulty}</Badge>
         <Badge color="indigo">{question.category}</Badge>
-        {language && language !== '—' && <Badge color="sky">{language}</Badge>}
+        {language && language !== '-' && <Badge color="sky">{language}</Badge>}
         {question.acceptanceRate && (
           <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
             ~{question.acceptanceRate}% acceptance
@@ -64,7 +64,7 @@ export function ProblemStatement({ question, language }: ProblemStatementProps) 
               <div key={i} className="space-y-2">
                 <div>
                   <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
-                    {question.examples.length > 1 ? `Example ${i + 1} — Input` : 'Input'}
+                    {question.examples.length > 1 ? `Example ${i + 1}: Input` : 'Input'}
                   </p>
                   <pre className="text-xs font-mono bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-300 overflow-x-auto">
                     {ex.input}

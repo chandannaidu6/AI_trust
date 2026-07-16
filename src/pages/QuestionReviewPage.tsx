@@ -200,7 +200,7 @@ export default function QuestionReviewPage() {
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 space-y-4">
 
-        <ProblemStatement question={question} language={language || '—'} />
+        <ProblemStatement question={question} language={language || '-'} />
 
         {review && (
           <>
@@ -254,13 +254,13 @@ export default function QuestionReviewPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Saving your responses — please do not close this tab until this finishes.
+                Saving your responses. Please do not close this tab until this finishes.
               </div>
             )}
 
             {allDone && sheetStatus === 'error' && (
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
-                Could not reach Google Sheets — your response is still saved in this session. You
+                Could not reach Google Sheets. Your response is still saved in this session. You
                 can download a backup copy from the summary page.
               </div>
             )}
