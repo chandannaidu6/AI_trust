@@ -1,33 +1,112 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { useStudy } from '../state/StudyContext';
-import { SLOT_LABELS } from '../types';
+import { SLOT_LABELS, DIFFICULTIES, ReviewSession } from '../types';
 import { avgRating } from '../utils/helpers';
 import {
   buildExportPayload,
   downloadExportJSON,
   downloadExportCSV,
   copyExportJSON,
-  submitToSheets,
-  SheetSubmitStatus,
+  ExportPayload,
 } from '../utils/export';
 
 const SLOT_COLOR = { A: 'violet', B: 'sky' } as const;
 
+function ReviewSummaryCard({ review }: { review: ReviewSession }) {
+  const assessment = review.finalAssessment;
+  const ratings = review.slotRatings;
+  return (
+    <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden mb-5">
+      <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2">
+        <Badge color="green">{review.question.difficulty}</Badge>
+        <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          {review.question.category} · {review.question.title}
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-slate-100 dark:divide-slate-800 border-b border-slate-100 dark:border-slate-800">
+        {[
+          { label: 'Category',   value: review.question.category },
+          { label: 'Question',   value: review.question.id },
+          { label: 'Language',   value: review.language },
+          { label: 'Difficulty', value: review.question.difficulty },
+        ].map(item => (
+          <div key={item.label} className="px-4 py-3.5">
+            <p className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">{item.label}</p>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="px-5 py-4 space-y-3">
+        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Your Ratings
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {SLOT_LABELS.map(slot => {
+            const r = ratings[slot];
+            if (!r) return (
+              <div key={slot} className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 px-3 py-3 flex items-center justify-center">
+                <span className="text-xs text-slate-300 dark:text-slate-600">Not rated</span>
+              </div>
+            );
+            return (
+              <div key={slot} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Badge color={SLOT_COLOR[slot]}>Solution {slot}</Badge>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-200 tabular-nums">
+                    {avgRating(r).toFixed(1)}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Read.</span>{r.readability}/10</div>
+                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
+                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
+                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Decision</span>{r.acceptDecision ?? '—'}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {assessment && (
+          <div className="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Final Assessment</p>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-xs text-slate-500 dark:text-slate-400">Best:</span>
+              <Badge color={SLOT_COLOR[assessment.bestChoice]}>Solution {assessment.bestChoice}</Badge>
+            </div>
+            {assessment.explanation && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic border-l-2 border-slate-200 dark:border-slate-600 pl-3 leading-relaxed">
+                "{assessment.explanation}"
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function CompletionPage() {
   const navigate = useNavigate();
   const { state, reset } = useStudy();
-  const { participant, review, selectedCategory } = state;
+  const { participant, reviewsByQuestion, completedDifficulties } = state;
 
-  const [copiedJSON,    setCopiedJSON]    = useState(false);
-  const [sheetStatus,   setSheetStatus]   = useState<SheetSubmitStatus>('idle');
-  const submitted = useRef(false);
+  const [copiedJSON, setCopiedJSON] = useState(false);
 
-  if (!participant || !review) {
+  const completedReviews = useMemo(
+    () => Object.values(reviewsByQuestion).filter((r): r is ReviewSession => !!r.finalAssessment),
+    [reviewsByQuestion],
+  );
+  const allRequiredDone = DIFFICULTIES.every(d => completedDifficulties[d]);
+
+  if (!participant || completedReviews.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
         <Header />
@@ -41,22 +120,14 @@ export default function CompletionPage() {
     );
   }
 
-  const payload    = useMemo(() => buildExportPayload(state), [state]);
-  const assessment = review.finalAssessment;
-  const ratings    = review.slotRatings;
-  const filename   = `code-review-study-${participant.id}`;
-
-  // Auto-submit to Google Sheets exactly once (useRef guard prevents StrictMode double-fire)
-  useEffect(() => {
-    if (!payload || submitted.current) return;
-    submitted.current = true;
-    setSheetStatus('submitting');
-    submitToSheets(payload).then(setSheetStatus);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const payloads = completedReviews
+    .map(r => buildExportPayload(participant, r))
+    .filter((p): p is ExportPayload => !!p);
+  const filename = `code-review-study-${participant.id}`;
 
   const handleCopyJSON = async () => {
-    if (!payload) return;
-    await copyExportJSON(payload);
+    if (payloads.length === 0) return;
+    await copyExportJSON(payloads);
     setCopiedJSON(true);
     setTimeout(() => setCopiedJSON(false), 2500);
   };
@@ -81,121 +152,25 @@ export default function CompletionPage() {
           <div>
             <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">Study Complete</h1>
             <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">
-              Thank you for participating. Please save your responses using the options below.
+              Thank you for participating. Your responses were saved automatically as you
+              completed each review.
             </p>
           </div>
         </div>
 
-        {/* ── Google Sheets status banner ─────────────────────────────────── */}
-        {sheetStatus === 'submitting' && (
-          <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 text-sm text-indigo-700 dark:text-indigo-300">
-            <svg className="w-4 h-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-            </svg>
-            Saving your responses to Google Sheets…
-          </div>
-        )}
-
-        {sheetStatus === 'success' && (
-          <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 text-sm text-green-700 dark:text-green-300">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7"/>
-            </svg>
-            Responses saved to Google Sheets automatically.
-          </div>
-        )}
-
-        {sheetStatus === 'error' && (
-          <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Could not reach Google Sheets. Please download your responses below as a backup.
-          </div>
-        )}
-
-        {sheetStatus === 'unconfigured' && (
+        {!allRequiredDone && (
           <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 text-sm text-amber-700 dark:text-amber-300">
-            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Google Sheets not configured — add <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1 rounded">VITE_SHEETS_URL</code> to <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1 rounded">.env</code> to enable auto-save.
+            You've only completed {completedReviews.length} of the 3 required reviews (Easy,
+            Medium, Hard).{' '}
+            <button className="underline font-semibold" onClick={() => navigate('/categories')}>
+              Continue reviewing
+            </button>
           </div>
         )}
 
-        {/* ── Session summary ─────────────────────────────────────────────── */}
-        <section
-          aria-label="Session summary"
-          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden mb-5"
-        >
-          <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
-            <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Session Summary
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-slate-100 dark:divide-slate-800 border-b border-slate-100 dark:border-slate-800">
-            {[
-              { label: 'Category',    value: selectedCategory ?? '—' },
-              { label: 'Question',    value: review.question.id },
-              { label: 'Language',    value: review.language },
-              { label: 'Role',        value: participant.role },
-            ].map(item => (
-              <div key={item.label} className="px-4 py-3.5">
-                <p className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">{item.label}</p>
-                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate">{item.value}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="px-5 py-4 space-y-3">
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Your Ratings
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {SLOT_LABELS.map(slot => {
-                const r = ratings[slot];
-                if (!r) return (
-                  <div key={slot} className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 px-3 py-3 flex items-center justify-center">
-                    <span className="text-xs text-slate-300 dark:text-slate-600">Not rated</span>
-                  </div>
-                );
-                return (
-                  <div key={slot} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-3 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Badge color={SLOT_COLOR[slot]}>Solution {slot}</Badge>
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-200 tabular-nums">
-                        {avgRating(r).toFixed(1)}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Read.</span>{r.readability}/10</div>
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
-                      <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Decision</span>{r.acceptDecision ?? '—'}</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {assessment && (
-              <div className="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800 space-y-1.5">
-                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Final Assessment</p>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">Best:</span>
-                  <Badge color={SLOT_COLOR[assessment.bestChoice]}>Solution {assessment.bestChoice}</Badge>
-                </div>
-                {assessment.explanation && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic border-l-2 border-slate-200 dark:border-slate-600 pl-3 leading-relaxed">
-                    "{assessment.explanation}"
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
+        {completedReviews.map(r => (
+          <ReviewSummaryCard key={r.question.id} review={r} />
+        ))}
 
         {/* ── Export ──────────────────────────────────────────────────────── */}
         <section
@@ -204,20 +179,20 @@ export default function CompletionPage() {
         >
           <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
             <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Save Your Responses
+              Personal Backup Copy
             </h2>
           </div>
           <div className="px-5 py-4 space-y-3">
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Download your responses before closing this page.
-              Your data is held in memory only — it will be lost when you close or refresh.
+              Your responses were already sent to the study's Google Sheet as you completed each
+              review. These buttons just give you a personal copy — your data is held in memory
+              only and will be lost when you close or refresh this page.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 size="lg"
-                onClick={() => payload && downloadExportJSON(payload, `${filename}.json`)}
-                disabled={!payload}
+                onClick={() => downloadExportJSON(payloads, `${filename}.json`)}
                 className="flex-1 justify-center"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -230,8 +205,7 @@ export default function CompletionPage() {
               <Button
                 variant="secondary"
                 size="lg"
-                onClick={() => payload && downloadExportCSV(payload, `${filename}.csv`)}
-                disabled={!payload}
+                onClick={() => downloadExportCSV(payloads, `${filename}.csv`)}
                 className="flex-1 justify-center"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -245,7 +219,6 @@ export default function CompletionPage() {
                 variant="secondary"
                 size="lg"
                 onClick={handleCopyJSON}
-                disabled={!payload}
                 className="flex-1 justify-center"
               >
                 {copiedJSON ? (
@@ -269,17 +242,13 @@ export default function CompletionPage() {
           </div>
         </section>
 
-        {/* ── Review another / Restart ───────────────────────────────────── */}
+        {/* ── Restart ─────────────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-3 pb-12">
-          <Button size="lg" onClick={() => navigate('/categories')}>
-            Review another question
-          </Button>
           <Button variant="ghost" onClick={handleRestart}>
             Start a new session
           </Button>
           <p className="text-xs text-slate-300 dark:text-slate-600 basis-full sm:basis-auto">
-            "Start a new session" clears your participant profile too — use "Review another
-            question" to keep reviewing as the same participant.
+            Only start a new session if a different participant is using this device now.
           </p>
         </div>
 

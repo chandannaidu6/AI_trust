@@ -171,7 +171,7 @@ export default function CategorySelectionPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Choose a Category</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
             Select the problem category you want to review. You'll review exactly one Easy, one
-            Medium, and one Hard question in total — {doneCount} of 3 done so far.
+            Medium, and one Hard question in total. {doneCount} of 3 done so far.
           </p>
         </div>
 

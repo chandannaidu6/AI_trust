@@ -64,7 +64,7 @@ export default function CategoryDifficultyPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{category}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             You review exactly one Easy, one Medium, and one Hard question across the whole
-            study — {doneCount} of 3 done so far. Pick a difficulty to see this category's
+            study. {doneCount} of 3 done so far. Pick a difficulty to see this category's
             questions at that level.
           </p>
         </div>

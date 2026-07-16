@@ -1,4 +1,4 @@
-import { AppState, SlotLabel, SLOT_LABELS } from '../types';
+import { ParticipantProfile, ReviewSession, SlotLabel, SLOT_LABELS } from '../types';
 import { avgRating } from './helpers';
 
 // ─── Payload types ─────────────────────────────────────────────────────────────
@@ -35,6 +35,7 @@ export interface ExportPayload {
     category: string;
     questionId: string;
     questionTitle: string;
+    difficulty: string;
     language: string;
     startedAt: string;               // ISO-8601
     solutionOrder: string[];         // solutionId at positions [A, B]
@@ -52,8 +53,10 @@ export interface ExportPayload {
 
 // ─── Builder ───────────────────────────────────────────────────────────────────
 
-export function buildExportPayload(state: AppState): ExportPayload | null {
-  const { participant, review, selectedCategory } = state;
+export function buildExportPayload(
+  participant: ParticipantProfile | null,
+  review: ReviewSession | null,
+): ExportPayload | null {
   if (!participant || !review) return null;
 
   const slotMapping: Record<string, string> = {};
@@ -103,9 +106,10 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
       aiFamiliarity: participant.aiFamiliarity,
     },
     session: {
-      category: selectedCategory ?? '',
+      category: review.question.category,
       questionId: review.question.id,
       questionTitle: review.question.title,
+      difficulty: review.question.difficulty,
       language: review.language,
       startedAt,
       solutionOrder: SLOT_LABELS.map(s => slotMapping[s]),
@@ -124,25 +128,27 @@ export function buildExportPayload(state: AppState): ExportPayload | null {
   };
 }
 
-// ─── Export helpers ────────────────────────────────────────────────────────────
+// ─── Export helpers (accept one review or all completed reviews) ──────────────
 
-export function downloadExportJSON(payload: ExportPayload, filename: string): void {
+export function downloadExportJSON(payloads: ExportPayload | ExportPayload[], filename: string): void {
   triggerDownload(
-    new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
+    new Blob([JSON.stringify(payloads, null, 2)], { type: 'application/json' }),
     filename,
   );
 }
 
-export function downloadExportCSV(payload: ExportPayload, filename: string): void {
-  const row = flattenToCSVRow(payload);
-  const headers = Object.keys(row);
-  const values = headers.map(h => csvCell(row[h]));
-  const csv = [headers.join(','), values.join(',')].join('\n');
+export function downloadExportCSV(payloads: ExportPayload | ExportPayload[], filename: string): void {
+  const rows = (Array.isArray(payloads) ? payloads : [payloads]).map(flattenToCSVRow);
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(','),
+    ...rows.map(row => headers.map(h => csvCell(row[h])).join(',')),
+  ].join('\n');
   triggerDownload(new Blob([csv], { type: 'text/csv;charset=utf-8;' }), filename);
 }
 
-export async function copyExportJSON(payload: ExportPayload): Promise<void> {
-  await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+export async function copyExportJSON(payloads: ExportPayload | ExportPayload[]): Promise<void> {
+  await navigator.clipboard.writeText(JSON.stringify(payloads, null, 2));
 }
 
 // ─── Google Sheets submission ──────────────────────────────────────────────────
@@ -198,6 +204,7 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   // session
   r['category']           = p.session.category;
   r['questionId']         = p.session.questionId;
+  r['difficulty']         = p.session.difficulty;
   r['language']           = p.session.language;
   r['startedAt']          = p.session.startedAt;
   r['solutionOrder']      = p.session.solutionOrder;

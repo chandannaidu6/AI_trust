@@ -24,9 +24,16 @@ interface FinalAssessmentFormProps {
   onDraftChange: (draft: DraftAssessment) => void;
   onSubmit: (a: FinalAssessment) => void;
   onNext:   () => void;
+  /** True while this review's data is being sent to Google Sheets. */
+  submitting?: boolean;
+  /** True if submitting this assessment completes all 3 required reviews —
+   *  in that case there's no "continue" step, just an automatic redirect. */
+  isFinalReview?: boolean;
 }
 
-export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, onSubmit, onNext }: FinalAssessmentFormProps) {
+export function FinalAssessmentForm({
+  ratings, existing, draft, onDraftChange, onSubmit, onNext, submitting = false, isFinalReview = false,
+}: FinalAssessmentFormProps) {
   const [bestChoice,  setBestChoice]  = useState<SlotLabel | null>(existing?.bestChoice ?? draft?.bestChoice ?? null);
   const [explanation, setExplanation] = useState(existing?.explanation ?? draft?.explanation ?? '');
   const [saved,       setSaved]       = useState(!!existing);
@@ -150,7 +157,7 @@ export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, o
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-            <Button type="submit" disabled={!valid} size="lg">
+            <Button type="submit" disabled={!valid || submitting} size="lg">
               {saved ? 'Update Assessment' : 'Submit Assessment'}
             </Button>
             {!valid && (
@@ -159,9 +166,14 @@ export function FinalAssessmentForm({ ratings, existing, draft, onDraftChange, o
                 {bestChoice && !explanation.trim() ? 'Add an explanation.' : ''}
               </p>
             )}
-            {saved && (
-              <Button type="button" variant="secondary" size="lg" onClick={onNext}>
-                Finish &amp; Export →
+            {saved && isFinalReview && (
+              <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                {submitting ? 'Saving your responses…' : 'All done — redirecting to your summary…'}
+              </p>
+            )}
+            {saved && !isFinalReview && (
+              <Button type="button" variant="secondary" size="lg" onClick={onNext} disabled={submitting}>
+                {submitting ? 'Saving…' : 'Continue to next review →'}
               </Button>
             )}
           </div>
