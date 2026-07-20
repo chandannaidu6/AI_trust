@@ -46,12 +46,12 @@
               "solutionId": "py-001-h",
               "code": "def normalize_listargument(arg):\n    if isinstance(arg, np.ndarray):\n        return arg.flatten()\n    if isinstance(arg, str):\n        return [arg]\n    if isinstance(arg, list) or isinstance(arg, tuple) or isinstance(arg, dict) or isinstance(arg, set):\n        return list(arg)\n    return [arg]",
               "comprehension": {
-                "input": "normalize_listargument(5)",
+                "input": "normalize_listargument(np.array([[1, 2], [3, 4]]))",
                 "options": [
-                  "[5]",
-                  "5",
-                  "TypeError: 'int' object is not iterable",
-                  "[[5]]"
+                  "[1, 2, 3, 4]",
+                  "array([1, 2, 3, 4])",
+                  "array([[1, 2], [3, 4]])",
+                  "[[1, 2], [3, 4]]"
                 ]
               },
               "_hidden": {
@@ -61,19 +61,19 @@
                 "sourceRepoOrAuthor": "awacha/sastool",
                 "sourceUrl": "https://github.com/awacha/sastool/blob/deaddfa3002f3f6818697e36139633b7e30427a3/sastool/misc/utils.py#L27-L37",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 0
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "py-001-ai",
               "code": "def normalize_listargument(arg):\n    if isinstance(arg, np.ndarray):\n        return arg.flatten().tolist()\n    if isinstance(arg, str):\n        return [arg]\n    if isinstance(arg, (list, tuple, dict, set)):\n        return list(arg)\n    return [arg]",
               "comprehension": {
-                "input": "normalize_listargument('hi')",
+                "input": "normalize_listargument(np.array([[5, 6], [7, 8]]))",
                 "options": [
-                  "['h', 'i']",
-                  "['hi']",
-                  "'hi'",
-                  "TypeError: strings are not supported"
+                  "array([5, 6, 7, 8])",
+                  "[5, 6, 7, 8]",
+                  "[[5, 6], [7, 8]]",
+                  "array([[5, 6], [7, 8]])"
                 ]
               },
               "_hidden": {
@@ -94,17 +94,17 @@
     },
     {
       "id": "py-002",
-      "category": "Data Structures",
-      "title": "Resolve Dotted Path In Nested Dict",
-      "summary": "Look up a value in a nested dictionary using a dotted path string.",
-      "paraphrasedPrompt": "Write a function `getitem_in(obj, name)` that looks up a value inside a nested dictionary `obj`, using a dot-separated path string `name`. For example, given `obj = {'foo': {'bar': {'baz': True}}}`, calling `getitem_in(obj, 'foo.bar.baz')` walks through `foo` -> `bar` -> `baz` and returns `True`.",
-      "difficulty": "Easy",
+      "category": "Date & Time",
+      "title": "Convert UTC Offset String To Minutes",
+      "summary": "Convert a UTC offset string like \"+0500\" into a signed number of minutes.",
+      "paraphrasedPrompt": "Write a function `offset_to_min(utc_offset)` that converts a UTC offset string of the form \"[+-]?HHMM\" (e.g. \"+0500\", \"-0300\", \"0800\") into a signed number of minutes. For example, \"+0500\" returns 300, \"-0300\" returns -180, and \"0800\" (no sign, treated as positive) returns 480. If the string doesn't match that 4-digit HHMM pattern (with an optional leading + or -), raise an exception rather than returning a value.",
+      "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "jaredLunde/vital-tools",
-      "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L59-L71",
+      "sourceRepo": "saltstack/salt",
+      "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/modules/system.py#L221-L235",
       "supportedLanguages": [
         "Python"
       ],
@@ -121,36 +121,36 @@
           "solutions": [
             {
               "solutionId": "py-002-h",
-              "code": "def getitem_in(obj, name):\n    for part in name.split('.'):\n        obj = obj[part]\n    return obj",
+              "code": "def _offset_to_min(utc_offset):\n    match = re.match(r\"^([+-])?(\\d\\d)(\\d\\d)$\", utc_offset)\n    if not match:\n        raise SaltInvocationError(\"Invalid UTC offset\")\n\n    sign = -1 if match.group(1) == '-' else 1\n    hours_offset = int(match.group(2))\n    minutes_offset = int(match.group(3))\n    total_offset = sign * (hours_offset * 60 + minutes_offset)\n    return total_offset",
               "comprehension": {
-                "input": "getitem_in({'a': {'b': 7}}, 'a.b')",
+                "input": "offset_to_min('+0130')",
                 "options": [
-                  "{'b': 7}",
-                  "KeyError: 'b'",
-                  "7",
-                  "None"
+                  "-90",
+                  "130",
+                  "90",
+                  "SaltInvocationError: Invalid UTC offset"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "jaredLunde/vital-tools",
-                "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L59-L71",
+                "sourceRepoOrAuthor": "saltstack/salt",
+                "sourceUrl": "https://github.com/saltstack/salt/blob/e8541fd6e744ab0df786c0f76102e41631f45d46/salt/modules/system.py#L221-L235",
                 "selectionNotes": "",
                 "comprehensionCorrectIndex": 2
               }
             },
             {
               "solutionId": "py-002-ai",
-              "code": "def getitem_in(obj, name):\n    result = obj\n    for key in name.split('.'):\n        result = result[key]\n    return result",
+              "code": "def offset_to_min(utc_offset):\n    m = re.match(r'^([+-])?(\\d{2})(\\d{2})$', utc_offset)\n    if m is None:\n        raise SaltInvocationError('Invalid UTC offset')\n    sign_str, hours_str, minutes_str = m.groups()\n    magnitude = int(hours_str) * 60 + int(minutes_str)\n    return -magnitude if sign_str == '-' else magnitude",
               "comprehension": {
-                "input": "getitem_in({'x': {'y': {'z': 3}}}, 'x.y.z')",
+                "input": "offset_to_min('-1245')",
                 "options": [
-                  "3",
-                  "{'z': 3}",
-                  "KeyError: 'z'",
-                  "None"
+                  "-765",
+                  "765",
+                  "-1245",
+                  "SaltInvocationError: Invalid UTC offset"
                 ]
               },
               "_hidden": {
@@ -325,17 +325,17 @@
     },
     {
       "id": "py-005",
-      "category": "Data Structures",
-      "title": "Map Array Indices To Elements",
-      "summary": "Build a dictionary mapping each list index to its element.",
-      "paraphrasedPrompt": "Write a function `index_element_map(arr)` that takes a list `arr` and returns a dictionary where each key is a position in the list (0, 1, 2, ...) and each value is the element at that position. For example, `index_element_map(['a', 'b', 'c'])` returns `{0: 'a', 1: 'b', 2: 'c'}`.",
-      "difficulty": "Easy",
+      "category": "Math & Numeric",
+      "title": "Combine Standard Deviations Of Weighted Subsets",
+      "summary": "Compute the pooled standard deviation across several weighted subsets.",
+      "paraphrasedPrompt": "Write a function `combine_std(n, mean, std)` that computes the combined (pooled) standard deviation across several subsets, given each subset's sample count, mean, and standard deviation as equal-length numpy arrays. First compute the overall weighted mean: sum(n * mean) / sum(n). Then compute the overall second moment: sum(n * (std**2 + mean**2)) / sum(n). Subtract the square of the weighted mean from that second moment to get the combined variance, and return its square root.",
+      "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "kathyxchen/crosstalk-correction",
-      "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/eac11d54b39ea7ec301b54f8e498adce91713223/crosstalk_correction/crosstalk_correction.py#L201-L216",
+      "sourceRepo": "petebachant/PXL",
+      "sourceUrl": "https://github.com/petebachant/PXL/blob/d7d06cb74422e1ac0154741351fbecea080cfcc0/pxl/timeseries.py#L156-L172",
       "supportedLanguages": [
         "Python"
       ],
@@ -352,36 +352,36 @@
           "solutions": [
             {
               "solutionId": "py-005-h",
-              "code": "def index_element_map(arr):\n    index_to_element = {}\n    for index, element in enumerate(arr):\n        index_to_element[index] = element\n    return index_to_element",
+              "code": "def combine_std(n, mean, std):\n    mean_tot = np.sum(n*mean)/np.sum(n)\n    var_tot = np.sum(n*(std**2 + mean**2))/np.sum(n) - mean_tot**2\n    return np.sqrt(var_tot)",
               "comprehension": {
-                "input": "index_element_map(['a', 'b', 'c'])",
+                "input": "combine_std(n=[10, 20], mean=[5.0, 7.0], std=[1.0, 2.0])",
                 "options": [
-                  "{'a': 0, 'b': 1, 'c': 2}",
-                  "{1: 'a', 2: 'b', 3: 'c'}",
-                  "{0: 'a', 1: 'b'}",
-                  "{0: 'a', 1: 'b', 2: 'c'}"
+                  "1.972",
+                  "6.633",
+                  "1.5",
+                  "6.333"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "kathyxchen/crosstalk-correction",
-                "sourceUrl": "https://github.com/kathyxchen/crosstalk-correction/blob/eac11d54b39ea7ec301b54f8e498adce91713223/crosstalk_correction/crosstalk_correction.py#L201-L216",
+                "sourceRepoOrAuthor": "petebachant/PXL",
+                "sourceUrl": "https://github.com/petebachant/PXL/blob/d7d06cb74422e1ac0154741351fbecea080cfcc0/pxl/timeseries.py#L156-L172",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 3
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-005-ai",
-              "code": "def index_element_map(arr):\n    return {index: element for index, element in enumerate(arr)}",
+              "code": "def combine_std(n, mean, std):\n    total_n = np.sum(n)\n    weighted_mean = np.sum(n * mean) / total_n\n    weighted_second_moment = np.sum(n * (std ** 2 + mean ** 2)) / total_n\n    variance = weighted_second_moment - weighted_mean ** 2\n    return np.sqrt(variance)",
               "comprehension": {
-                "input": "index_element_map([10, 20])",
+                "input": "combine_std(n=[50, 30, 20], mean=[2.0, 3.0, 4.0], std=[0.5, 0.8, 1.2])",
                 "options": [
-                  "{0: 10, 1: 20}",
-                  "{10: 0, 20: 1}",
-                  "{1: 10, 2: 20}",
-                  "{0: 10}"
+                  "2.916",
+                  "1.102",
+                  "0.833",
+                  "2.7"
                 ]
               },
               "_hidden": {
@@ -391,7 +391,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 0,
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -585,12 +585,12 @@
               "solutionId": "py-008-h",
               "code": "def merge_map(a, b):\n    if isinstance(a, list) and isinstance(b, list):\n        return a + b\n\n    if not isinstance(a, dict) or not isinstance(b, dict):\n        return b\n\n    for key in b:\n        a[key] = merge_map(a[key], b[key]) if key in a else b[key]\n    return a",
               "comprehension": {
-                "input": "merge_map({'a': 1}, {'b': 2})",
+                "input": "merge_map({'x': {'p': 1, 'q': 2}, 'y': 10}, {'x': {'q': 99, 'r': 3}, 'z': 20})",
                 "options": [
-                  "{'b': 2}",
-                  "{'a': 1}",
-                  "{'a': 1, 'b': 2}",
-                  "TypeError: unsupported merge"
+                  "{'x': {'p': 1, 'q': 99, 'r': 3}, 'y': 10, 'z': 20}",
+                  "{'x': {'q': 99, 'r': 3}, 'y': 10, 'z': 20}",
+                  "{'x': {'p': 1, 'q': 2, 'r': 3}, 'y': 10, 'z': 20}",
+                  "{'z': 20}"
                 ]
               },
               "_hidden": {
@@ -600,19 +600,19 @@
                 "sourceRepoOrAuthor": "cloudtools/stacker",
                 "sourceUrl": "https://github.com/cloudtools/stacker/blob/ad6013a03a560c46ba3c63c4d153336273e6da5d/stacker/util.py#L220-L234",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "py-008-ai",
               "code": "def merge_map(a, b):\n    if isinstance(a, list) and isinstance(b, list):\n        return a + b\n\n    if not isinstance(a, dict) or not isinstance(b, dict):\n        return b\n\n    result = dict(a)\n    for key, value in b.items():\n        if key in result:\n            result[key] = merge_map(result[key], value)\n        else:\n            result[key] = value\n    return result",
               "comprehension": {
-                "input": "merge_map([1, 2], [3, 4])",
+                "input": "merge_map({'m': {'a': 1}, 'n': {'b': 2}}, {'m': {'a': 5, 'c': 6}, 'n': {'d': 7}})",
                 "options": [
-                  "[3, 4, 1, 2]",
-                  "[3, 4]",
-                  "[1, 2]",
-                  "[1, 2, 3, 4]"
+                  "{'m': {'a': 1, 'c': 6}, 'n': {'b': 2, 'd': 7}}",
+                  "{'m': {'a': 5, 'c': 6}, 'n': {'b': 2, 'd': 7}}",
+                  "{'m': {'c': 6}, 'n': {'d': 7}}",
+                  "{'m': {'a': 5, 'c': 6}, 'n': {'d': 7}}"
                 ]
               },
               "_hidden": {
@@ -622,7 +622,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 3,
+                "comprehensionCorrectIndex": 1,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -682,7 +682,7 @@
             },
             {
               "solutionId": "py-009-ai",
-              "code": "def to_reddit_list(arg):\n    if isinstance(arg, str) or not (hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\")):\n        return str(arg)\n    return ','.join(str(item) for item in arg)",
+              "code": "def to_reddit_list(arg):\n    is_scalar = isinstance(arg, str) or not (hasattr(arg, \"__getitem__\") or hasattr(arg, \"__iter__\"))\n    if is_scalar:\n        return str(arg)\n    return ','.join(map(str, arg))",
               "comprehension": {
                 "input": "to_reddit_list('hi')",
                 "options": [
@@ -1298,7 +1298,7 @@
             },
             {
               "solutionId": "py-017-ai",
-              "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    count = len(binary) // 4\n    return struct.unpack('<{}i'.format(count), binary)",
+              "code": "def decode_ints(message):\n    binary = base64.b64decode(message)\n    values = []\n    for i in range(0, len(binary), 4):\n        chunk = binary[i:i + 4]\n        values.append(int.from_bytes(chunk, byteorder='little', signed=True))\n    return tuple(values)",
               "comprehension": {
                 "input": "decode_ints(base64_of_int32_le([1000]))",
                 "options": [
@@ -1375,7 +1375,7 @@
             },
             {
               "solutionId": "py-018-ai",
-              "code": "def timedelta_total_minutes(td, strict=False):\n    total_seconds = td.days * 24 * 3600 + td.seconds\n    minutes, seconds = divmod(total_seconds, 60)\n    if seconds or td.microseconds:\n        if strict:\n            raise ValueError(\"%r is not an integral multiple of 60 seconds\" % (td,))\n        if seconds > 30 or (seconds == 30 and td.microseconds > 0):\n            minutes += 1\n    return minutes",
+              "code": "def timedelta_total_minutes(td, strict=False):\n    total_seconds = td.total_seconds()\n    whole_minutes, remainder = divmod(total_seconds, 60)\n    if remainder:\n        if strict:\n            raise ValueError(\"%r is not an integral multiple of 60 seconds\" % (td,))\n        if remainder > 30:\n            whole_minutes += 1\n    return int(whole_minutes)",
               "comprehension": {
                 "input": "timedelta_total_minutes(timedelta(minutes=2, seconds=45))",
                 "options": [
@@ -1529,7 +1529,7 @@
             },
             {
               "solutionId": "py-020-ai",
-              "code": "def scrub_dict(d):\n    if isinstance(d, dict):\n        return {k: scrub_dict(v) for k, v in d.items() if v and scrub_dict(v)}\n    if isinstance(d, list):\n        return [scrub_dict(v) for v in d if v and scrub_dict(v)]\n    return d",
+              "code": "def scrub_dict(d):\n    if isinstance(d, dict):\n        cleaned = {}\n        for key, value in d.items():\n            scrubbed = scrub_dict(value)\n            if value and scrubbed:\n                cleaned[key] = scrubbed\n        return cleaned\n    if isinstance(d, list):\n        cleaned = []\n        for value in d:\n            scrubbed = scrub_dict(value)\n            if value and scrubbed:\n                cleaned.append(scrubbed)\n        return cleaned\n    return d",
               "comprehension": {
                 "input": "scrub_dict({'x': None, 'y': [1, 2], 'z': []})",
                 "options": [
@@ -1557,17 +1557,17 @@
     },
     {
       "id": "py-021",
-      "category": "Data Structures",
-      "title": "Sort A Dict By Key Or Value",
-      "summary": "Sort a dictionary's entries by key or value.",
-      "paraphrasedPrompt": "Write a function `rank_dict(dict, key=lambda t: t[1], as_tuple=False)` that sorts a dictionary's entries using a key function (by default, sorting by value) and returns the result as an `OrderedDict`. If `as_tuple` is `True`, return the sorted `(key, value)` pairs as a tuple instead. For example, sorting `{'a': 3, 'b': 1, 'c': 2}` by value gives `[('b', 1), ('c', 2), ('a', 3)]`.",
+      "category": "Parsing & Conversion",
+      "title": "Normalize An API Response Into A List",
+      "summary": "Normalize an API response into a list, whether it's a single object or already a list.",
+      "paraphrasedPrompt": "Write a method `list_response(self, response)` that normalizes an API response into a list. If `response` is already a list, return it unchanged. If `response` is a dict, wrap it in a single-element list (some APIs return a bare object instead of a one-item list when there's only one result). For any other type, there's no explicit case, so the method falls through and implicitly returns None.",
       "difficulty": "Easy",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "jaredLunde/vital-tools",
-      "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L45-L56",
+      "sourceRepo": "andreagrandi/toshl-python",
+      "sourceUrl": "https://github.com/andreagrandi/toshl-python/blob/16a2aef8a0d389db73db3253b0bea3fcc33cc2bf/toshl/client.py#L49-L59",
       "supportedLanguages": [
         "Python"
       ],
@@ -1584,36 +1584,36 @@
           "solutions": [
             {
               "solutionId": "py-021-h",
-              "code": "def rank_dict(dict, key=lambda t: t[1], as_tuple=False):\n    sorted_list = sorted(dict.items(), key=key)\n    return OrderedDict(sorted_list) if not as_tuple else tuple(sorted_list)",
+              "code": "def _list_response(self, response):\n    if type(response) is list:\n        return response\n    if type(response) is dict:\n        return [response]",
               "comprehension": {
-                "input": "rank_dict({'a': 3, 'b': 1, 'c': 2})",
+                "input": "list_response(None, {'id': 7, 'name': 'Groceries'})",
                 "options": [
-                  "OrderedDict([('a', 3), ('b', 1), ('c', 2)])",
-                  "OrderedDict([('a', 3), ('c', 2), ('b', 1)])",
-                  "OrderedDict([('b', 1), ('c', 2), ('a', 3)])",
-                  "OrderedDict([('c', 2), ('b', 1), ('a', 3)])"
+                  "{'id': 7, 'name': 'Groceries'}",
+                  "[{'id': 7, 'name': 'Groceries'}]",
+                  "[]",
+                  "None"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "jaredLunde/vital-tools",
-                "sourceUrl": "https://github.com/jaredLunde/vital-tools/blob/ea924c9bbb6ec22aa66f8095f018b1ee0099ac04/vital/tools/dicts.py#L45-L56",
+                "sourceRepoOrAuthor": "andreagrandi/toshl-python",
+                "sourceUrl": "https://github.com/andreagrandi/toshl-python/blob/16a2aef8a0d389db73db3253b0bea3fcc33cc2bf/toshl/client.py#L49-L59",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "py-021-ai",
-              "code": "def rank_dict(mapping, key=lambda item: item[1], as_tuple=False):\n    items = sorted(mapping.items(), key=key)\n    if as_tuple:\n        return tuple(items)\n    return OrderedDict(items)",
+              "code": "def list_response(self, response):\n    if isinstance(response, list):\n        return response\n    elif isinstance(response, dict):\n        return [response]\n    return None",
               "comprehension": {
-                "input": "rank_dict({'p': 5, 'q': 2})",
+                "input": "list_response(None, 'unexpected string')",
                 "options": [
-                  "OrderedDict([('p', 5), ('q', 2)])",
-                  "OrderedDict([('q', 2), ('p', 5)])",
-                  "(('q', 2), ('p', 5))",
-                  "OrderedDict([('p', 2), ('q', 5)])"
+                  "'unexpected string'",
+                  "['unexpected string']",
+                  "None",
+                  "TypeError: unsupported type"
                 ]
               },
               "_hidden": {
@@ -1623,7 +1623,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 1,
+                "comprehensionCorrectIndex": 2,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -1683,7 +1683,7 @@
             },
             {
               "solutionId": "py-022-ai",
-              "code": "def bytes_to_uuid_list(byte_array):\n    return [\n        uuid.UUID(bytes=bytes(byte_array[i:i + 16]))\n        for i in range(0, len(byte_array), 16)\n    ]",
+              "code": "def bytes_to_uuid_list(byte_array):\n    data = bytes(byte_array)\n    result = []\n    offset = 0\n    while offset < len(data):\n        result.append(uuid.UUID(bytes=data[offset:offset + 16]))\n        offset += 16\n    return result",
               "comprehension": {
                 "input": "bytes_to_uuid_list(bytes(32))",
                 "options": [
@@ -1791,7 +1791,7 @@
       "category": "Data Structures",
       "title": "Find Return Target Index In Call Stack",
       "summary": "Search a call stack for a frame with a matching return address.",
-      "paraphrasedPrompt": "Write a function `find_return_target(stack, target)` that searches `stack` -- a list of call-stack frame objects, each with a `ret_addr` attribute -- for a frame whose `ret_addr` equals `target`. Search from the start of the list (the most recent frame) and return the index of the first match, or `None` if no frame matches.",
+      "paraphrasedPrompt": "Write a function `find_return_target(stack, target)` that searches `stack` -- a list of call-stack frame objects, each with a `ret_addr` attribute -- for a frame whose `ret_addr` equals `target`. Search from the start of the list (the most recent frame) and return the index of the first match, or `None` if no frame matches. (One implementation shown below is a method defined directly on the stack list class itself, so it iterates over `self` rather than a `stack` parameter -- `self` there is exactly the stack.)",
       "difficulty": "Easy",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
@@ -2068,7 +2068,7 @@
             },
             {
               "solutionId": "py-027-ai",
-              "code": "def countKey(theDict, name):\n    count = 0\n    for key, val in theDict.items():\n        if key == name:\n            count += 1\n        if isinstance(val, dict):\n            count += countKey(val, name)\n    return count",
+              "code": "def countKey(theDict, name):\n    total = 0\n    for key, val in theDict.items():\n        if isinstance(val, dict):\n            total += countKey(val, name)\n        elif key == name:\n            total += 1\n    return total",
               "comprehension": {
                 "input": "countKey({'x': {'x': 1}}, 'x')",
                 "options": [
@@ -2085,7 +2085,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 1,
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2299,7 +2299,7 @@
             },
             {
               "solutionId": "py-030-ai",
-              "code": "def label_list_parser(url):\n    pairs = set(re.findall(r'[^/,]+=[^/,]+', url))\n    pairs.discard('')\n    return pairs",
+              "code": "def label_list_parser(url):\n    return {\n        match.group()\n        for match in re.finditer(r'[^/,]+=[^/,]+', url)\n        if match.group()\n    }",
               "comprehension": {
                 "input": "label_list_parser('x=9,y=8')",
                 "options": [
@@ -2327,17 +2327,17 @@
     },
     {
       "id": "java-001",
-      "category": "Data Structures",
-      "title": "Convert Tag List To Sorted Map",
-      "summary": "Convert a list of tagged objects into a map keyed by name.",
-      "paraphrasedPrompt": "Write a generic method `toSortedMap(List<Tag> tags, Comparator<String> comparator)` that converts a list of `Tag` objects (each has a `getName()` method) into a `Map<String, Tag>`, keyed by each tag's name. If `comparator` is provided (non-null), sort the map's keys using it (e.g. with a `TreeMap`). If `comparator` is `null`, just preserve the tags' original order instead (e.g. with a `LinkedHashMap`).",
-      "difficulty": "Easy",
+      "category": "Encoding & Checksums",
+      "title": "Decode A Base64 CRC32C Into A Hex String",
+      "summary": "Decode a base64 checksum field into a lowercase hex string.",
+      "paraphrasedPrompt": "Write a method `getCrc32cToHexString()` on a class with an instance field `crc32c` (a base64-encoded checksum string, possibly null). If `crc32c` is null, return null. Otherwise, base64-decode it into raw bytes, then convert those bytes into a lowercase hexadecimal string (two hex characters per byte, zero-padded).",
+      "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "Swagger2Markup/swagger2markup",
-      "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/da83465f19a2f8a0f1fba873b5762bca8587896b/src/main/java/io/github/swagger2markup/internal/utils/TagUtils.java#L41-L49",
+      "sourceRepo": "googleapis/google-cloud-java",
+      "sourceUrl": "https://github.com/googleapis/google-cloud-java/blob/d2f0bc64a53049040fe9c9d338b12fab3dd1ad6a/google-cloud-clients/google-cloud-storage/src/main/java/com/google/cloud/storage/BlobInfo.java#L762-L772",
       "supportedLanguages": [
         "Java"
       ],
@@ -2354,36 +2354,36 @@
           "solutions": [
             {
               "solutionId": "java-001-h",
-              "code": "public static Map<String, Tag> toSortedMap(List<Tag> tags, Comparator<String> comparator) {\n        Map<String, Tag> sortedMap;\n        if (comparator == null)\n            sortedMap = new LinkedHashMap<>();\n        else\n            sortedMap = new TreeMap<>(comparator);\n        tags.forEach(tag -> sortedMap.put(tag.getName(), tag));\n        return sortedMap;\n    }",
+              "code": "public String getCrc32cToHexString() {\n    if (crc32c == null) {\n      return null;\n    }\n    byte[] decodeCrc32c = BaseEncoding.base64().decode(crc32c);\n    StringBuilder stringBuilder = new StringBuilder();\n    for (byte b : decodeCrc32c) {\n      stringBuilder.append(String.format(\"%02x\", b & 0xff));\n    }\n    return stringBuilder.toString();\n  }",
               "comprehension": {
-                "input": "toSortedMap(tags=[Tag(\"zeta\"), Tag(\"alpha\"), Tag(\"mid\")], comparator=natural order)",
+                "input": "getCrc32cToHexString() with crc32c = base64 of [0x0A, 0xFF, 0x01]",
                 "options": [
-                  "[zeta, alpha, mid]",
-                  "[mid, alpha, zeta]",
-                  "[alpha, mid, zeta]",
-                  "[alpha, zeta, mid]"
+                  "0aff01",
+                  "0AFF01",
+                  "0a-ff-01",
+                  "aff01"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "Swagger2Markup/swagger2markup",
-                "sourceUrl": "https://github.com/Swagger2Markup/swagger2markup/blob/da83465f19a2f8a0f1fba873b5762bca8587896b/src/main/java/io/github/swagger2markup/internal/utils/TagUtils.java#L41-L49",
+                "sourceRepoOrAuthor": "googleapis/google-cloud-java",
+                "sourceUrl": "https://github.com/googleapis/google-cloud-java/blob/d2f0bc64a53049040fe9c9d338b12fab3dd1ad6a/google-cloud-clients/google-cloud-storage/src/main/java/com/google/cloud/storage/BlobInfo.java#L762-L772",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "java-001-ai",
-              "code": "public static Map<String, Tag> toSortedMap(List<Tag> tags, Comparator<String> comparator) {\n    Map<String, Tag> result = comparator == null ? new LinkedHashMap<>() : new TreeMap<>(comparator);\n    for (Tag tag : tags) {\n        result.put(tag.getName(), tag);\n    }\n    return result;\n}",
+              "code": "public String getCrc32cToHexString() {\n    if (crc32c == null) return null;\n    byte[] bytes = BaseEncoding.base64().decode(crc32c);\n    StringBuilder sb = new StringBuilder(bytes.length * 2);\n    for (int i = 0; i < bytes.length; i++) {\n        sb.append(String.format(\"%02x\", bytes[i] & 0xff));\n    }\n    return sb.toString();\n}",
               "comprehension": {
-                "input": "toSortedMap(tags=[Tag(\"b\"), Tag(\"a\")], comparator=null)",
+                "input": "getCrc32cToHexString() with crc32c = base64 of [0x00, 0x10, 0xAB]",
                 "options": [
-                  "[a, b]",
-                  "[b, a]",
-                  "NullPointerException",
-                  "{} (empty map)"
+                  "10ab",
+                  "0010ab",
+                  "0010AB",
+                  "00-10-ab"
                 ]
               },
               "_hidden": {
@@ -2635,17 +2635,17 @@
     },
     {
       "id": "java-005",
-      "category": "Data Structures",
-      "title": "Count Children Of A Parent In Dependency Tree",
-      "summary": "Count how many array positions point to a given parent index.",
-      "paraphrasedPrompt": "Write a method `countChildrenOf(int[] parents, int parent)` that counts how many elements in a dependency tree have `parent` as their parent. `parents` is an array where `parents[i]` holds the index of the parent of item `i`. Return how many positions `i` satisfy `parents[i] == parent`.",
-      "difficulty": "Easy",
+      "category": "Parsing & Conversion",
+      "title": "Check If A Jar Filename Matches A Name And Version Range",
+      "summary": "Check whether a jar filename matches a component name and a version range.",
+      "paraphrasedPrompt": "Write a method `accept(String fName, String name, Version min, Version max)` that checks whether a jar filename `fName` matches a component `name` and an optional version range. First, `fName` must start with `name + \"_\"` and end with `\".jar\"` (case-insensitively for the extension) -- if not, return false. If either `min` or `max` is null, return true at this point (no version filtering). Otherwise, extract the version substring between the first `\"_\"` and the `\".jar\"` suffix, parse it into a `Version` (via `Version.createVersion`, which returns null for an unparseable string -- treat that as an automatic match, returning true), and return whether that version is >= min and < max.",
+      "difficulty": "Hard",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "mgormley/pacaya",
-      "sourceUrl": "https://github.com/mgormley/pacaya/blob/786294cbac7cc65dbc32210c10acc32ed0c69233/src/main/java/edu/jhu/pacaya/parse/dep/ParentsArray.java#L184-L192",
+      "sourceRepo": "OpenLiberty/open-liberty",
+      "sourceUrl": "https://github.com/OpenLiberty/open-liberty/blob/ca725d9903e63645018f9fa8cbda25f60af83a5d/dev/com.ibm.ws.install.map/src/com/ibm/ws/install/map/InstallMap.java#L350-L362",
       "supportedLanguages": [
         "Java"
       ],
@@ -2662,36 +2662,36 @@
           "solutions": [
             {
               "solutionId": "java-005-h",
-              "code": "public static int countChildrenOf(int[] parents, int parent) {\n        int count = 0;\n        for (int i=0; i<parents.length; i++) {\n            if (parents[i] == parent) {\n                count++;\n            }\n        }\n        return count;\n    }",
+              "code": "public static boolean accept(String fName, String name, Version min, Version max) {\n        if (fName.startsWith(name + \"_\") && fName.toLowerCase().endsWith(\".jar\")) {\n            if (min == null || max == null)\n                return true;\n            int i = fName.indexOf(\"_\");\n            String versionStr = fName.substring(i + 1, fName.length() - 4);\n            Version v = Version.createVersion(versionStr);\n            if (v == null)\n                return true;\n            return v.compareTo(min) >= 0 && v.compareTo(max) < 0;\n        }\n        return false;\n    }",
               "comprehension": {
-                "input": "countChildrenOf(parents=[0,0,1,0,2], parent=0)",
+                "input": "accept(\"myjar_1.2.0.jar\", \"myjar\", min=1.0.0, max=2.0.0)",
                 "options": [
-                  "2",
-                  "4",
-                  "3",
-                  "5"
+                  "true",
+                  "false",
+                  "NullPointerException",
+                  "\"1.2.0\""
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "mgormley/pacaya",
-                "sourceUrl": "https://github.com/mgormley/pacaya/blob/786294cbac7cc65dbc32210c10acc32ed0c69233/src/main/java/edu/jhu/pacaya/parse/dep/ParentsArray.java#L184-L192",
+                "sourceRepoOrAuthor": "OpenLiberty/open-liberty",
+                "sourceUrl": "https://github.com/OpenLiberty/open-liberty/blob/ca725d9903e63645018f9fa8cbda25f60af83a5d/dev/com.ibm.ws.install.map/src/com/ibm/ws/install/map/InstallMap.java#L350-L362",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "java-005-ai",
-              "code": "public static int countChildrenOf(int[] parents, int parent) {\n    int count = 0;\n    for (int p : parents) {\n        if (p == parent) {\n            count++;\n        }\n    }\n    return count;\n}",
+              "code": "public static boolean accept(String fName, String name, Version min, Version max) {\n    boolean namePrefixMatches = fName.startsWith(name + \"_\");\n    boolean isJar = fName.toLowerCase().endsWith(\".jar\");\n    if (!namePrefixMatches || !isJar) {\n        return false;\n    }\n    if (min == null || max == null) {\n        return true;\n    }\n    int underscoreIdx = fName.indexOf(\"_\");\n    String versionStr = fName.substring(underscoreIdx + 1, fName.length() - 4);\n    Version parsed = Version.createVersion(versionStr);\n    if (parsed == null) {\n        return true;\n    }\n    return parsed.compareTo(min) >= 0 && parsed.compareTo(max) < 0;\n}",
               "comprehension": {
-                "input": "countChildrenOf(parents=[1,1,1,2], parent=1)",
+                "input": "accept(\"tool_0.5.0.jar\", \"tool\", min=1.0.0, max=2.0.0)",
                 "options": [
-                  "4",
-                  "2",
-                  "1",
-                  "3"
+                  "false",
+                  "true",
+                  "NullPointerException",
+                  "\"0.5.0\""
                 ]
               },
               "_hidden": {
@@ -2701,7 +2701,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 3,
+                "comprehensionCorrectIndex": 0,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
@@ -2761,7 +2761,7 @@
             },
             {
               "solutionId": "java-006-ai",
-              "code": "public static int indexOneOf(CharSequence string, char... chars) {\n    for (int i = 0; i < string.length(); i++) {\n        char c = string.charAt(i);\n        for (char candidate : chars) {\n            if (c == candidate) {\n                return i;\n            }\n        }\n    }\n    return -1;\n}",
+              "code": "public static int indexOneOf(CharSequence string, char... chars) {\n    Set<Character> targets = new HashSet<>();\n    for (char c : chars) {\n        targets.add(c);\n    }\n    for (int i = 0; i < string.length(); i++) {\n        if (targets.contains(string.charAt(i))) {\n            return i;\n        }\n    }\n    return -1;\n}",
               "comprehension": {
                 "input": "indexOneOf(\"world\", 'z', 'r')",
                 "options": [
@@ -2838,7 +2838,7 @@
             },
             {
               "solutionId": "java-007-ai",
-              "code": "public static String listToString(Map<?, ?> map) {\n    if (map == null) {\n        return \"null\";\n    }\n    StringBuilder sb = new StringBuilder();\n    for (Map.Entry<?, ?> entry : new TreeMap<Object, Object>(map).entrySet()) {\n        Object key = entry.getKey();\n        Object value = entry.getValue();\n        sb.append(key == null ? \"null\" : key.toString());\n        sb.append(\"\\t= \");\n        sb.append(value == null ? \"null\" : value.toString());\n        sb.append('\\n');\n    }\n    return sb.toString();\n}",
+              "code": "public static String listToString(Map<?, ?> map) {\n    if (map == null) {\n        return \"null\";\n    }\n    StringBuilder sb = new StringBuilder();\n    new TreeMap<Object, Object>(map).forEach((key, value) -> {\n        sb.append(key == null ? \"null\" : key.toString());\n        sb.append(\"\\t= \");\n        sb.append(value == null ? \"null\" : value.toString());\n        sb.append('\\n');\n    });\n    return sb.toString();\n}",
               "comprehension": {
                 "input": "listToString({\"z\"->null})",
                 "options": [
@@ -3098,16 +3098,16 @@
     {
       "id": "java-011",
       "category": "Data Structures",
-      "title": "Filter Map Values By Key List",
-      "summary": "Look up several keys in a map and collect their values in order.",
-      "paraphrasedPrompt": "Write a method `filterMapToList(Map<String, ?> map, String[] nameMapping)` that looks up each name in `nameMapping`, in order, inside `map`, and collects the results into a `List<Object>` (one entry per name -- `null` if that key isn't in `map`). Throw a `NullPointerException` if either `map` or `nameMapping` is `null`.",
-      "difficulty": "Easy",
+      "title": "Count Links Between Sentinel Nodes In A Linked List",
+      "summary": "Count the real links between two sentinel nodes in a linked list.",
+      "paraphrasedPrompt": "Write a method `countLinks()` on a linked-list class that has two instance fields marking the ends of the list: `_dummyHead` and `_dummyTail` (sentinel nodes that don't themselves count as real links). Every link, including `_dummyHead`, exposes two equivalent accessors for the next link in the chain (or null at the end): `getNextLogicalLink()` and `_getNextLink()` -- they return the same thing. Starting from `_dummyHead`'s next link, walk the chain and count how many real links there are before reaching `_dummyTail` (or null, if `_dummyTail` isn't reached).",
+      "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "super-csv/super-csv",
-      "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L159-L171",
+      "sourceRepo": "OpenLiberty/open-liberty",
+      "sourceUrl": "https://github.com/OpenLiberty/open-liberty/blob/ca725d9903e63645018f9fa8cbda25f60af83a5d/dev/com.ibm.ws.messaging.msgstore/src/com/ibm/ws/sib/msgstore/list/LinkedList.java#L302-L312",
       "supportedLanguages": [
         "Java"
       ],
@@ -3124,13 +3124,13 @@
           "solutions": [
             {
               "solutionId": "java-011-h",
-              "code": "public static List<Object> filterMapToList(final Map<String, ?> map, final String[] nameMapping) {\n\t\tif( map == null ) {\n\t\t\tthrow new NullPointerException(\"map should not be null\");\n\t\t} else if( nameMapping == null ) {\n\t\t\tthrow new NullPointerException(\"nameMapping should not be null\");\n\t\t}\n\n\t\tfinal List<Object> result = new ArrayList<Object>(nameMapping.length);\n\t\tfor( final String key : nameMapping ) {\n\t\t\tresult.add(map.get(key));\n\t\t}\n\t\treturn result;\n\t}",
+              "code": "public int countLinks()\n    {\n        int count = 0;\n        Link look = _dummyHead.getNextLogicalLink();\n        while (look != null && _dummyTail != look)\n        {\n            count++;\n            look = look._getNextLink();\n        }\n        return count;\n    }",
               "comprehension": {
-                "input": "filterMapToList({\"a\"->1, \"b\"->2}, nameMapping=[\"b\", \"a\", \"c\"])",
+                "input": "countLinks() on a chain with 4 real links between _dummyHead and _dummyTail",
                 "options": [
-                  "[1, 2, null]",
-                  "[2, 1]",
-                  "[2, 1, null]",
+                  "3",
+                  "4",
+                  "5",
                   "NullPointerException"
                 ]
               },
@@ -3138,22 +3138,22 @@
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "super-csv/super-csv",
-                "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L159-L171",
+                "sourceRepoOrAuthor": "OpenLiberty/open-liberty",
+                "sourceUrl": "https://github.com/OpenLiberty/open-liberty/blob/ca725d9903e63645018f9fa8cbda25f60af83a5d/dev/com.ibm.ws.messaging.msgstore/src/com/ibm/ws/sib/msgstore/list/LinkedList.java#L302-L312",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 1
               }
             },
             {
               "solutionId": "java-011-ai",
-              "code": "public static List<Object> filterMapToList(Map<String, ?> map, String[] nameMapping) {\n    if (map == null) {\n        throw new NullPointerException(\"map should not be null\");\n    }\n    if (nameMapping == null) {\n        throw new NullPointerException(\"nameMapping should not be null\");\n    }\n    List<Object> result = new ArrayList<>();\n    for (String key : nameMapping) {\n        result.add(map.get(key));\n    }\n    return result;\n}",
+              "code": "public int countLinks() {\n    int total = 0;\n    for (Link current = _dummyHead._getNextLink();\n         current != null && current != _dummyTail;\n         current = current._getNextLink()) {\n        total++;\n    }\n    return total;\n}",
               "comprehension": {
-                "input": "filterMapToList({\"x\"->\"hi\"}, nameMapping=[\"x\", \"y\"])",
+                "input": "countLinks() on a chain with 2 real links between _dummyHead and _dummyTail",
                 "options": [
-                  "[\"hi\"]",
-                  "[\"hi\", null]",
-                  "[null, \"hi\"]",
-                  "NullPointerException"
+                  "1",
+                  "2",
+                  "3",
+                  "0"
                 ]
               },
               "_hidden": {
@@ -3454,7 +3454,7 @@
             },
             {
               "solutionId": "java-015-ai",
-              "code": "public static double trace(DMatrixSparseCSC A) {\n    int n = Math.min(A.numRows, A.numCols);\n    double sum = 0;\n    for (int col = 0; col < n; col++) {\n        for (int i = A.col_idx[col]; i < A.col_idx[col + 1]; i++) {\n            if (A.nz_rows[i] == col) {\n                sum += A.nz_values[i];\n                break;\n            }\n        }\n    }\n    return sum;\n}",
+              "code": "public static double trace(DMatrixSparseCSC A) {\n    double sum = 0;\n    int n = Math.min(A.numRows, A.numCols);\n    for (int col = 0; col < n; col++) {\n        sum += diagonalValueForColumn(A, col);\n    }\n    return sum;\n}\n\nprivate static double diagonalValueForColumn(DMatrixSparseCSC A, int col) {\n    for (int i = A.col_idx[col]; i < A.col_idx[col + 1]; i++) {\n        if (A.nz_rows[i] == col) {\n            return A.nz_values[i];\n        }\n    }\n    return 0;\n}",
               "comprehension": {
                 "input": "trace(3x3 sparse matrix with diagonal 1.0, 2.0, 3.0)",
                 "options": [
@@ -3559,17 +3559,17 @@
     },
     {
       "id": "java-017",
-      "category": "Data Structures",
-      "title": "Convert Object List To String Array",
-      "summary": "Convert a list of objects into a String array by calling toString() on each.",
-      "paraphrasedPrompt": "Write a method `objectListToStringArray(List<?> objectList)` that converts a list of objects into a `String[]` by calling `toString()` on each non-null element (null elements map to `null`). If `objectList` itself is `null`, return `null`.",
+      "category": "Parsing & Conversion",
+      "title": "Convert A List Or Scalar Into A Comma-Separated String",
+      "summary": "Turn a list (or any value) into a single comma-separated string.",
+      "paraphrasedPrompt": "Write a method `convertListToString(Object listOrString)` that normalizes a value into a string. If `listOrString` is null, return null. If it's a `Collection`, join its elements with commas (no spaces) and return that. Otherwise, return `listOrString.toString()` as-is.",
       "difficulty": "Easy",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "super-csv/super-csv",
-      "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L227-L238",
+      "sourceRepo": "bullhorn/sdk-rest",
+      "sourceUrl": "https://github.com/bullhorn/sdk-rest/blob/0c75a141c768bb31510afc3a412c11bd101eca06/src/main/java/com/bullhornsdk/data/model/entity/core/type/AbstractEntity.java#L76-L91",
       "supportedLanguages": [
         "Java"
       ],
@@ -3586,36 +3586,36 @@
           "solutions": [
             {
               "solutionId": "java-017-h",
-              "code": "public static String[] objectListToStringArray(final List<?> objectList) {\n\t\tif( objectList == null ) {\n\t\t\treturn null;\n\t\t}\n\n\t\tfinal String[] stringArray = new String[objectList.size()];\n\t\tfor( int i = 0; i < objectList.size(); i++ ) {\n\t\t\tstringArray[i] = objectList.get(i) != null ? objectList.get(i).toString() : null;\n\t\t}\n\n\t\treturn stringArray;\n\t}",
+              "code": "public String convertListToString(Object listOrString) {\n\n\t\tif (listOrString == null) {\n\t\t\treturn null;\n\t\t}\n\n\t\tif (listOrString instanceof Collection) {\n\t\t\tList<String> list = (List<String>) listOrString;\n\n\t\t\treturn StringUtils.join(list, \",\");\n\n\t\t}\n\n\t\treturn listOrString.toString();\n\n\t}",
               "comprehension": {
-                "input": "objectListToStringArray([1, null, \"x\"])",
+                "input": "convertListToString([\"red\", \"green\", \"blue\"])",
                 "options": [
-                  "[\"1\", \"null\", \"x\"]",
-                  "null",
-                  "[\"1\", \"x\"]",
-                  "[\"1\", null, \"x\"]"
+                  "red,green,blue",
+                  "red, green, blue",
+                  "[red, green, blue]",
+                  "null"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "super-csv/super-csv",
-                "sourceUrl": "https://github.com/super-csv/super-csv/blob/f18db724674dc1c4116e25142c1b5403ebf43e96/super-csv/src/main/java/org/supercsv/util/Util.java#L227-L238",
+                "sourceRepoOrAuthor": "bullhorn/sdk-rest",
+                "sourceUrl": "https://github.com/bullhorn/sdk-rest/blob/0c75a141c768bb31510afc3a412c11bd101eca06/src/main/java/com/bullhornsdk/data/model/entity/core/type/AbstractEntity.java#L76-L91",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 3
+                "comprehensionCorrectIndex": 0
               }
             },
             {
               "solutionId": "java-017-ai",
-              "code": "public static String[] objectListToStringArray(List<?> objectList) {\n    if (objectList == null) {\n        return null;\n    }\n    String[] result = new String[objectList.size()];\n    for (int i = 0; i < objectList.size(); i++) {\n        Object element = objectList.get(i);\n        result[i] = element != null ? element.toString() : null;\n    }\n    return result;\n}",
+              "code": "public String convertListToString(Object listOrString) {\n    if (listOrString == null) {\n        return null;\n    }\n    if (listOrString instanceof Collection) {\n        StringBuilder sb = new StringBuilder();\n        boolean first = true;\n        for (Object item : (Collection<?>) listOrString) {\n            if (!first) sb.append(\",\");\n            sb.append(item);\n            first = false;\n        }\n        return sb.toString();\n    }\n    return listOrString.toString();\n}",
               "comprehension": {
-                "input": "objectListToStringArray([true, 2.5])",
+                "input": "convertListToString(42)",
                 "options": [
-                  "[\"true\", \"2.5\"]",
+                  "42",
                   "null",
-                  "[\"true\", \"2.50\"]",
-                  "[true, 2.5]"
+                  "[42]",
+                  "NumberFormatException"
                 ]
               },
               "_hidden": {
@@ -3916,7 +3916,7 @@
             },
             {
               "solutionId": "java-021-ai",
-              "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n        maxVal = Math.max(maxVal, Math.abs(c.getCount(key)));\n    }\n    if (maxVal == 0.0) {\n        return 0.0;\n    }\n    double sumOfSquares = 0.0;\n    for (E key : c.keySet()) {\n        double scaled = c.getCount(key) / maxVal;\n        sumOfSquares += scaled * scaled;\n    }\n    return maxVal * Math.sqrt(sumOfSquares);\n}",
+              "code": "public static <E, C extends Counter<E>> double saferL2Norm(C c) {\n    double maxVal = 0.0;\n    for (E key : c.keySet()) {\n        maxVal = Math.max(maxVal, Math.abs(c.getCount(key)));\n    }\n    double sumOfSquares = 0.0;\n    for (E key : c.keySet()) {\n        double scaled = c.getCount(key) / maxVal;\n        sumOfSquares += scaled * scaled;\n    }\n    return maxVal * Math.sqrt(sumOfSquares);\n}",
               "comprehension": {
                 "input": "saferL2Norm(counter{x:6.0, y:8.0})",
                 "options": [
@@ -4224,7 +4224,7 @@
             },
             {
               "solutionId": "java-025-ai",
-              "code": "public static int encodeNum(long num, byte[] data, int beginIndex, int maxBytes) {\n    for (int i = 0; i < maxBytes; i++) {\n        int index = beginIndex + maxBytes - 1 - i;\n        data[index] = (byte) ((num >> (8 * i)) & 0xff);\n    }\n    return beginIndex + maxBytes;\n}",
+              "code": "public static int encodeNum(long num, byte[] data, int beginIndex, int maxBytes) {\n    byte[] encoded = new byte[maxBytes];\n    for (int shift = 0; shift < maxBytes; shift++) {\n        encoded[maxBytes - 1 - shift] = (byte) (num >> (8 * shift));\n    }\n    System.arraycopy(encoded, 0, data, beginIndex, maxBytes);\n    return beginIndex + maxBytes;\n}",
               "comprehension": {
                 "input": "encodeNum(num=255, data=new byte[2], beginIndex=0, maxBytes=2)",
                 "options": [
@@ -4561,16 +4561,16 @@
     {
       "id": "java-030",
       "category": "Data Structures",
-      "title": "Sort Map Entries By Key",
-      "summary": "Sort a collection of map entries into a list, ordered by key.",
-      "paraphrasedPrompt": "Write a generic method `<K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries)` that returns the given collection of map entries as a `List`, sorted in ascending order by key.",
-      "difficulty": "Easy",
+      "title": "Convert A List Into A Map Using Key/Value Extractors",
+      "summary": "Convert a list into a map using per-item key/value extractor functions.",
+      "paraphrasedPrompt": "Write a method `<K, V> Map<K, V> asHashMap(List<V> list, ListExtractor<K, V> extractor)` that converts a list into a map. `ListExtractor<K, V>` is an interface with two methods, `extractKey(V item)` and `extractValue(V item)`, used to derive a map key and value from each list element. If `list` is null, `extractor` is null, or `list` is empty, return an empty map. Otherwise, build a map by calling `extractor.extractKey(item)` and `extractor.extractValue(item)` for every item in `list` and inserting each key/value pair -- if two items derive the same key, the later item's value overwrites the earlier one's, but the key keeps its original insertion position when the map is iterated.",
+      "difficulty": "Medium",
       "acceptanceRate": null,
       "acceptanceRateAvailable": false,
       "sourceProblemNumber": null,
       "sourcePlatform": "CodeSearchNet",
-      "sourceRepo": "PeterisP/LVTagger",
-      "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/Maps.java#L98-L106",
+      "sourceRepo": "openwms/org.openwms",
+      "sourceUrl": "https://github.com/openwms/org.openwms/blob/b24a95c5d09a7ec3c723d7e107d1cb0039d06a7e/org.openwms.core.util/src/main/java/org/openwms/core/lang/CollectionUtil.java#L59-L68",
       "supportedLanguages": [
         "Java"
       ],
@@ -4587,36 +4587,36 @@
           "solutions": [
             {
               "solutionId": "java-030-h",
-              "code": "public static <K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries) {\n    List<Entry<K,V>> entriesList = new ArrayList<Map.Entry<K, V>>(entries);\n    Collections.sort(entriesList, new Comparator<Map.Entry<K, V>>() {\n      public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {\n        return e1.getKey().compareTo(e2.getKey());\n      }\n    });\n    return entriesList;\n  }",
+              "code": "public static <K, V> Map<K, V> asHashMap(List<V> list, ListExtractor<K, V> extractor) {\n        if (list == null || extractor == null || list.isEmpty()) {\n            return Collections.<K, V>emptyMap();\n        }\n        Map<K, V> map = new LinkedHashMap<>(list.size());\n        for (V node : list) {\n            map.put(extractor.extractKey(node), extractor.extractValue(node));\n        }\n        return map;\n    }",
               "comprehension": {
-                "input": "sortedEntries([(3,\"c\"), (1,\"a\"), (2,\"b\")])",
+                "input": "asHashMap([\"apple\", \"banana\", \"avocado\"], extractor: key=firstLetter, value=toUpperCase)",
                 "options": [
-                  "[3=c, 1=a, 2=b]",
-                  "[2=b, 1=a, 3=c]",
-                  "[1=a, 2=b, 3=c]",
-                  "[1=a, 3=c, 2=b]"
+                  "{false=10, true=20}",
+                  "{true=50, false=40}",
+                  "{} (empty map)",
+                  "{a=AVOCADO, b=BANANA}"
                 ]
               },
               "_hidden": {
                 "origin": "human",
                 "variantKey": "human1",
                 "styleNotes": "",
-                "sourceRepoOrAuthor": "PeterisP/LVTagger",
-                "sourceUrl": "https://github.com/PeterisP/LVTagger/blob/b3d44bab9ec07ace0d13612c448a6b7298c1f681/src/main/java/edu/stanford/nlp/util/Maps.java#L98-L106",
+                "sourceRepoOrAuthor": "openwms/org.openwms",
+                "sourceUrl": "https://github.com/openwms/org.openwms/blob/b24a95c5d09a7ec3c723d7e107d1cb0039d06a7e/org.openwms.core.util/src/main/java/org/openwms/core/lang/CollectionUtil.java#L59-L68",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 2
+                "comprehensionCorrectIndex": 3
               }
             },
             {
               "solutionId": "java-030-ai",
-              "code": "public static <K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries) {\n    List<Map.Entry<K, V>> entriesList = new ArrayList<>(entries);\n    entriesList.sort((e1, e2) -> e1.getKey().compareTo(e2.getKey()));\n    return entriesList;\n}",
+              "code": "public static <K, V> Map<K, V> asHashMap(List<V> list, ListExtractor<K, V> extractor) {\n    if (list == null || extractor == null || list.isEmpty()) {\n        return Collections.emptyMap();\n    }\n    return list.stream().collect(Collectors.toMap(\n        extractor::extractKey,\n        extractor::extractValue,\n        (existing, replacement) -> replacement,\n        LinkedHashMap::new\n    ));\n}",
               "comprehension": {
-                "input": "sortedEntries([(20,\"x\"), (5,\"y\")])",
+                "input": "asHashMap([1, 2, 3, 4, 5], extractor: key=isEven, value=i*10)",
                 "options": [
-                  "[20=x, 5=y]",
-                  "[5=y, 20=x]",
-                  "[5=x, 20=y]",
-                  "ClassCastException"
+                  "{false=10, true=20}",
+                  "{true=50, false=40}",
+                  "{} (empty map)",
+                  "{false=50, true=40}"
                 ]
               },
               "_hidden": {
@@ -4626,7 +4626,7 @@
                 "sourceRepoOrAuthor": "LLM",
                 "sourceUrl": "",
                 "selectionNotes": "",
-                "comprehensionCorrectIndex": 1,
+                "comprehensionCorrectIndex": 3,
                 "generatedBy": "claude-sonnet-5",
                 "generationDate": "2026-07-01"
               }
