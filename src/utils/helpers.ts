@@ -10,15 +10,22 @@ export function reviewSessionKey(questionId: string, language: string): string {
   return `${questionId}::${language}`;
 }
 
-/** Average of the five 1–10 rating dimensions. */
+/**
+ * Average of the six 1–10 rating dimensions. `hiddenComplexity` is asked as
+ * "higher = worse" (more hidden risk), so it's inverted (11 - value) before
+ * averaging — otherwise a riskier rating would push the score up instead of
+ * down, the opposite of what it should do.
+ */
 export function avgRating(r: SlotRating): number {
+  const complexityScore = 11 - r.hiddenComplexity;
   return (
     r.readability +
+    r.understandability +
     r.perceivedRobustness +
     r.maintenanceConfidence +
     r.perceivedAuthorCompetence +
-    r.hiddenComplexity
-  ) / 5;
+    complexityScore
+  ) / 6;
 }
 
 /** Count how many slots have been rated. */

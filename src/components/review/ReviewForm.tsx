@@ -15,20 +15,26 @@ const ACCEPT_OPTIONS: {
   activeCls: string;
 }[] = [
   {
-    value: 'yes',
-    label: 'Yes, approve',
+    value: 'approve',
+    label: 'Approve',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-green-400 hover:text-green-700',
     activeCls:   'border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 ring-2 ring-green-200 dark:ring-green-800 ring-offset-1',
   },
   {
-    value: 'needs_changes',
-    label: 'Needs changes',
+    value: 'approve_minor',
+    label: 'Approve with minor changes',
+    inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-lime-400 hover:text-lime-700',
+    activeCls:   'border-lime-500 bg-lime-50 dark:bg-lime-950 text-lime-700 dark:text-lime-300 ring-2 ring-lime-200 dark:ring-lime-800 ring-offset-1',
+  },
+  {
+    value: 'needs_major',
+    label: 'Needs major changes',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-700',
     activeCls:   'border-amber-500 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 ring-2 ring-amber-200 dark:ring-amber-800 ring-offset-1',
   },
   {
-    value: 'no',
-    label: 'No, reject',
+    value: 'reject',
+    label: 'Reject',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-700',
     activeCls:   'border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 ring-2 ring-red-200 dark:ring-red-800 ring-offset-1',
   },
@@ -38,10 +44,10 @@ const MIN_EXPLANATION_LENGTH = 25;
 
 const DEFAULT: SlotRating = {
   readability:               0,
+  understandability:         0,
   perceivedRobustness:       0,
   maintenanceConfidence:     0,
   perceivedAuthorCompetence: 0,
-  willingnessToApprove:      0,
   hiddenComplexity:          0,
   acceptDecision:            null,
   briefExplanation:          '',
@@ -69,10 +75,10 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
 
   const numericComplete =
     form.readability > 0 &&
+    form.understandability > 0 &&
     form.perceivedRobustness > 0 &&
     form.maintenanceConfidence > 0 &&
     form.perceivedAuthorCompetence > 0 &&
-    form.willingnessToApprove > 0 &&
     form.hiddenComplexity > 0;
 
   const explanationLength = form.briefExplanation.trim().length;
@@ -119,49 +125,47 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
 
       <form onSubmit={handleSubmit} noValidate className="px-5 py-5 space-y-6 bg-white/70 dark:bg-slate-900/70">
 
-        {/* Q1–Q4: 1–10 scales */}
+        {/* Q1–Q6: 1–10 scales */}
         <fieldset className="space-y-5 border-0 p-0 m-0">
           <legend className="sr-only">Code quality ratings for Solution {slot}</legend>
           <ScoreButtons
             label="Readability"
-            description="How easy is this code to visually read and navigate?"
+            description="How easy is this code to visually read and navigate? (1 = very hard to read · 10 = effortless to read)"
             value={form.readability}
             onChange={v => set('readability', v)}
             max={10}
           />
           <ScoreButtons
+            label="Understandability"
+            description="How easy is it to understand what this code does? (1 = very hard to understand · 10 = fully clear)"
+            value={form.understandability}
+            onChange={v => set('understandability', v)}
+            max={10}
+          />
+          <ScoreButtons
             label="Perceived robustness"
-            description="How confident are you that this code handles edge cases and unusual inputs correctly?"
+            description="How confident are you that this code handles edge cases and unusual inputs correctly? (1 = not confident at all · 10 = fully confident)"
             value={form.perceivedRobustness}
             onChange={v => set('perceivedRobustness', v)}
             max={10}
           />
           <ScoreButtons
             label="Maintenance confidence"
-            description="How confident would you be modifying or extending this code six months from now?"
+            description="How confident would you be modifying or extending this code six months from now? (1 = not confident at all · 10 = fully confident)"
             value={form.maintenanceConfidence}
             onChange={v => set('maintenanceConfidence', v)}
             max={10}
           />
           <ScoreButtons
             label="Perceived author competence"
-            description="Based on this code alone, how skilled does the author appear to be?"
+            description="Based on this code alone, how skilled does the author appear to be? (1 = not skilled at all · 10 = highly skilled)"
             value={form.perceivedAuthorCompetence}
             onChange={v => set('perceivedAuthorCompetence', v)}
             max={10}
           />
         </fieldset>
 
-        {/* Q5: Willingness to approve 1–5 */}
-        <ScoreButtons
-          label="Willingness to approve"
-          description="Would you approve this code in a real code review at work? (1 = definitely not · 5 = definitely yes)"
-          value={form.willingnessToApprove}
-          onChange={v => set('willingnessToApprove', v)}
-          max={5}
-        />
-
-        {/* Q6: Hidden complexity 1–10 */}
+        {/* Q7: Hidden complexity 1–10 */}
         <ScoreButtons
           label="Hidden complexity"
           description="How much non-obvious complexity or subtle risk is lurking beneath the surface of this code? (Higher means worse: more hidden risk.)"
@@ -170,7 +174,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
           max={10}
         />
 
-        {/* Q7: Accept decision */}
+        {/* Q8: Accept decision */}
         <div className="space-y-2">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
             Would you accept this code?{' '}
@@ -195,7 +199,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
           </div>
         </div>
 
-        {/* Q8: Brief explanation */}
+        {/* Q9: Brief explanation */}
         <div className="space-y-1.5">
           <label
             htmlFor={`explanation-${slot}`}

@@ -65,8 +65,8 @@ function ReviewSummaryCard({ review }: { review: ReviewSession }) {
                 </div>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
                   <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Read.</span>{r.readability}/10</div>
+                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Underst.</span>{r.understandability}/10</div>
                   <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
-                  <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
                   <div><span className="block text-slate-400 dark:text-slate-500 text-[10px]">Decision</span>{r.acceptDecision ?? '-'}</div>
                 </div>
               </div>

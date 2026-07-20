@@ -7,13 +7,13 @@ export interface SlotExport {
   solutionId: string;
   originLabel: string;               // "human 1" | "human 2" | "LLM concise" | "LLM readable"
   readability: number;
+  understandability: number;
   perceivedRobustness: number;
   maintenanceConfidence: number;
   perceivedAuthorCompetence: number;
-  willingnessToApprove: number;
   hiddenComplexity: number;
-  averageScore: number;              // mean of the five 1–10 dimensions
-  acceptDecision: string;            // "yes" | "no" | "needs_changes"
+  averageScore: number;              // mean of the six 1–10 dimensions, hiddenComplexity inverted
+  acceptDecision: string;            // "approve" | "approve_minor" | "needs_major" | "reject"
   briefExplanation: string;
   comprehensionSelectedIndex: number | null;
   comprehensionCorrect: boolean | null;
@@ -77,10 +77,10 @@ export function buildExportPayload(
         solutionId: sid,
         originLabel: labels[sid] ?? '',
         readability: r.readability,
+        understandability: r.understandability,
         perceivedRobustness: r.perceivedRobustness,
         maintenanceConfidence: r.maintenanceConfidence,
         perceivedAuthorCompetence: r.perceivedAuthorCompetence,
-        willingnessToApprove: r.willingnessToApprove,
         hiddenComplexity: r.hiddenComplexity,
         averageScore: parseFloat(avgRating(r).toFixed(2)),
         acceptDecision: r.acceptDecision ?? '',
@@ -221,10 +221,10 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
     r[`slot${slot}_solutionId`]               = s?.solutionId ?? '';
     r[`slot${slot}_originLabel`]              = s?.originLabel ?? '';
     r[`slot${slot}_readability`]              = s?.readability ?? '';
+    r[`slot${slot}_understandability`]        = s?.understandability ?? '';
     r[`slot${slot}_perceivedRobustness`]      = s?.perceivedRobustness ?? '';
     r[`slot${slot}_maintenanceConfidence`]    = s?.maintenanceConfidence ?? '';
     r[`slot${slot}_perceivedAuthorCompetence`]= s?.perceivedAuthorCompetence ?? '';
-    r[`slot${slot}_willingnessToApprove`]     = s?.willingnessToApprove ?? '';
     r[`slot${slot}_hiddenComplexity`]         = s?.hiddenComplexity ?? '';
     r[`slot${slot}_averageScore`]             = s?.averageScore ?? '';
     r[`slot${slot}_acceptDecision`]           = s?.acceptDecision ?? '';

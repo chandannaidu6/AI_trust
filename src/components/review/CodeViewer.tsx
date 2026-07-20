@@ -124,6 +124,11 @@ export function CodeViewer({ code, language, slot }: CodeViewerProps) {
           codeTagProps={{
             style: {
               fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", Menlo, monospace',
+              // JetBrains Mono / Fira Code fuse "==", "!=", etc. into single ligature glyphs
+              // by default, which reads as ambiguous at this font size — disable that.
+              fontVariantLigatures: 'none',
+              fontFeatureSettings: '"liga" 0, "calt" 0',
+              letterSpacing: '0.01em',
             },
           }}
         >

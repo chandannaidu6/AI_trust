@@ -354,7 +354,7 @@
               "solutionId": "py-005-h",
               "code": "def combine_std(n, mean, std):\n    mean_tot = np.sum(n*mean)/np.sum(n)\n    var_tot = np.sum(n*(std**2 + mean**2))/np.sum(n) - mean_tot**2\n    return np.sqrt(var_tot)",
               "comprehension": {
-                "input": "combine_std(n=[10, 20], mean=[5.0, 7.0], std=[1.0, 2.0])",
+                "input": "combine_std(n=np.array([10, 20]), mean=np.array([5.0, 7.0]), std=np.array([1.0, 2.0]))",
                 "options": [
                   "1.972",
                   "6.633",
@@ -376,7 +376,7 @@
               "solutionId": "py-005-ai",
               "code": "def combine_std(n, mean, std):\n    total_n = np.sum(n)\n    weighted_mean = np.sum(n * mean) / total_n\n    weighted_second_moment = np.sum(n * (std ** 2 + mean ** 2)) / total_n\n    variance = weighted_second_moment - weighted_mean ** 2\n    return np.sqrt(variance)",
               "comprehension": {
-                "input": "combine_std(n=[50, 30, 20], mean=[2.0, 3.0, 4.0], std=[0.5, 0.8, 1.2])",
+                "input": "combine_std(n=np.array([50, 30, 20]), mean=np.array([2.0, 3.0, 4.0]), std=np.array([0.5, 0.8, 1.2]))",
                 "options": [
                   "2.916",
                   "1.102",
@@ -893,7 +893,7 @@
               "solutionId": "py-012-h",
               "code": "def calc_cost(y, yhat, cost_matrix):\n    return np.mean(cost_matrix[list(y), list(yhat)])",
               "comprehension": {
-                "input": "calc_cost(y=[0, 1], yhat=[0, 1], cost_matrix=[[0, 1], [2, 0]])",
+                "input": "calc_cost(y=[0, 1], yhat=[0, 1], cost_matrix=np.array([[0, 1], [2, 0]]))",
                 "options": [
                   "1.5",
                   "0.0",
@@ -915,7 +915,7 @@
               "solutionId": "py-012-ai",
               "code": "def calc_cost(y, yhat, cost_matrix):\n    y = list(y)\n    yhat = list(yhat)\n    costs = [cost_matrix[true][pred] for true, pred in zip(y, yhat)]\n    return float(np.mean(costs))",
               "comprehension": {
-                "input": "calc_cost(y=[0, 1], yhat=[1, 0], cost_matrix=[[0, 1], [2, 0]])",
+                "input": "calc_cost(y=[0, 1], yhat=[1, 0], cost_matrix=np.array([[0, 1], [2, 0]]))",
                 "options": [
                   "0.0",
                   "1.0",
@@ -1894,7 +1894,7 @@
               "solutionId": "py-025-h",
               "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for ii in range(encoded.shape[1]):\n        inv_mapping = {v: k for k, v in mapping[ii].items()}\n        decoded.append(np.vectorize(inv_mapping.__getitem__)(encoded[:, ii]))\n    return np.atleast_2d(np.array(decoded)).T",
               "comprehension": {
-                "input": "decode_centroids([[0, 1], [1, 0]], mapping=[{'x': 0, 'y': 1}, {'p': 0, 'q': 1}])",
+                "input": "decode_centroids(np.array([[0, 1], [1, 0]]), mapping=[{'x': 0, 'y': 1}, {'p': 0, 'q': 1}])",
                 "options": [
                   "[['x', 'p'], ['y', 'q']]",
                   "[['y', 'q'], ['x', 'p']]",
@@ -1916,7 +1916,7 @@
               "solutionId": "py-025-ai",
               "code": "def decode_centroids(encoded, mapping):\n    decoded = []\n    for col in range(encoded.shape[1]):\n        inverse = {code: label for label, code in mapping[col].items()}\n        decoded.append([inverse[value] for value in encoded[:, col]])\n    return np.array(decoded).T",
               "comprehension": {
-                "input": "decode_centroids([[1, 0]], mapping=[{'a': 0, 'b': 1}, {'c': 0, 'd': 1}])",
+                "input": "decode_centroids(np.array([[1, 0]]), mapping=[{'a': 0, 'b': 1}, {'c': 0, 'd': 1}])",
                 "options": [
                   "[['a', 'c']]",
                   "[['b', 'd']]",
@@ -2202,7 +2202,7 @@
               "solutionId": "py-029-h",
               "code": "def iostats_dict(header, stats):\n    stats = [float((sum(stat) / len(stat)).quantize(decimal.Decimal('.01'))) for stat in zip(*stats)]\n    stats = dict(zip(header, stats))\n    return stats",
               "comprehension": {
-                "input": "iostats_dict(['r', 'w'], stats=[[1.111, 2.222], [3.333, 4.444]])  # Decimal readings",
+                "input": "iostats_dict(['r', 'w'], stats=[[decimal.Decimal('1.111'), decimal.Decimal('2.222')], [decimal.Decimal('3.333'), decimal.Decimal('4.444')]])",
                 "options": [
                   "{'r': 2.2, 'w': 3.3}",
                   "{'r': 4.44, 'w': 6.67}",
@@ -2224,7 +2224,7 @@
               "solutionId": "py-029-ai",
               "code": "def iostats_dict(header, stats):\n    averaged = []\n    for column in zip(*stats):\n        avg = sum(column) / len(column)\n        averaged.append(float(avg.quantize(decimal.Decimal('0.01'))))\n    return dict(zip(header, averaged))",
               "comprehension": {
-                "input": "iostats_dict(['a'], stats=[[1], [2], [3]])  # Decimal readings",
+                "input": "iostats_dict(['a'], stats=[[decimal.Decimal('1')], [decimal.Decimal('2')], [decimal.Decimal('3')]])",
                 "options": [
                   "{'a': 2.0}",
                   "{'a': 6.0}",
@@ -2279,7 +2279,7 @@
               "solutionId": "py-030-h",
               "code": "def label_list_parser(self, url):\n        labels = re.findall('([^/,]+=[^/,]+)', url)\n        slabels = set(labels)\n        if '' in slabels:\n            slabels.remove('')\n        return slabels",
               "comprehension": {
-                "input": "label_list_parser('a=1,b=2/c=3')",
+                "input": "label_list_parser(None, 'a=1,b=2/c=3')",
                 "options": [
                   "['a=1', 'b=2', 'c=3']",
                   "{'a=1,b=2', 'c=3'}",
@@ -3821,10 +3821,10 @@
               "comprehension": {
                 "input": "transformedCopy(multiset{1x2, 2x3}, func=parity as \"odd\"/\"even\")",
                 "options": [
-                  "{odd x3, even x2}",
-                  "{odd x5}",
-                  "{odd x2, even x3}",
-                  "{even x5}"
+                  "[odd x 3, even x 2]",
+                  "[odd x 5]",
+                  "[odd x 2, even x 3]",
+                  "[even x 5]"
                 ]
               },
               "_hidden": {
@@ -3843,10 +3843,10 @@
               "comprehension": {
                 "input": "transformedCopy(multiset{5x1, 10x4}, func=x*2)",
                 "options": [
-                  "{10x1, 20x4}",
-                  "{10x4, 20x1}",
-                  "{10x5}",
-                  "{20x5}"
+                  "[10, 20 x 4]",
+                  "[10 x 4, 20]",
+                  "[10 x 5]",
+                  "[20 x 5]"
                 ]
               },
               "_hidden": {

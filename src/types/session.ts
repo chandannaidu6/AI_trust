@@ -15,15 +15,15 @@ export interface UISlot {
 
 // ─── Per-slot review rating (8 questions) ────────────────────────────────────
 
-export type AcceptDecision = 'yes' | 'no' | 'needs_changes';
+export type AcceptDecision = 'approve' | 'approve_minor' | 'needs_major' | 'reject';
 
 export interface SlotRating {
   readability: number;               // 1–10
+  understandability: number;         // 1–10
   perceivedRobustness: number;       // 1–10
   maintenanceConfidence: number;     // 1–10
   perceivedAuthorCompetence: number; // 1–10
-  willingnessToApprove: number;      // 1–5
-  hiddenComplexity: number;          // 1–10
+  hiddenComplexity: number;          // 1–10 (higher = worse; inverted when averaged into a score)
   acceptDecision: AcceptDecision | null;
   briefExplanation: string;
 }

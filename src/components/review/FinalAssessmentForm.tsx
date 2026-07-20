@@ -97,16 +97,20 @@ export function FinalAssessmentForm({
                   </div>
                   <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-xs opacity-80">
                     <div><span className="block opacity-70 text-[10px]">Read.</span>{r.readability}/10</div>
+                    <div><span className="block opacity-70 text-[10px]">Underst.</span>{r.understandability}/10</div>
                     <div><span className="block opacity-70 text-[10px]">Robust.</span>{r.perceivedRobustness}/10</div>
                     <div><span className="block opacity-70 text-[10px]">Maint.</span>{r.maintenanceConfidence}/10</div>
-                    <div><span className="block opacity-70 text-[10px]">Approve</span>{r.willingnessToApprove}/5</div>
                   </div>
                   <div className={`text-[10px] font-semibold mt-0.5 ${
-                    r.acceptDecision === 'yes' ? 'text-green-600 dark:text-green-400' :
-                    r.acceptDecision === 'no'  ? 'text-red-500 dark:text-red-400' :
-                    'text-amber-600 dark:text-amber-400'
+                    r.acceptDecision === 'approve'       ? 'text-green-600 dark:text-green-400' :
+                    r.acceptDecision === 'approve_minor' ? 'text-lime-600 dark:text-lime-400' :
+                    r.acceptDecision === 'needs_major'   ? 'text-amber-600 dark:text-amber-400' :
+                    'text-red-500 dark:text-red-400'
                   }`}>
-                    {r.acceptDecision === 'yes' ? '✓ Approve' : r.acceptDecision === 'no' ? '✗ Reject' : '~ Changes'}
+                    {r.acceptDecision === 'approve'       ? '✓ Approve' :
+                     r.acceptDecision === 'approve_minor' ? '✓ Minor changes' :
+                     r.acceptDecision === 'needs_major'   ? '~ Major changes' :
+                     '✗ Reject'}
                   </div>
                 </div>
               );
