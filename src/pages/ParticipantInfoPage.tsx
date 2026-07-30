@@ -110,7 +110,6 @@ export default function ParticipantInfoPage() {
                 options={[
                   { value: 'woman',              label: 'Woman' },
                   { value: 'man',                label: 'Man' },
-                  { value: 'non_binary',         label: 'Non-binary' },
                   { value: 'prefer_not_to_say',  label: 'Prefer not to say' },
                 ]}
               />
