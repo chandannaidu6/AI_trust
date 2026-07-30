@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
 import { OptionPicker } from '../components/ui/OptionPicker';
+import { CityAutocomplete } from '../components/ui/CityAutocomplete';
+import { TextInput } from '../components/ui/TextInput';
 import { Button } from '../components/ui/Button';
 import { useStudy } from '../state/StudyContext';
-import { ParticipantProfile, SkillLevel, Role, ReviewFrequency, AIFamiliarity } from '../types';
+import { ParticipantProfile, SkillLevel, Role, ReviewFrequency, AIFamiliarity, Gender } from '../types';
 import { generateId } from '../utils/helpers';
+
+const AGE_BRACKETS = ['18–24', '25–34', '35–44', '45–54', '55–64', '65+'];
 
 function Field({ label, description, required, children }: {
   label: string;
@@ -34,16 +38,26 @@ export default function ParticipantInfoPage() {
   const navigate = useNavigate();
   const { setParticipant } = useStudy();
 
+  const [region,           setRegion]           = useState('');
+  const [gender,           setGender]           = useState<Gender | ''>('');
+  const [age,              setAge]              = useState('');
   const [skillLevel,       setSkillLevel]       = useState<SkillLevel | ''>('');
   const [yearsExperience,  setYearsExperience]  = useState('');
   const [role,             setRole]             = useState<Role | ''>('');
+  const [university,       setUniversity]       = useState('');
   const [reviewFrequency,  setReviewFrequency]  = useState<ReviewFrequency | ''>('');
   const [aiFamiliarity,    setAIFamiliarity]    = useState<AIFamiliarity | ''>('');
 
+  const isStudent = role === 'student';
+
   const isValid =
+    region.trim() !== '' &&
+    gender !== '' &&
+    age !== '' &&
     skillLevel !== '' &&
     yearsExperience !== '' &&
     role !== '' &&
+    (!isStudent || university.trim() !== '') &&
     reviewFrequency !== '' &&
     aiFamiliarity !== '';
 
@@ -52,9 +66,13 @@ export default function ParticipantInfoPage() {
     if (!isValid) return;
     const profile: ParticipantProfile = {
       id:                 generateId(),
+      region:             region.trim(),
+      gender:             gender as Gender,
+      age,
       skillLevel:         skillLevel as SkillLevel,
       yearsExperience,
       role:               role as Role,
+      university:         isStudent ? university.trim() : '',
       reviewFrequency:    reviewFrequency as ReviewFrequency,
       aiFamiliarity:      aiFamiliarity as AIFamiliarity,
     };
@@ -76,6 +94,35 @@ export default function ParticipantInfoPage() {
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm px-6 sm:px-8 py-8">
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
+
+            <Field label="Region" description="Search for your city." required>
+              <CityAutocomplete
+                value={region}
+                onChange={setRegion}
+                placeholder="e.g. Fort Collins"
+              />
+            </Field>
+
+            <Field label="Gender" required>
+              <OptionPicker<Gender>
+                value={gender}
+                onChange={setGender}
+                options={[
+                  { value: 'woman',              label: 'Woman' },
+                  { value: 'man',                label: 'Man' },
+                  { value: 'non_binary',         label: 'Non-binary' },
+                  { value: 'prefer_not_to_say',  label: 'Prefer not to say' },
+                ]}
+              />
+            </Field>
+
+            <Field label="Age" required>
+              <OptionPicker<string>
+                value={age}
+                onChange={setAge}
+                options={AGE_BRACKETS.map(a => ({ value: a, label: a }))}
+              />
+            </Field>
 
             <Field label="Overall programming skill level" required>
               <OptionPicker<SkillLevel>
@@ -119,6 +166,16 @@ export default function ParticipantInfoPage() {
                 ]}
               />
             </Field>
+
+            {isStudent && (
+              <Field label="University name" required>
+                <TextInput
+                  value={university}
+                  onChange={setUniversity}
+                  placeholder="e.g. Colorado State University"
+                />
+              </Field>
+            )}
 
             <Field label="How often do you perform code reviews?" required>
               <OptionPicker<ReviewFrequency>

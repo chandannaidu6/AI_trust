@@ -55,6 +55,7 @@ export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 export type Role = 'student' | 'junior' | 'mid' | 'senior' | 'staff' | 'researcher' | 'other';
 export type ReviewFrequency = 'never' | 'rarely' | 'monthly' | 'weekly' | 'daily';
 export type AIFamiliarity = 'never' | 'aware' | 'occasional' | 'regular' | 'heavy';
+export type Gender = 'man' | 'woman' | 'non_binary' | 'prefer_not_to_say';
 
 export interface ParticipantProfile {
   id: string;
@@ -63,6 +64,11 @@ export interface ParticipantProfile {
   role: Role;
   reviewFrequency: ReviewFrequency;
   aiFamiliarity: AIFamiliarity;
+  region: string;               // e.g. "Fort Collins, CO, USA"
+  gender: Gender;
+  age: string;                  // bracket, e.g. "25–34"
+  /** Only collected (and only meaningful) when role === 'student'. */
+  university: string;
 }
 
 // ─── Active review session (single question, in-memory only) ─────────────────

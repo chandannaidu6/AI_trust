@@ -28,9 +28,13 @@ export interface ExportPayload {
   };
   participant: {
     id: string;
+    region: string;
+    gender: string;
+    age: string;
     skillLevel: string;
     yearsExperience: string;
     role: string;
+    university: string;
     reviewFrequency: string;
     aiFamiliarity: string;
   };
@@ -106,9 +110,13 @@ export function buildExportPayload(
     },
     participant: {
       id: participant.id,
+      region: participant.region,
+      gender: participant.gender,
+      age: participant.age,
       skillLevel: participant.skillLevel,
       yearsExperience: participant.yearsExperience,
       role: participant.role,
+      university: participant.university,
       reviewFrequency: participant.reviewFrequency,
       aiFamiliarity: participant.aiFamiliarity,
     },
@@ -203,9 +211,13 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   r['exportedAt']         = p.meta.exportedAt;
   r['studyVersion']       = p.meta.studyVersion;
   // participant
+  r['region']             = p.participant.region;
+  r['gender']             = p.participant.gender;
+  r['age']                = p.participant.age;
   r['skillLevel']         = p.participant.skillLevel;
   r['yearsExperience']    = p.participant.yearsExperience;
   r['role']               = p.participant.role;
+  r['university']         = p.participant.university;
   r['reviewFrequency']    = p.participant.reviewFrequency;
   r['aiFamiliarity']      = p.participant.aiFamiliarity;
   // session
