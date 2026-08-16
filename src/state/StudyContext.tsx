@@ -1,5 +1,5 @@
 import {
-  createContext, useContext, useReducer, useCallback, ReactNode,
+  createContext, useContext, useReducer, useCallback, useEffect, ReactNode,
 } from 'react';
 import {
   AppState, ParticipantProfile, ReviewSession,
@@ -34,6 +34,37 @@ const initial: AppState = {
   lastViewedQuestion: {},
   completedDifficulties: {},
 };
+
+// ─── Persistence ──────────────────────────────────────────────────────────────
+//
+// State lived purely in memory before this, so ANY full page reload mid-study
+// (a stray browser refresh, a dev-server dependency-optimization reload, a
+// tab accidentally restored, etc.) wiped it — including `participant`, which
+// every review page guards on, so a wipe silently bounced the participant
+// back to /participant mid-review. Persisting to sessionStorage means a
+// reload resumes exactly where they left off; it's still cleared when the
+// tab actually closes, so it doesn't linger like localStorage would.
+
+const STORAGE_KEY = 'ai-trust-study-state';
+
+/** JSON round-tripping turns Date fields into strings — revive them. */
+function reviveDates(state: AppState): AppState {
+  if (state.review) state.review.startedAt = new Date(state.review.startedAt);
+  for (const session of Object.values(state.reviewsByQuestion)) {
+    session.startedAt = new Date(session.startedAt);
+  }
+  return state;
+}
+
+function loadPersistedState(fallback: AppState): AppState {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return fallback;
+    return reviveDates(JSON.parse(raw) as AppState);
+  } catch {
+    return fallback;
+  }
+}
 
 /** Write the (possibly updated) active review session back into the per-question store. */
 function withReview(state: AppState, review: ReviewSession): AppState {
@@ -210,7 +241,16 @@ interface StudyContextValue {
 const StudyContext = createContext<StudyContextValue | null>(null);
 
 export function StudyProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initial);
+  const [state, dispatch] = useReducer(reducer, initial, loadPersistedState);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // sessionStorage can be unavailable (private-browsing quota, etc.) —
+      // the study still works, it just won't survive an accidental reload.
+    }
+  }, [state]);
 
   const setParticipant  = useCallback((p: ParticipantProfile) => dispatch({ type: 'SET_PARTICIPANT', payload: p }), []);
   const setCategory     = useCallback((c: string)             => dispatch({ type: 'SET_CATEGORY',   payload: c }), []);

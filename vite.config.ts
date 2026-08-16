@@ -7,6 +7,16 @@ export default defineConfig({
   worker: {
     format: 'es',
   },
+  optimizeDeps: {
+    // react-syntax-highlighter is only reached via a lazy import() in
+    // CodeViewer, so Vite's dev-server dependency scanner doesn't see it on
+    // startup. Without pre-bundling it up front, the first time a participant
+    // opens a question's code panel triggers an on-demand optimize pass that
+    // forces a full page reload — wiping the in-memory study state (see
+    // StudyContext) and bouncing them back to /participant. Listing it here
+    // makes sure it's pre-bundled at startup instead.
+    include: ['react-syntax-highlighter'],
+  },
   build: {
     rollupOptions: {
       output: {

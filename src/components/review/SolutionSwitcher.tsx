@@ -67,6 +67,7 @@ export function SolutionSwitcher({ activeSlot, onSelect, done }: SolutionSwitche
           return (
             <button
               key={slot}
+              type="button"
               ref={el => { btnRefs.current[idx] = el; }}
               role="tab"
               aria-selected={isActive}

@@ -78,7 +78,7 @@ cp dataset/study-dataset.json study-app/public/data/study-dataset.json
 Each completed session can be downloaded as:
 
 - **JSON** — full structured export (nested, all fields)
-- **CSV** — single flat row per participant (43 columns, suitable for spreadsheets)
+- **CSV** — single flat row per participant (50 columns, suitable for spreadsheets)
 
 Both formats include: session ID, participant background, category, question, language, solution order shown, per-slot ratings, best choice, ranking, and free-text explanation.
 

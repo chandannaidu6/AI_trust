@@ -27,6 +27,7 @@ export function ProblemStatement({ question, language }: ProblemStatementProps) 
         )}
 
         <button
+          type="button"
           onClick={() => setCollapsed(c => !c)}
           aria-expanded={!collapsed}
           aria-controls="problem-body"

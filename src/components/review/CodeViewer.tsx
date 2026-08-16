@@ -55,6 +55,7 @@ export function CodeViewer({ code, language, slot }: CodeViewerProps) {
 
           {/* Expand / collapse */}
           <button
+            type="button"
             onClick={() => setExpanded(x => !x)}
             className="text-xs text-slate-500 hover:text-slate-200 transition-colors flex items-center gap-1"
             aria-label={expanded ? 'Collapse code' : 'Expand code'}
@@ -73,6 +74,7 @@ export function CodeViewer({ code, language, slot }: CodeViewerProps) {
 
           {/* Copy */}
           <button
+            type="button"
             onClick={handleCopy}
             className="text-xs text-slate-500 hover:text-slate-200 transition-colors flex items-center gap-1.5"
             aria-label={copied ? 'Copied to clipboard' : 'Copy code to clipboard'}
