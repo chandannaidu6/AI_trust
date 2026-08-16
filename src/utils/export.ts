@@ -15,6 +15,7 @@ export interface SlotExport {
   averageScore: number;              // mean of the six 1–10 dimensions, hiddenComplexity inverted
   acceptDecision: string;            // "approve" | "approve_minor" | "needs_major" | "reject"
   briefExplanation: string;
+  confusionNotes: string;
   comprehensionSelectedIndex: number | null;
   comprehensionCorrect: boolean | null;
   comprehensionElapsedMs: number | null;
@@ -89,6 +90,7 @@ export function buildExportPayload(
         averageScore: parseFloat(avgRating(r).toFixed(2)),
         acceptDecision: r.acceptDecision ?? '',
         briefExplanation: r.briefExplanation,
+        confusionNotes: r.confusionNotes,
         comprehensionSelectedIndex: comp?.selectedIndex ?? null,
         comprehensionCorrect: comp?.correct ?? null,
         comprehensionElapsedMs: comp?.elapsedMs ?? null,
@@ -241,6 +243,7 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
     r[`slot${slot}_averageScore`]             = s?.averageScore ?? '';
     r[`slot${slot}_acceptDecision`]           = s?.acceptDecision ?? '';
     r[`slot${slot}_briefExplanation`]         = s?.briefExplanation ?? '';
+    r[`slot${slot}_confusionNotes`]           = s?.confusionNotes ?? '';
     r[`slot${slot}_comprehensionSelectedIndex`] = s?.comprehensionSelectedIndex ?? '';
     r[`slot${slot}_comprehensionCorrect`]       = s?.comprehensionCorrect ?? '';
     r[`slot${slot}_comprehensionElapsedMs`]     = s?.comprehensionElapsedMs ?? '';

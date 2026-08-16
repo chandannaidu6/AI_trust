@@ -13,7 +13,7 @@ export interface UISlot {
   code: string;
 }
 
-// ─── Per-slot review rating (8 questions) ────────────────────────────────────
+// ─── Per-slot review rating (9 questions) ────────────────────────────────────
 
 export type AcceptDecision = 'approve' | 'approve_minor' | 'needs_major' | 'reject';
 
@@ -26,6 +26,8 @@ export interface SlotRating {
   hiddenComplexity: number;          // 1–10 (higher = worse; inverted when averaged into a score)
   acceptDecision: AcceptDecision | null;
   briefExplanation: string;
+  /** Optional — anything about the code the reviewer didn't understand. */
+  confusionNotes: string;
 }
 
 // ─── Per-slot objective comprehension check ──────────────────────────────────

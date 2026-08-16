@@ -16,31 +16,32 @@ const ACCEPT_OPTIONS: {
 }[] = [
   {
     value: 'approve',
-    label: 'Approve',
+    label: 'Yes',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-green-400 hover:text-green-700',
     activeCls:   'border-green-500 bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 ring-2 ring-green-200 dark:ring-green-800 ring-offset-1',
   },
   {
     value: 'approve_minor',
-    label: 'Approve with minor changes',
+    label: 'Yes, after minor changes',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-lime-400 hover:text-lime-700',
     activeCls:   'border-lime-500 bg-lime-50 dark:bg-lime-950 text-lime-700 dark:text-lime-300 ring-2 ring-lime-200 dark:ring-lime-800 ring-offset-1',
   },
   {
     value: 'needs_major',
-    label: 'Needs major changes',
+    label: 'Yes, after major changes',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-700',
     activeCls:   'border-amber-500 bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 ring-2 ring-amber-200 dark:ring-amber-800 ring-offset-1',
   },
   {
     value: 'reject',
-    label: 'Reject',
+    label: 'No',
     inactiveCls: 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-red-400 hover:text-red-700',
     activeCls:   'border-red-500 bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 ring-2 ring-red-200 dark:ring-red-800 ring-offset-1',
   },
 ];
 
 const MIN_EXPLANATION_LENGTH = 25;
+const MIN_CONFUSION_LENGTH = 15;
 
 const DEFAULT: SlotRating = {
   readability:               0,
@@ -51,6 +52,7 @@ const DEFAULT: SlotRating = {
   hiddenComplexity:          0,
   acceptDecision:            null,
   briefExplanation:          '',
+  confusionNotes:            '',
 };
 
 interface ReviewFormProps {
@@ -83,7 +85,13 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
 
   const explanationLength = form.briefExplanation.trim().length;
   const explanationValid = explanationLength >= MIN_EXPLANATION_LENGTH;
-  const valid = numericComplete && form.acceptDecision !== null && explanationValid;
+
+  // Optional field — blank is fine, but a non-empty answer has to be a real
+  // one, not just "no" or "n/a".
+  const confusionLength = form.confusionNotes.trim().length;
+  const confusionValid = confusionLength === 0 || confusionLength >= MIN_CONFUSION_LENGTH;
+
+  const valid = numericComplete && form.acceptDecision !== null && explanationValid && confusionValid;
 
   const set = <K extends keyof SlotRating>(key: K, val: SlotRating[K]) => {
     const next = { ...form, [key]: val };
@@ -177,7 +185,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
         {/* Q8: Accept decision */}
         <div className="space-y-2">
           <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-            Would you accept this code?{' '}
+            Do you consider this code to be of high quality?{' '}
             <span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </span>
           <div className="flex gap-2 flex-wrap" role="radiogroup" aria-label="Accept decision">
@@ -228,6 +236,37 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
           </p>
         </div>
 
+        {/* Q10: Confusion notes (optional) */}
+        <div className="space-y-1.5">
+          <label
+            htmlFor={`confusion-${slot}`}
+            className="text-sm font-semibold text-slate-800 dark:text-slate-200"
+          >
+            Is there anything you didn't understand in the code?
+          </label>
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            Optional — leave blank if nothing was unclear. If you do answer, give a real example
+            (at least {MIN_CONFUSION_LENGTH} characters), not just "no" or "n/a".
+          </p>
+          <textarea
+            id={`confusion-${slot}`}
+            value={form.confusionNotes}
+            onChange={e => set('confusionNotes', e.target.value)}
+            placeholder="e.g. wasn't sure what the second branch was guarding against…"
+            rows={2}
+            className="w-full text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2.5
+                       text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800
+                       placeholder:text-slate-300 dark:placeholder:text-slate-500
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                       resize-none"
+          />
+          {confusionLength > 0 && (
+            <p className={`text-xs text-right ${confusionValid ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
+              {confusionLength} / {MIN_CONFUSION_LENGTH} characters minimum
+            </p>
+          )}
+        </div>
+
         {/* Submit */}
         <div className="flex flex-wrap items-center gap-3 pt-1">
           <Button type="submit" disabled={!valid}>
@@ -241,6 +280,8 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
                 (explanationLength === 0
                   ? 'Add a brief explanation.'
                   : `Add ${MIN_EXPLANATION_LENGTH - explanationLength} more character${MIN_EXPLANATION_LENGTH - explanationLength === 1 ? '' : 's'} to your explanation.`)}
+              {numericComplete && form.acceptDecision && explanationValid && !confusionValid &&
+                `Add ${MIN_CONFUSION_LENGTH - confusionLength} more character${MIN_CONFUSION_LENGTH - confusionLength === 1 ? '' : 's'} to your answer, or clear it to leave blank.`}
             </p>
           )}
         </div>
