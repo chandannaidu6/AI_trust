@@ -17,14 +17,6 @@ export default function CategoryQuestionListPage() {
   const [error,     setError]     = useState('');
   const restoredRef = useRef(false);
 
-  if (!state.participant) return <Navigate to="/participant" replace />;
-
-  // This difficulty was already used up (in this or another category) — it's
-  // no longer available, so send the participant back to the difficulty picker.
-  if (difficulty && state.completedDifficulties[difficulty as Difficulty]) {
-    return <Navigate to={`/categories/${category}`} replace />;
-  }
-
   // Sync category into context
   useEffect(() => {
     if (category && state.selectedCategory !== category) setCategory(category);
@@ -57,6 +49,19 @@ export default function CategoryQuestionListPage() {
     if (category) setLastViewedQuestion(category, q.id);
     navigate(`/review/${category}/${q.id}`);
   };
+
+  // Guards placed after every hook call above, so this component always
+  // calls the same hooks in the same order regardless of participant/
+  // completedDifficulties state — returning early before all hooks run
+  // risks a "rendered fewer hooks than expected" crash (which unmounts the
+  // whole app with no error boundary).
+  if (!state.participant) return <Navigate to="/participant" replace />;
+
+  // This difficulty was already used up (in this or another category) — it's
+  // no longer available, so send the participant back to the difficulty picker.
+  if (difficulty && state.completedDifficulties[difficulty as Difficulty]) {
+    return <Navigate to={`/categories/${category}`} replace />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">

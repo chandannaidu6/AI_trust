@@ -65,8 +65,6 @@ export default function QuestionReviewPage() {
   const [started,      setStarted]      = useState(false);
   const [sheetStatus,  setSheetStatus]  = useState<SheetSubmitStatus>('idle');
 
-  if (!state.participant) return <Navigate to="/participant" replace />;
-
   // Load question data
   useEffect(() => {
     if (!questionId) return;
@@ -162,6 +160,12 @@ export default function QuestionReviewPage() {
   };
 
   const handleFinish = () => navigate('/categories');
+
+  // Placed after every hook call above, so this component always calls the
+  // same hooks in the same order regardless of participant state — returning
+  // early before all hooks run risks a "rendered fewer hooks than expected"
+  // crash (which unmounts the whole app with no error boundary).
+  if (!state.participant) return <Navigate to="/participant" replace />;
 
   if (loading) {
     return (

@@ -33,8 +33,6 @@ export default function CategoryDifficultyPage() {
   const [counts,  setCounts]  = useState<Partial<Record<Difficulty, number>>>({});
   const [loading, setLoading] = useState(true);
 
-  if (!state.participant) return <Navigate to="/participant" replace />;
-
   useEffect(() => {
     if (!category) return;
     setLoading(true);
@@ -51,6 +49,12 @@ export default function CategoryDifficultyPage() {
 
   const allDone = DIFFICULTIES.every(d => state.completedDifficulties[d]);
   const doneCount = DIFFICULTIES.filter(d => state.completedDifficulties[d]).length;
+
+  // Guard placed after every hook call above, so this component always calls
+  // the same hooks in the same order regardless of participant state —
+  // returning early before all hooks run risks a "rendered fewer hooks than
+  // expected" crash (which unmounts the whole app with no error boundary).
+  if (!state.participant) return <Navigate to="/participant" replace />;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
