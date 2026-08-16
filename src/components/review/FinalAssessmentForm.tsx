@@ -152,6 +152,7 @@ export function FinalAssessmentForm({
             </label>
             <p className="text-xs text-slate-400 dark:text-slate-500">
               Speak your answer naturally. Click record and explain your reasoning out loud.
+              Please make sure your browser has been given microphone access before recording.
             </p>
             <VoiceTextArea
               id="final-explanation"
