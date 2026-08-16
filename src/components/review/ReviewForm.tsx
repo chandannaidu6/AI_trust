@@ -245,7 +245,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
             Is there anything you didn't understand in the code?
           </label>
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            Optional — leave blank if nothing was unclear. If you do answer, give a real example
+            Optional, leave blank if nothing was unclear. If you do answer, give a real example
             (at least {MIN_CONFUSION_LENGTH} characters), not just "no" or "n/a".
           </p>
           <textarea
