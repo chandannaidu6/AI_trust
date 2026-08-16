@@ -92,6 +92,11 @@ export interface ReviewSession {
    *  question's timer for that slot starts here and stops when it's answered. */
   comprehensionStartedAt: Partial<Record<SlotLabel, number>>;
   comprehensionAnswers: Partial<Record<SlotLabel, ComprehensionAnswer>>;
+  /** Epoch ms of the last successful Sheets submission for this review's final
+   *  assessment, or null if it's never been sent. Used to avoid writing a
+   *  duplicate row if "Submit"/"Update Assessment" is triggered again with an
+   *  unchanged assessment (e.g. after a reload made the UI look unsaved). */
+  sheetsSubmittedAt: number | null;
 }
 
 // ─── Difficulty gating ─────────────────────────────────────────────────────────

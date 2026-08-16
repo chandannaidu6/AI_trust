@@ -19,6 +19,7 @@ type Action =
   | { type: 'RATE_SLOT'; payload: { slot: SlotLabel; rating: SlotRating } }
   | { type: 'SUBMIT_COMPREHENSION_ANSWER'; payload: { slot: SlotLabel; selectedIndex: number; correct: boolean } }
   | { type: 'SUBMIT_ASSESSMENT'; payload: FinalAssessment }
+  | { type: 'MARK_SHEETS_SUBMITTED' }
   | { type: 'UPDATE_DRAFT_RATING'; payload: { slot: SlotLabel; rating: SlotRating } }
   | { type: 'UPDATE_DRAFT_ASSESSMENT'; payload: DraftAssessment }
   | { type: 'SET_LAST_VIEWED_QUESTION'; payload: { category: string; questionId: string } }
@@ -137,6 +138,7 @@ function reducer(state: AppState, action: Action): AppState {
         draftAssessment: null,
         comprehensionStartedAt: {},
         comprehensionAnswers: {},
+        sheetsSubmittedAt: null,
       };
 
       return withReview(state, session);
@@ -189,6 +191,11 @@ function reducer(state: AppState, action: Action): AppState {
       };
     }
 
+    case 'MARK_SHEETS_SUBMITTED': {
+      if (!state.review) return state;
+      return withReview(state, { ...state.review, sheetsSubmittedAt: Date.now() });
+    }
+
     case 'UPDATE_DRAFT_RATING': {
       if (!state.review) return state;
       return withReview(state, {
@@ -232,6 +239,7 @@ interface StudyContextValue {
   rateSlot: (slot: SlotLabel, rating: SlotRating) => void;
   submitComprehensionAnswer: (slot: SlotLabel, selectedIndex: number, correct: boolean) => void;
   submitAssessment: (a: FinalAssessment) => void;
+  markSheetsSubmitted: () => void;
   updateDraftRating: (slot: SlotLabel, rating: SlotRating) => void;
   updateDraftAssessment: (a: DraftAssessment) => void;
   setLastViewedQuestion: (category: string, questionId: string) => void;
@@ -262,6 +270,7 @@ export function StudyProvider({ children }: { children: ReactNode }) {
   const submitComprehensionAnswer = useCallback((slot: SlotLabel, selectedIndex: number, correct: boolean) =>
     dispatch({ type: 'SUBMIT_COMPREHENSION_ANSWER', payload: { slot, selectedIndex, correct } }), []);
   const submitAssessment = useCallback((a: FinalAssessment)    => dispatch({ type: 'SUBMIT_ASSESSMENT', payload: a }), []);
+  const markSheetsSubmitted = useCallback(()                   => dispatch({ type: 'MARK_SHEETS_SUBMITTED' }), []);
   const updateDraftRating = useCallback((slot: SlotLabel, rating: SlotRating) =>
     dispatch({ type: 'UPDATE_DRAFT_RATING', payload: { slot, rating } }), []);
   const updateDraftAssessment = useCallback((a: DraftAssessment) =>
@@ -274,7 +283,7 @@ export function StudyProvider({ children }: { children: ReactNode }) {
     <StudyContext.Provider value={{
       state, setParticipant, setCategory, startReview, setActiveSlot, rateSlot,
       submitComprehensionAnswer,
-      submitAssessment, updateDraftRating, updateDraftAssessment, setLastViewedQuestion, reset,
+      submitAssessment, markSheetsSubmitted, updateDraftRating, updateDraftAssessment, setLastViewedQuestion, reset,
     }}>
       {children}
     </StudyContext.Provider>

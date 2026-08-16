@@ -56,7 +56,7 @@ export default function QuestionReviewPage() {
   const navigate = useNavigate();
   const {
     state, startReview, setActiveSlot, rateSlot, submitComprehensionAnswer, submitAssessment,
-    updateDraftRating, updateDraftAssessment,
+    markSheetsSubmitted, updateDraftRating, updateDraftAssessment,
   } = useStudy();
 
   const [question,     setQuestion]     = useState<StudyQuestion | null>(null);
@@ -146,12 +146,31 @@ export default function QuestionReviewPage() {
     DIFFICULTIES.every(d => d === question.difficulty || state.completedDifficulties[d]);
 
   const handleAssessment = async (a: FinalAssessment) => {
-    submitAssessment(a);
     if (!state.participant || !review) return;
+
+    // If this exact assessment was already successfully sent (e.g. a reload
+    // made the "Submit" button look unclicked and the participant clicked it
+    // again), skip re-posting so Sheets doesn't get a duplicate row. A
+    // genuinely changed assessment (an intentional "Update Assessment") still
+    // goes through.
+    const unchangedResubmit =
+      review.sheetsSubmittedAt != null &&
+      review.finalAssessment != null &&
+      review.finalAssessment.bestChoice === a.bestChoice &&
+      review.finalAssessment.explanation === a.explanation;
+
+    submitAssessment(a);
+
+    if (unchangedResubmit) {
+      setSheetStatus('success');
+      if (willCompleteStudy) navigate('/complete');
+      return;
+    }
 
     setSheetStatus('submitting');
     const payload = buildExportPayload(state.participant, { ...review, finalAssessment: a });
     const status = payload ? await submitToSheets(payload) : 'unconfigured';
+    if (status === 'success') markSheetsSubmitted();
     setSheetStatus(status);
 
     // The last of the 3 required reviews finishes the whole study automatically —
