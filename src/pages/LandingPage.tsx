@@ -21,7 +21,7 @@ const STEPS = [
       </svg>
     ),
     title: 'Pick a Question',
-    desc: 'Choose a problem category and question to review.',
+    desc: 'Choose a category, then one Easy, one Medium, and one Hard question in total.',
   },
   {
     icon: (
