@@ -1,7 +1,7 @@
 # Code Review Study
 
-A research web app for the **Trust in AI-Generated Code** study.
-Participants perform blind code reviews of 4 unlabeled solutions — without knowing which were written by humans and which by AI.
+A research web app for the **Evaluating AI-Generated Code** study.
+Participants perform blind code reviews of 2 unlabeled solutions per question, without knowing which were written by humans and which by AI.
 
 ---
 

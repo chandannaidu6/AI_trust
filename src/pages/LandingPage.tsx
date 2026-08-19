@@ -67,13 +67,14 @@ export default function LandingPage() {
           {/* Headline */}
           <div className="space-y-3">
             <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-slate-100 leading-tight tracking-tight">
-              Trust in<br />
+              Evaluating<br />
               <span className="text-indigo-600 dark:text-indigo-400">AI-Generated Code</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
               A blind code review experiment. You will evaluate real functions pulled from
-              open-source Python and Java projects, without knowing which solution was written
-              by a human developer and which by AI.
+              open-source Python and Java projects and answer quick comprehension checks along
+              the way, without knowing which solution was written by a human developer and
+              which by AI.
             </p>
           </div>
 
