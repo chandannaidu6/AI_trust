@@ -176,7 +176,7 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
         {/* Q7: Hidden complexity 1–10 */}
         <ScoreButtons
           label="Hidden complexity"
-          description="How much risk is hidden in this code, the kind you wouldn't catch without a close look? (1 = no hidden risk · 10 = a lot of hidden risk)"
+          description="How much complexity is hidden in this code, the kind you wouldn't catch without a close look? (1 = no hidden complexity · 10 = a lot of hidden complexity)"
           value={form.hiddenComplexity}
           onChange={v => set('hiddenComplexity', v)}
           max={10}
