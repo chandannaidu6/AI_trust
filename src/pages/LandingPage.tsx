@@ -21,7 +21,7 @@ const STEPS = [
       </svg>
     ),
     title: 'Pick a Question',
-    desc: 'Choose a category, then one Easy, one Medium, and one Hard question in total.',
+    desc: '3 questions total: one Easy, one Medium, one Hard. Pick any category each time.',
   },
   {
     icon: (
