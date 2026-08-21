@@ -67,8 +67,13 @@ export async function startDeepgramSession(
 
   // Browsers can't set an Authorization header on a WebSocket handshake --
   // Deepgram's documented workaround for browser clients is to pass the
-  // token as a subprotocol instead.
-  const socket = new WebSocket(DEEPGRAM_WS_URL, ['token', token]);
+  // token as a subprotocol instead. The temporary token from /v1/auth/grant
+  // is a JWT, which Deepgram authenticates as "Authorization: Bearer <jwt>"
+  // (unlike a long-lived master API key, which uses "Token <key>") -- so the
+  // subprotocol scheme has to be 'bearer' here, not 'token', or Deepgram
+  // rejects the handshake outright and the browser only ever sees a generic
+  // WebSocket error event with no detail.
+  const socket = new WebSocket(DEEPGRAM_WS_URL, ['bearer', token]);
 
   let finalText = '';
   let interimText = '';
