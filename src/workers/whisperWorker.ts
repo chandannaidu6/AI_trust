@@ -1,7 +1,8 @@
 // Runs entirely in a Web Worker so the (multi-MB, WASM-backed) model never
-// blocks the main thread. Used only as a fallback on browsers without the
-// native Web Speech API (notably iOS Safari/Chrome, which share Apple's
-// WebKit engine and have no built-in speech recognition at all).
+// blocks the main thread. This is the only transcription backend now (see
+// VoiceTextArea) — the browser's native Web Speech API was dropped in favor
+// of this fully local, no-cost, no-third-party-data-sharing model for every
+// participant, not just as an iOS fallback.
 import { pipeline, env } from '@xenova/transformers';
 
 // Always fetch from the Hugging Face hub CDN (and let the browser cache it),
@@ -29,7 +30,7 @@ let pipelinePromise: Promise<any> | null = null;
 
 function getPipeline() {
   if (!pipelinePromise) {
-    pipelinePromise = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+    pipelinePromise = pipeline('automatic-speech-recognition', 'Xenova/whisper-base.en', {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       progress_callback: (data: any) => ctx.postMessage({ type: 'progress', ...data }),
     });
