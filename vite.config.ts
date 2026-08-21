@@ -8,14 +8,16 @@ export default defineConfig({
     format: 'es',
   },
   optimizeDeps: {
-    // react-syntax-highlighter is only reached via a lazy import() in
-    // CodeViewer, so Vite's dev-server dependency scanner doesn't see it on
-    // startup. Without pre-bundling it up front, the first time a participant
-    // opens a question's code panel triggers an on-demand optimize pass that
-    // forces a full page reload — wiping the in-memory study state (see
-    // StudyContext) and bouncing them back to /participant. Listing it here
-    // makes sure it's pre-bundled at startup instead.
-    include: ['react-syntax-highlighter'],
+    // Both of these are only ever reached via a dynamic import (a lazy
+    // import() for react-syntax-highlighter in CodeViewer, a `new
+    // Worker(new URL(...))` for @huggingface/transformers in speechWorker),
+    // so Vite's dev-server dependency scanner doesn't see either on startup.
+    // Without pre-bundling them up front, the first time one is actually
+    // used triggers an on-demand optimize pass that forces a full page
+    // reload — wiping the in-memory study state (see StudyContext) and
+    // bouncing the participant back to /participant. Listing them here
+    // makes sure they're pre-bundled at startup instead.
+    include: ['react-syntax-highlighter', '@huggingface/transformers'],
   },
   build: {
     rollupOptions: {

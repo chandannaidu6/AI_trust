@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { blobToWhisperPCM } from '../../utils/audio';
+import { blobToPCM } from '../../utils/audio';
+import { transcribePCM, isSpeechModelReady } from '../../utils/speechClient';
 
 interface VoiceTextAreaProps {
   id: string;
@@ -18,6 +19,15 @@ type EngineState =
   | 'unsupported'
   | 'error';
 
+// Re-transcribe the audio captured so far this often while still recording,
+// so a rough draft appears as the participant talks instead of only after
+// they stop. This is a *preview* only — see finalizeRecording, which always
+// re-transcribes the complete, final audio once recording stops, so preview
+// quality/timing has no bearing on the answer that actually gets saved.
+// Moonshine-tiny is small/fast enough to run this often; untested on real
+// devices though, so if it visibly lags recording, raise this first.
+const PREVIEW_INTERVAL_MS = 1500;
+
 function isSupported(): boolean {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const w = window as any;
@@ -34,91 +44,91 @@ function logVoiceError(context: string, detail: unknown) {
  * the only way to fill it in is by recording, so participants can't just
  * type a canned answer instead of speaking one.
  *
- * Transcription runs entirely client-side via a Whisper model in a Web
- * Worker (WebAssembly, free, no server, no per-request cost, no audio ever
- * leaves the browser). This used to be a fallback for browsers without the
- * Web Speech API (notably iOS Safari/Chrome, which share Apple's WebKit
- * engine and have no built-in recognition at all); it's now used for every
- * participant. The browser's native engine was faster and typically more
- * accurate on clear audio, but its mic sensitivity is opaque and
- * browser/OS-controlled — quiet speech was getting silently dropped with no
- * way to compensate. Recording locally means the audio can be gain-boosted
- * before transcription (see utils/audio.ts) instead of just hoping the
- * browser's own threshold picks it up.
+ * Transcription runs entirely client-side via a Moonshine model in a shared
+ * Web Worker (see utils/speechClient — one worker/model instance for the
+ * whole page, preloaded from main.tsx so it's normally already warm by the
+ * time this is used). While recording, the audio captured so far is
+ * periodically re-transcribed to show a live-updating draft; the final
+ * answer always comes from one authoritative transcription of the complete
+ * recording once the participant stops, so a slow or missed preview cycle
+ * never affects what actually gets saved.
  */
 export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: VoiceTextAreaProps) {
   const supportedRef = useRef(false);
   const [state, setState] = useState<EngineState>('idle');
   const [modelProgress, setModelProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [liveDraft, setLiveDraft] = useState('');
 
-  const workerRef = useRef<Worker | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const previewInFlightRef = useRef(false);
+  // Bumped on every clear/new recording so a slow preview or final
+  // transcription from a since-abandoned recording can detect it's stale and
+  // skip applying its result — otherwise clicking "Clear & re-record" mid-
+  // recording (stopping it, which still triggers its own async finalize)
+  // could have that finalize resolve after the clear and silently overwrite it.
+  const generationRef = useRef(0);
 
   useEffect(() => {
     supportedRef.current = isSupported();
     console.info('[VoiceTextArea] supported:', supportedRef.current);
     if (!supportedRef.current) setState('unsupported');
     return () => {
+      stopPreviewTimer();
       mediaRecorderRef.current?.stop();
       streamRef.current?.getTracks().forEach(t => t.stop());
-      workerRef.current?.terminate();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Whisper (WebAssembly, in a Worker) ─────────────────────────────────────
-
-  const getWorker = () => {
-    if (!workerRef.current) {
-      let worker: Worker;
-      try {
-        worker = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
-      } catch (err) {
-        logVoiceError('new Worker(whisperWorker) construction threw', err);
-        throw err;
-      }
-      // Covers failures the worker itself can't catch and postMessage back
-      // (e.g. the module failing to load/evaluate at all).
-      worker.addEventListener('error', (event: ErrorEvent) => {
-        logVoiceError('whisper worker crashed', event);
-        setErrorMessage(event.message || 'The speech model failed to load.');
-        setState('error');
-      });
-      workerRef.current = worker;
+  const stopPreviewTimer = () => {
+    if (previewTimerRef.current !== null) {
+      clearInterval(previewTimerRef.current);
+      previewTimerRef.current = null;
     }
-    return workerRef.current;
   };
 
-  const transcribeRecording = async () => {
+  const prefixFor = (base: string) => (base ? base.trim() + ' ' : '');
+
+  const runPreview = async () => {
+    if (previewInFlightRef.current || chunksRef.current.length === 0) return;
+    previewInFlightRef.current = true;
+    const myGeneration = generationRef.current;
+    try {
+      const blob = new Blob([...chunksRef.current], { type: mediaRecorderRef.current?.mimeType });
+      const pcm = await blobToPCM(blob);
+      const text = await transcribePCM(pcm);
+      if (myGeneration !== generationRef.current) return;
+      setLiveDraft(prefixFor(value) + text);
+    } catch (err) {
+      // A failed preview cycle just means the draft doesn't update this
+      // round — recording continues either way, and the final transcription
+      // on stop is unaffected.
+      logVoiceError('preview transcription cycle failed (non-fatal)', err);
+    } finally {
+      previewInFlightRef.current = false;
+    }
+  };
+
+  const finalizeRecording = async () => {
+    const myGeneration = generationRef.current;
     try {
       const blob = new Blob(chunksRef.current, { type: mediaRecorderRef.current?.mimeType });
-      const worker = getWorker();
-      const pcm = await blobToWhisperPCM(blob);
-      const prefix = value ? value.trim() + ' ' : '';
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const handleMessage = (event: MessageEvent<any>) => {
-        const msg = event.data;
-        if (msg.type === 'progress' && typeof msg.progress === 'number') {
-          setState('loading-model');
-          setModelProgress(msg.progress);
-        } else if (msg.type === 'result') {
-          onChange((prefix + msg.text).trim());
-          setState('idle');
-          worker.removeEventListener('message', handleMessage);
-        } else if (msg.type === 'error') {
-          logVoiceError('whisper transcription failed', msg.message);
-          setErrorMessage(msg.message || 'Transcription failed.');
-          setState('error');
-          worker.removeEventListener('message', handleMessage);
-        }
-      };
-      worker.addEventListener('message', handleMessage);
-      worker.postMessage({ type: 'transcribe', audio: pcm }, [pcm.buffer]);
+      const pcm = await blobToPCM(blob);
+      const text = await transcribePCM(pcm, progress => {
+        if (myGeneration !== generationRef.current) return;
+        setState('loading-model');
+        setModelProgress(progress);
+      });
+      if (myGeneration !== generationRef.current) return;
+      onChange((prefixFor(value) + text).trim());
+      setState('idle');
     } catch (err) {
-      logVoiceError('recording could not be decoded/sent for transcription', err);
+      if (myGeneration !== generationRef.current) return;
+      logVoiceError('final transcription failed', err);
       setErrorMessage(err instanceof Error ? err.message : 'Could not process the recording.');
       setState('error');
     }
@@ -127,7 +137,16 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
   const startRecording = async () => {
     let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Browsers enable noiseSuppression by default, and it's tuned
+      // aggressively enough that it can suppress quiet speech right along
+      // with background noise — a real contributor to dropped words, not
+      // just the model. autoGainControl is kept on (it actively boosts a
+      // quiet input signal, which is what we want) and so is
+      // echoCancellation (harmless here, and worth keeping for anyone using
+      // speakers instead of headphones).
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { noiseSuppression: false, autoGainControl: true, echoCancellation: true },
+      });
     } catch (err) {
       logVoiceError('getUserMedia failed', err);
       const name = err instanceof Error ? err.name : '';
@@ -161,13 +180,19 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       return;
     }
 
+    generationRef.current++;
     chunksRef.current = [];
+    setLiveDraft(value);
     recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-    recorder.onstop = () => { transcribeRecording(); };
+    recorder.onstop = () => { finalizeRecording(); };
     mediaRecorderRef.current = recorder;
     try {
-      recorder.start();
+      // A timeslice makes ondataavailable fire periodically instead of only
+      // once at the end, so there's audio to preview-transcribe while still
+      // recording.
+      recorder.start(1000);
       setState('recording');
+      previewTimerRef.current = setInterval(runPreview, PREVIEW_INTERVAL_MS);
     } catch (err) {
       logVoiceError('MediaRecorder.start() threw', err);
       stream.getTracks().forEach(t => t.stop());
@@ -177,16 +202,19 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
   };
 
   const stopRecording = () => {
+    stopPreviewTimer();
     try {
       mediaRecorderRef.current?.stop();
     } catch (err) {
       logVoiceError('MediaRecorder.stop() threw', err);
     }
     streamRef.current?.getTracks().forEach(t => t.stop());
-    setState('transcribing');
+    setState(isSpeechModelReady() ? 'transcribing' : 'loading-model');
   };
 
   const clearText = () => {
+    generationRef.current++;
+    stopPreviewTimer();
     try {
       mediaRecorderRef.current?.stop();
     } catch (err) {
@@ -194,10 +222,12 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     }
     streamRef.current?.getTracks().forEach(t => t.stop());
     onChange('');
+    setLiveDraft('');
     setState('idle');
   };
 
   const busy = state === 'transcribing' || state === 'loading-model';
+  const displayedValue = state === 'recording' ? liveDraft : value;
 
   return (
     <div className="space-y-2">
@@ -276,7 +306,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       </div>
       <textarea
         id={id}
-        value={value}
+        value={displayedValue}
         readOnly
         placeholder={placeholder}
         rows={rows}
@@ -286,6 +316,12 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
                    placeholder:text-slate-300 dark:placeholder:text-slate-500
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none cursor-default"
       />
+      {state === 'recording' && (
+        <p className="text-xs text-slate-400 dark:text-slate-500">
+          Draft updates every few seconds while you talk — the final answer is re-transcribed once
+          you stop, so it may differ slightly from what's shown above.
+        </p>
+      )}
     </div>
   );
 }

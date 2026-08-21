@@ -1,8 +1,8 @@
-const WHISPER_SAMPLE_RATE = 16000;
+const ASR_SAMPLE_RATE = 16000;
 
 /**
- * Decode a recorded audio Blob, resample it to 16kHz mono (the format Whisper
- * expects), and boost quiet speech on the way through.
+ * Decode a recorded audio Blob, resample it to 16kHz mono (the format both
+ * Moonshine and Whisper expect), and boost quiet speech on the way through.
  *
  * Participants who speak quietly were getting dropped words because the
  * recording was too soft for the model to pick up. A DynamicsCompressorNode
@@ -10,7 +10,7 @@ const WHISPER_SAMPLE_RATE = 16000;
  * multiplier, which would just as happily clip/distort anyone already
  * speaking at a normal volume), followed by a modest makeup gain.
  */
-export async function blobToWhisperPCM(blob: Blob): Promise<Float32Array> {
+export async function blobToPCM(blob: Blob): Promise<Float32Array> {
   const arrayBuffer = await blob.arrayBuffer();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const AudioContextCtor = window.AudioContext || (window as any).webkitAudioContext;
@@ -25,8 +25,8 @@ export async function blobToWhisperPCM(blob: Blob): Promise<Float32Array> {
 
   const offlineCtx = new OfflineAudioContext(
     1,
-    Math.ceil(audioBuffer.duration * WHISPER_SAMPLE_RATE),
-    WHISPER_SAMPLE_RATE,
+    Math.ceil(audioBuffer.duration * ASR_SAMPLE_RATE),
+    ASR_SAMPLE_RATE,
   );
   const source = offlineCtx.createBufferSource();
   source.buffer = audioBuffer;
