@@ -10,14 +10,14 @@ export default defineConfig({
   optimizeDeps: {
     // Both of these are only ever reached via a dynamic import (a lazy
     // import() for react-syntax-highlighter in CodeViewer, a `new
-    // Worker(new URL(...))` for @huggingface/transformers in speechWorker),
-    // so Vite's dev-server dependency scanner doesn't see either on startup.
+    // Worker(new URL(...))` for @xenova/transformers in whisperWorker), so
+    // Vite's dev-server dependency scanner doesn't see either on startup.
     // Without pre-bundling them up front, the first time one is actually
     // used triggers an on-demand optimize pass that forces a full page
     // reload — wiping the in-memory study state (see StudyContext) and
     // bouncing the participant back to /participant. Listing them here
     // makes sure they're pre-bundled at startup instead.
-    include: ['react-syntax-highlighter', '@huggingface/transformers'],
+    include: ['react-syntax-highlighter', '@xenova/transformers'],
   },
   build: {
     rollupOptions: {

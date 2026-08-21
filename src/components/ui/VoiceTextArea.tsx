@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { blobToPCM } from '../../utils/audio';
-import { transcribePCM, isSpeechModelReady } from '../../utils/speechClient';
+import { blobToWhisperPCM } from '../../utils/audio';
 
 interface VoiceTextAreaProps {
   id: string;
@@ -19,19 +18,14 @@ type EngineState =
   | 'unsupported'
   | 'error';
 
-// Re-transcribe the audio captured so far this often while still recording,
-// so a rough draft appears as the participant talks instead of only after
-// they stop. This is a *preview* only — see finalizeRecording, which always
-// re-transcribes the complete, final audio once recording stops, so preview
-// quality/timing has no bearing on the answer that actually gets saved.
-// Moonshine-tiny is small/fast enough to run this often; untested on real
-// devices though, so if it visibly lags recording, raise this first.
-const PREVIEW_INTERVAL_MS = 1500;
+type Mode = 'native' | 'whisper' | 'unsupported';
 
-function isSupported(): boolean {
+function detectMode(): Mode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const w = window as any;
-  return !!(navigator.mediaDevices && w.MediaRecorder);
+  if (w.SpeechRecognition || w.webkitSpeechRecognition) return 'native';
+  if (navigator.mediaDevices && w.MediaRecorder) return 'whisper';
+  return 'unsupported';
 }
 
 // Tagged so it's easy to filter in DevTools (console filter: "[VoiceTextArea]").
@@ -40,113 +34,256 @@ function logVoiceError(context: string, detail: unknown) {
 }
 
 /**
- * Free, browser-native-recording speech-to-text. The textarea is read-only —
- * the only way to fill it in is by recording, so participants can't just
- * type a canned answer instead of speaking one.
+ * Free, browser-native speech-to-text. The textarea is read-only — the only
+ * way to fill it in is by recording, so participants can't just type a
+ * canned answer instead of speaking one.
  *
- * Transcription runs entirely client-side via a Moonshine model in a shared
- * Web Worker (see utils/speechClient — one worker/model instance for the
- * whole page, preloaded from main.tsx so it's normally already warm by the
- * time this is used). While recording, the audio captured so far is
- * periodically re-transcribed to show a live-updating draft; the final
- * answer always comes from one authoritative transcription of the complete
- * recording once the participant stops, so a slow or missed preview cycle
- * never affects what actually gets saved.
+ * Two backends, picked automatically per device:
+ *  - "native": the Web Speech API (instant, streaming, no download) —
+ *    available on desktop Chrome/Edge and Android Chrome. Mobile browsers
+ *    silently end `continuous` recognition after a short pause, so we detect
+ *    unintentional stops and transparently restart to keep listening.
+ *  - "whisper": a Whisper speech-to-text model run fully client-side via
+ *    WebAssembly in a Web Worker (free, no server, no per-request cost) —
+ *    used wherever the Web Speech API isn't available, notably iOS
+ *    Safari/Chrome (both share Apple's WebKit engine, which has no built-in
+ *    speech recognition). The model downloads once (~40MB) and is cached by
+ *    the browser after that.
  */
 export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: VoiceTextAreaProps) {
-  const supportedRef = useRef(false);
+  const modeRef = useRef<Mode>('unsupported');
   const [state, setState] = useState<EngineState>('idle');
   const [modelProgress, setModelProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
-  const [liveDraft, setLiveDraft] = useState('');
 
+  // Native Web Speech API refs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const baseTextRef = useRef('');
+  const intentionalStopRef = useRef(false);
+
+  // Whisper fallback refs
+  const workerRef = useRef<Worker | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
-  const previewTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const previewInFlightRef = useRef(false);
-  // Bumped on every clear/new recording so a slow preview or final
-  // transcription from a since-abandoned recording can detect it's stale and
-  // skip applying its result — otherwise clicking "Clear & re-record" mid-
-  // recording (stopping it, which still triggers its own async finalize)
-  // could have that finalize resolve after the clear and silently overwrite it.
-  const generationRef = useRef(0);
 
   useEffect(() => {
-    supportedRef.current = isSupported();
-    console.info('[VoiceTextArea] supported:', supportedRef.current);
-    if (!supportedRef.current) setState('unsupported');
+    modeRef.current = detectMode();
+    console.info('[VoiceTextArea] detected mode:', modeRef.current);
+    if (modeRef.current === 'unsupported') setState('unsupported');
     return () => {
-      stopPreviewTimer();
+      intentionalStopRef.current = true;
+      recognitionRef.current?.stop();
       mediaRecorderRef.current?.stop();
       streamRef.current?.getTracks().forEach(t => t.stop());
+      workerRef.current?.terminate();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const stopPreviewTimer = () => {
-    if (previewTimerRef.current !== null) {
-      clearInterval(previewTimerRef.current);
-      previewTimerRef.current = null;
-    }
-  };
+  // ── Native Web Speech API path ────────────────────────────────────────────
 
-  const prefixFor = (base: string) => (base ? base.trim() + ' ' : '');
+  const getSpeechRecognitionCtor = () =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
-  const runPreview = async () => {
-    if (previewInFlightRef.current || chunksRef.current.length === 0) return;
-    previewInFlightRef.current = true;
-    const myGeneration = generationRef.current;
+  const createRecognition = () => {
+    const SpeechRecognition = getSpeechRecognitionCtor();
+    if (!SpeechRecognition) return null;
+
+    let recognition;
     try {
-      const blob = new Blob([...chunksRef.current], { type: mediaRecorderRef.current?.mimeType });
-      const pcm = await blobToPCM(blob);
-      const text = await transcribePCM(pcm);
-      if (myGeneration !== generationRef.current) return;
-      setLiveDraft(prefixFor(value) + text);
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
     } catch (err) {
-      // A failed preview cycle just means the draft doesn't update this
-      // round — recording continues either way, and the final transcription
-      // on stop is unaffected.
-      logVoiceError('preview transcription cycle failed (non-fatal)', err);
-    } finally {
-      previewInFlightRef.current = false;
+      logVoiceError('new SpeechRecognition() construction/setup threw', err);
+      return null;
+    }
+
+    // Text finalized so far *within the current start/stop cycle*. Rebuilt
+    // from scratch on every event rather than appended incrementally: Android
+    // Chrome's `resultIndex` is unreliable and can replay already-finalized
+    // results, which previously caused the same sentence to be transcribed
+    // multiple times. Recomputing the full finalized text each time is
+    // idempotent regardless of what Android replays.
+    let sessionFinal = '';
+    let sessionStartedAt = Date.now();
+    // Consecutive sessions that ended almost instantly — a sign the browser
+    // is failing to start recognition at all (seen on some Mac browsers),
+    // not just a normal mobile pause cutoff. Left unchecked, "restart
+    // transparently" turns into a rapid on/off loop that never records
+    // anything (the mic indicator flickers) with no visible feedback.
+    let quickFailStreak = 0;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
+      // The browser doesn't stop instantly when .stop() is called — it can
+      // still fire one more result afterward. Ignore it once the user has
+      // intentionally stopped, or a late result can land after (and undo)
+      // a submission made right after clicking "Stop recording".
+      if (intentionalStopRef.current) return;
+      quickFailStreak = 0;
+      try {
+        let finalText = '';
+        let interimText = '';
+        for (let i = 0; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) finalText += transcript + ' ';
+          else interimText += transcript;
+        }
+        sessionFinal = finalText;
+        onChange((baseTextRef.current + sessionFinal + interimText).trim());
+      } catch (err) {
+        logVoiceError('native recognition.onresult parsing threw', err);
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
+      logVoiceError('native recognition.onerror', event.error);
+      if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+        intentionalStopRef.current = true;
+        setState('denied');
+      } else if (event.error === 'audio-capture') {
+        // No working microphone is available (e.g. the system's selected
+        // input device is disconnected) — restarting can't fix this, so
+        // don't loop forever silently retrying.
+        intentionalStopRef.current = true;
+        setErrorMessage('No working microphone was found. Check your system\'s audio input device and try again.');
+        setState('error');
+      }
+      // Other errors (e.g. "no-speech", "network") are recovered by the
+      // auto-restart in onend below, so they're not treated as fatal here.
+    };
+
+    recognition.onend = () => {
+      // Commit this cycle's finalized text before restarting (or stopping),
+      // so the next start/stop cycle begins clean and nothing is duplicated.
+      baseTextRef.current += sessionFinal;
+      sessionFinal = '';
+
+      if (intentionalStopRef.current) {
+        setState('idle');
+        return;
+      }
+
+      const sessionDurationMs = Date.now() - sessionStartedAt;
+      quickFailStreak = sessionDurationMs < 300 ? quickFailStreak + 1 : 0;
+      if (quickFailStreak >= 3) {
+        logVoiceError('native recognition — gave up after repeated instant-end restarts', { sessionDurationMs });
+        intentionalStopRef.current = true;
+        setErrorMessage('Speech recognition isn\'t responding in this browser. Please try Chrome, or check your microphone.');
+        setState('error');
+        return;
+      }
+
+      // Not a user-initiated stop — the browser cut us off (common on
+      // mobile). Restart transparently so recording keeps going.
+      try {
+        sessionStartedAt = Date.now();
+        recognition.start();
+      } catch (err) {
+        logVoiceError('native recognition.start() threw on restart', err);
+        setState('idle');
+      }
+    };
+
+    return recognition;
+  };
+
+  const startNativeRecording = () => {
+    const recognition = createRecognition();
+    if (!recognition) {
+      logVoiceError('createRecognition() returned null despite native mode being detected', null);
+      setState('unsupported');
+      return;
+    }
+
+    intentionalStopRef.current = false;
+    baseTextRef.current = value ? value.trim() + ' ' : '';
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+      setState('recording');
+    } catch (err) {
+      logVoiceError('native recognition.start() threw on initial start', err);
+      setState('error');
+      setErrorMessage(err instanceof Error ? err.message : 'Could not start recording.');
     }
   };
 
-  const finalizeRecording = async () => {
-    const myGeneration = generationRef.current;
+  const stopNativeRecording = () => {
+    intentionalStopRef.current = true;
+    try {
+      recognitionRef.current?.stop();
+    } catch (err) {
+      logVoiceError('native recognition.stop() threw', err);
+    }
+    setState('idle');
+  };
+
+  // ── Whisper (WebAssembly, in a Worker) fallback path ──────────────────────
+
+  const getWorker = () => {
+    if (!workerRef.current) {
+      let worker: Worker;
+      try {
+        worker = new Worker(new URL('../../workers/whisperWorker.ts', import.meta.url), { type: 'module' });
+      } catch (err) {
+        logVoiceError('new Worker(whisperWorker) construction threw', err);
+        throw err;
+      }
+      // Covers failures the worker itself can't catch and postMessage back
+      // (e.g. the module failing to load/evaluate at all).
+      worker.addEventListener('error', (event: ErrorEvent) => {
+        logVoiceError('whisper worker crashed', event);
+        setErrorMessage(event.message || 'The speech model failed to load.');
+        setState('error');
+      });
+      workerRef.current = worker;
+    }
+    return workerRef.current;
+  };
+
+  const transcribeWhisperRecording = async () => {
     try {
       const blob = new Blob(chunksRef.current, { type: mediaRecorderRef.current?.mimeType });
-      const pcm = await blobToPCM(blob);
-      const text = await transcribePCM(pcm, progress => {
-        if (myGeneration !== generationRef.current) return;
-        setState('loading-model');
-        setModelProgress(progress);
-      });
-      if (myGeneration !== generationRef.current) return;
-      onChange((prefixFor(value) + text).trim());
-      setState('idle');
+      const worker = getWorker();
+      const pcm = await blobToWhisperPCM(blob);
+      const prefix = value ? value.trim() + ' ' : '';
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleMessage = (event: MessageEvent<any>) => {
+        const msg = event.data;
+        if (msg.type === 'progress' && typeof msg.progress === 'number') {
+          setState('loading-model');
+          setModelProgress(msg.progress);
+        } else if (msg.type === 'result') {
+          onChange((prefix + msg.text).trim());
+          setState('idle');
+          worker.removeEventListener('message', handleMessage);
+        } else if (msg.type === 'error') {
+          logVoiceError('whisper transcription failed', msg.message);
+          setErrorMessage(msg.message || 'Transcription failed.');
+          setState('error');
+          worker.removeEventListener('message', handleMessage);
+        }
+      };
+      worker.addEventListener('message', handleMessage);
+      worker.postMessage({ type: 'transcribe', audio: pcm }, [pcm.buffer]);
     } catch (err) {
-      if (myGeneration !== generationRef.current) return;
-      logVoiceError('final transcription failed', err);
+      logVoiceError('whisper recording could not be decoded/sent for transcription', err);
       setErrorMessage(err instanceof Error ? err.message : 'Could not process the recording.');
       setState('error');
     }
   };
 
-  const startRecording = async () => {
+  const startWhisperRecording = async () => {
     let stream: MediaStream;
     try {
-      // Browsers enable noiseSuppression by default, and it's tuned
-      // aggressively enough that it can suppress quiet speech right along
-      // with background noise — a real contributor to dropped words, not
-      // just the model. autoGainControl is kept on (it actively boosts a
-      // quiet input signal, which is what we want) and so is
-      // echoCancellation (harmless here, and worth keeping for anyone using
-      // speakers instead of headphones).
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: { noiseSuppression: false, autoGainControl: true, echoCancellation: true },
-      });
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       logVoiceError('getUserMedia failed', err);
       const name = err instanceof Error ? err.name : '';
@@ -180,19 +317,13 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       return;
     }
 
-    generationRef.current++;
     chunksRef.current = [];
-    setLiveDraft(value);
     recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
-    recorder.onstop = () => { finalizeRecording(); };
+    recorder.onstop = () => { transcribeWhisperRecording(); };
     mediaRecorderRef.current = recorder;
     try {
-      // A timeslice makes ondataavailable fire periodically instead of only
-      // once at the end, so there's audio to preview-transcribe while still
-      // recording.
-      recorder.start(1000);
+      recorder.start();
       setState('recording');
-      previewTimerRef.current = setInterval(runPreview, PREVIEW_INTERVAL_MS);
     } catch (err) {
       logVoiceError('MediaRecorder.start() threw', err);
       stream.getTracks().forEach(t => t.stop());
@@ -201,33 +332,43 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
     }
   };
 
-  const stopRecording = () => {
-    stopPreviewTimer();
+  const stopWhisperRecording = () => {
     try {
       mediaRecorderRef.current?.stop();
     } catch (err) {
       logVoiceError('MediaRecorder.stop() threw', err);
     }
     streamRef.current?.getTracks().forEach(t => t.stop());
-    setState(isSpeechModelReady() ? 'transcribing' : 'loading-model');
+    setState('transcribing');
+  };
+
+  // ── Shared controls ────────────────────────────────────────────────────────
+
+  const startRecording = () => {
+    if (modeRef.current === 'native') startNativeRecording();
+    else if (modeRef.current === 'whisper') startWhisperRecording();
+  };
+
+  const stopRecording = () => {
+    if (modeRef.current === 'native') stopNativeRecording();
+    else if (modeRef.current === 'whisper') stopWhisperRecording();
   };
 
   const clearText = () => {
-    generationRef.current++;
-    stopPreviewTimer();
+    intentionalStopRef.current = true;
     try {
+      recognitionRef.current?.stop();
       mediaRecorderRef.current?.stop();
     } catch (err) {
       logVoiceError('teardown on clear threw', err);
     }
     streamRef.current?.getTracks().forEach(t => t.stop());
+    baseTextRef.current = '';
     onChange('');
-    setLiveDraft('');
     setState('idle');
   };
 
   const busy = state === 'transcribing' || state === 'loading-model';
-  const displayedValue = state === 'recording' ? liveDraft : value;
 
   return (
     <div className="space-y-2">
@@ -306,7 +447,7 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
       </div>
       <textarea
         id={id}
-        value={displayedValue}
+        value={value}
         readOnly
         placeholder={placeholder}
         rows={rows}
@@ -316,12 +457,6 @@ export function VoiceTextArea({ id, value, onChange, placeholder, rows = 3 }: Vo
                    placeholder:text-slate-300 dark:placeholder:text-slate-500
                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none cursor-default"
       />
-      {state === 'recording' && (
-        <p className="text-xs text-slate-400 dark:text-slate-500">
-          Draft updates every few seconds while you talk — the final answer is re-transcribed once
-          you stop, so it may differ slightly from what's shown above.
-        </p>
-      )}
     </div>
   );
 }
