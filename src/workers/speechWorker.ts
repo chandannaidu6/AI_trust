@@ -6,11 +6,10 @@
 //
 // Model: Moonshine (Useful Sensors), not Whisper. Whisper's chunk-and-hope
 // approach isn't built for repeated low-latency calls on short, growing
-// clips — Moonshine's encoder is specifically designed for that, and at
-// ~28MB (quantized tiny) it's small/fast enough to re-transcribe every
-// couple seconds while still recording (see PREVIEW_INTERVAL_MS in
-// VoiceTextArea) without the browser tab stalling. It's also meaningfully
-// smaller to download than the Whisper model this replaced.
+// clips — Moonshine's encoder is specifically designed for that, so it's
+// small/fast enough to re-transcribe every couple seconds while still
+// recording (see PREVIEW_INTERVAL_MS in VoiceTextArea) without the browser
+// tab stalling.
 import { pipeline, env } from '@huggingface/transformers';
 
 // Always fetch from the Hugging Face hub CDN (and let the browser cache it),
@@ -39,6 +38,20 @@ let pipelinePromise: Promise<any> | null = null;
 function getPipeline() {
   if (!pipelinePromise) {
     pipelinePromise = pipeline('automatic-speech-recognition', 'onnx-community/moonshine-tiny-ONNX', {
+      // The default on wasm is the "quantized" (int8) weights, which for
+      // this model crash ONNX Runtime entirely at session-creation time:
+      // "Missing required scale: model.decoder.embed_tokens.weight_merged_0_scale".
+      // ORT's own graph optimizer fuses DequantizeLinear+MatMul patterns into
+      // a MatMulNBits node during session init, and that fusion pass can't
+      // find the scale tensor it expects — almost certainly triggered by
+      // Moonshine's tied embedding/output-projection weights confusing the
+      // fusion heuristics for this particular export. fp16 has no
+      // DequantizeLinear nodes at all (verified directly against the ONNX
+      // file), so that optimizer pass has nothing to act on — sidesteps the
+      // bug entirely rather than working around it. Larger download than the
+      // quantized weights (~92MB vs. ~28MB) but this is the difference
+      // between working and not working at all.
+      dtype: 'fp16',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       progress_callback: (data: any) => ctx.postMessage({ type: 'progress', ...data }),
     });
