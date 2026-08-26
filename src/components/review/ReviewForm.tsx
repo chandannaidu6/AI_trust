@@ -1,7 +1,15 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { SlotLabel, SlotRating, AcceptDecision } from '../../types';
-import { ScoreButtons } from '../ui/ScoreButtons';
+import { WordScale } from '../ui/WordScale';
 import { Button } from '../ui/Button';
+import {
+  READABILITY_OPTIONS,
+  UNDERSTANDABILITY_OPTIONS,
+  ROBUSTNESS_OPTIONS,
+  MAINTENANCE_OPTIONS,
+  COMPETENCE_OPTIONS,
+  HIDDEN_COMPLEXITY_OPTIONS,
+} from '../../utils/ratingScales';
 
 const SLOT_ACCENT: Record<SlotLabel, string> = {
   A: 'border-violet-200 dark:border-violet-800',
@@ -133,53 +141,54 @@ export function ReviewForm({ slot, existing, draft, onDraftChange, onSubmit }: R
 
       <form onSubmit={handleSubmit} noValidate className="px-5 py-5 space-y-6 bg-white/70 dark:bg-slate-900/70">
 
-        {/* Q1–Q6: 1–10 scales */}
+        {/* Q1–Q6: worded 4-point scales */}
         <fieldset className="space-y-5 border-0 p-0 m-0">
           <legend className="sr-only">Code quality ratings for Solution {slot}</legend>
-          <ScoreButtons
+          <WordScale
             label="Readability"
-            description="How easy is this code to visually read and navigate? (1 = very hard to read · 10 = effortless to read)"
+            description="How easy is this code to visually read and navigate?"
             value={form.readability}
             onChange={v => set('readability', v)}
-            max={10}
+            options={READABILITY_OPTIONS}
           />
-          <ScoreButtons
+          <WordScale
             label="Understandability"
-            description="How easy is it to understand what this code does? (1 = very hard to understand · 10 = fully clear)"
+            description="How easy is it to understand what this code does?"
             value={form.understandability}
             onChange={v => set('understandability', v)}
-            max={10}
+            options={UNDERSTANDABILITY_OPTIONS}
           />
-          <ScoreButtons
+          <WordScale
             label="Perceived robustness"
-            description="How confident are you that this code handles edge cases and unusual inputs correctly? (1 = not confident at all · 10 = fully confident)"
+            description="How confident are you that this code handles edge cases and unusual inputs correctly?"
             value={form.perceivedRobustness}
             onChange={v => set('perceivedRobustness', v)}
-            max={10}
+            options={ROBUSTNESS_OPTIONS}
           />
-          <ScoreButtons
+          <WordScale
             label="Maintenance confidence"
-            description="How confident would you be modifying or extending this code six months from now? (1 = not confident at all · 10 = fully confident)"
+            description="How confident would you be modifying or extending this code six months from now?"
             value={form.maintenanceConfidence}
             onChange={v => set('maintenanceConfidence', v)}
-            max={10}
+            options={MAINTENANCE_OPTIONS}
           />
-          <ScoreButtons
+          <WordScale
             label="Perceived author competence"
-            description="Based on this code alone, how skilled does the author appear to be? (1 = not skilled at all · 10 = highly skilled)"
+            description="Based on this code alone, how skilled does the author appear to be?"
             value={form.perceivedAuthorCompetence}
             onChange={v => set('perceivedAuthorCompetence', v)}
-            max={10}
+            options={COMPETENCE_OPTIONS}
           />
         </fieldset>
 
-        {/* Q7: Hidden complexity 1–10 */}
-        <ScoreButtons
+        {/* Q7: Hidden complexity */}
+        <WordScale
           label="Hidden complexity"
-          description="How much complexity is hidden in this code, the kind you wouldn't catch without a close look? (1 = no hidden complexity · 10 = a lot of hidden complexity)"
+          description="How much complexity is hidden in this code, the kind you wouldn't catch without a close look?"
           value={form.hiddenComplexity}
           onChange={v => set('hiddenComplexity', v)}
-          max={10}
+          options={HIDDEN_COMPLEXITY_OPTIONS}
+          reverseColors
         />
 
         {/* Q8: Accept decision */}

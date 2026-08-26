@@ -18,12 +18,12 @@ export interface UISlot {
 export type AcceptDecision = 'approve' | 'approve_minor' | 'needs_major' | 'reject';
 
 export interface SlotRating {
-  readability: number;               // 1–10
-  understandability: number;         // 1–10
-  perceivedRobustness: number;       // 1–10
-  maintenanceConfidence: number;     // 1–10
-  perceivedAuthorCompetence: number; // 1–10
-  hiddenComplexity: number;          // 1–10 (higher = worse; inverted when averaged into a score)
+  readability: number;               // 1–4, worded scale (see WordScale/ReviewForm)
+  understandability: number;         // 1–4, worded scale
+  perceivedRobustness: number;       // 1–4, worded scale
+  maintenanceConfidence: number;     // 1–4, worded scale
+  perceivedAuthorCompetence: number; // 1–4, worded scale
+  hiddenComplexity: number;          // 1–4, worded scale (higher = worse; inverted when averaged into a score)
   acceptDecision: AcceptDecision | null;
   briefExplanation: string;
   /** Optional — anything about the code the reviewer didn't understand. */

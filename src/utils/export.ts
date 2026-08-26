@@ -1,18 +1,31 @@
 import { ParticipantProfile, ReviewSession, SlotLabel, SLOT_LABELS } from '../types';
 import { avgRating } from './helpers';
+import {
+  READABILITY_OPTIONS,
+  UNDERSTANDABILITY_OPTIONS,
+  ROBUSTNESS_OPTIONS,
+  MAINTENANCE_OPTIONS,
+  COMPETENCE_OPTIONS,
+  HIDDEN_COMPLEXITY_OPTIONS,
+  labelForValue,
+} from './ratingScales';
 
 // ─── Payload types ─────────────────────────────────────────────────────────────
 
 export interface SlotExport {
   solutionId: string;
   originLabel: string;               // "human 1" | "human 2" | "LLM concise" | "LLM readable"
-  readability: number;
-  understandability: number;
-  perceivedRobustness: number;
-  maintenanceConfidence: number;
-  perceivedAuthorCompetence: number;
-  hiddenComplexity: number;
-  averageScore: number;              // mean of the six 1–10 dimensions, hiddenComplexity inverted
+  // The six rating dimensions export as the worded option text the
+  // participant actually picked (e.g. "Clean and effortless to read"), not
+  // the underlying 1-4 number -- a bare number in the spreadsheet doesn't
+  // say what the reviewer meant by it.
+  readability: string;
+  understandability: string;
+  perceivedRobustness: string;
+  maintenanceConfidence: string;
+  perceivedAuthorCompetence: string;
+  hiddenComplexity: string;
+  averageScore: number;              // mean of the six underlying 1–4 values, hiddenComplexity inverted
   acceptDecision: string;            // "approve" | "approve_minor" | "needs_major" | "reject"
   briefExplanation: string;
   confusionNotes: string;
@@ -81,12 +94,12 @@ export function buildExportPayload(
       ratings[slot] = {
         solutionId: sid,
         originLabel: labels[sid] ?? '',
-        readability: r.readability,
-        understandability: r.understandability,
-        perceivedRobustness: r.perceivedRobustness,
-        maintenanceConfidence: r.maintenanceConfidence,
-        perceivedAuthorCompetence: r.perceivedAuthorCompetence,
-        hiddenComplexity: r.hiddenComplexity,
+        readability: labelForValue(READABILITY_OPTIONS, r.readability),
+        understandability: labelForValue(UNDERSTANDABILITY_OPTIONS, r.understandability),
+        perceivedRobustness: labelForValue(ROBUSTNESS_OPTIONS, r.perceivedRobustness),
+        maintenanceConfidence: labelForValue(MAINTENANCE_OPTIONS, r.maintenanceConfidence),
+        perceivedAuthorCompetence: labelForValue(COMPETENCE_OPTIONS, r.perceivedAuthorCompetence),
+        hiddenComplexity: labelForValue(HIDDEN_COMPLEXITY_OPTIONS, r.hiddenComplexity),
         averageScore: parseFloat(avgRating(r).toFixed(2)),
         acceptDecision: r.acceptDecision ?? '',
         briefExplanation: r.briefExplanation,
