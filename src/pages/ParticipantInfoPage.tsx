@@ -45,6 +45,7 @@ export default function ParticipantInfoPage() {
   const [yearsExperience,  setYearsExperience]  = useState('');
   const [role,             setRole]             = useState<Role | ''>('');
   const [university,       setUniversity]       = useState('');
+  const [drawEmail,        setDrawEmail]        = useState('');
   const [reviewFrequency,  setReviewFrequency]  = useState<ReviewFrequency | ''>('');
   const [aiFamiliarity,    setAIFamiliarity]    = useState<AIFamiliarity | ''>('');
 
@@ -73,6 +74,7 @@ export default function ParticipantInfoPage() {
       yearsExperience,
       role:               role as Role,
       university:         isStudent ? university.trim() : '',
+      drawEmail:          !isStudent ? drawEmail.trim() : '',
       reviewFrequency:    reviewFrequency as ReviewFrequency,
       aiFamiliarity:      aiFamiliarity as AIFamiliarity,
     };
@@ -172,6 +174,20 @@ export default function ParticipantInfoPage() {
                   value={university}
                   onChange={setUniversity}
                   placeholder="e.g. Colorado State University"
+                />
+              </Field>
+            )}
+
+            {role !== '' && !isStudent && (
+              <Field
+                label="Prize draw"
+                description="If you want to participate in the draw, write your email. Your email will be used only for the draw."
+              >
+                <TextInput
+                  value={drawEmail}
+                  onChange={setDrawEmail}
+                  placeholder="you@example.com"
+                  type="email"
                 />
               </Field>
             )}

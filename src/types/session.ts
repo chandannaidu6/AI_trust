@@ -71,6 +71,8 @@ export interface ParticipantProfile {
   age: string;                  // bracket, e.g. "25–34"
   /** Only collected (and only meaningful) when role === 'student'. */
   university: string;
+  /** Optional prize-draw entry, only offered when role !== 'student'; blank if skipped. */
+  drawEmail: string;
 }
 
 // ─── Active review session (single question, in-memory only) ─────────────────

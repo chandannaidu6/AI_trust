@@ -49,6 +49,7 @@ export interface ExportPayload {
     yearsExperience: string;
     role: string;
     university: string;
+    drawEmail: string;
     reviewFrequency: string;
     aiFamiliarity: string;
   };
@@ -132,6 +133,7 @@ export function buildExportPayload(
       yearsExperience: participant.yearsExperience,
       role: participant.role,
       university: participant.university,
+      drawEmail: participant.drawEmail,
       reviewFrequency: participant.reviewFrequency,
       aiFamiliarity: participant.aiFamiliarity,
     },
@@ -233,6 +235,7 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   r['yearsExperience']    = p.participant.yearsExperience;
   r['role']               = p.participant.role;
   r['university']         = p.participant.university;
+  r['drawEmail']          = p.participant.drawEmail;
   r['reviewFrequency']    = p.participant.reviewFrequency;
   r['aiFamiliarity']      = p.participant.aiFamiliarity;
   // session

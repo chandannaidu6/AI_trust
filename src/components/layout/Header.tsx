@@ -11,21 +11,11 @@ const STEPS = ['Background', 'Category', 'Questions', 'Review', 'Complete'];
 
 const BROWSER_NOTICE_DISMISSED_KEY = 'ai-trust-browser-notice-dismissed';
 
-function isChromiumBased(): boolean {
-  // Edge, Brave, Opera, etc. all report "Chrome" in their UA too (and share
-  // the same underlying engine), so this only flags the browsers whose
-  // MediaRecorder/WebSocket behavior for the voice-answer feature hasn't
-  // actually been tested: Safari (desktop and iOS), Firefox, Samsung
-  // Internet, and similar.
-  return /Chrome/.test(navigator.userAgent) && !/Edg\//.test(navigator.userAgent);
-}
-
 function BrowserNotice() {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    const alreadyDismissed = sessionStorage.getItem(BROWSER_NOTICE_DISMISSED_KEY) === '1';
-    setDismissed(alreadyDismissed || isChromiumBased());
+    setDismissed(sessionStorage.getItem(BROWSER_NOTICE_DISMISSED_KEY) === '1');
   }, []);
 
   const dismiss = () => {
@@ -49,8 +39,8 @@ function BrowserNotice() {
         </svg>
         <p className="flex-1">
           For the best experience recording your spoken answers, please use{' '}
-          <strong className="font-semibold">Google Chrome</strong> — other browsers haven't been tested
-          for this study and voice recording may not work reliably.
+          <strong className="font-semibold">Google Chrome</strong>. Other browsers haven't been tested
+          for this study, and voice recording may not work reliably.
         </p>
         <button
           type="button"

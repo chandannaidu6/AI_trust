@@ -3,13 +3,14 @@ interface TextInputProps {
   onChange: (v: string) => void;
   placeholder?: string;
   id?: string;
+  type?: 'text' | 'email';
 }
 
-export function TextInput({ value, onChange, placeholder, id }: TextInputProps) {
+export function TextInput({ value, onChange, placeholder, id, type = 'text' }: TextInputProps) {
   return (
     <input
       id={id}
-      type="text"
+      type={type}
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
