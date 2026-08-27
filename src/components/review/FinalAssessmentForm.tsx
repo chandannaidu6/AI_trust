@@ -26,13 +26,19 @@ interface FinalAssessmentFormProps {
   onNext:   () => void;
   /** True while this review's data is being sent to Google Sheets. */
   submitting?: boolean;
+  /** True if the last submit attempt failed to reach Google Sheets — keeps
+   *  the submit button available (relabeled) so there's a way to retry,
+   *  instead of it disappearing as it does once a submission has actually
+   *  succeeded. */
+  sheetsFailed?: boolean;
   /** True if submitting this assessment completes all 3 required reviews —
    *  in that case there's no "continue" step, just an automatic redirect. */
   isFinalReview?: boolean;
 }
 
 export function FinalAssessmentForm({
-  ratings, existing, draft, onDraftChange, onSubmit, onNext, submitting = false, isFinalReview = false,
+  ratings, existing, draft, onDraftChange, onSubmit, onNext,
+  submitting = false, sheetsFailed = false, isFinalReview = false,
 }: FinalAssessmentFormProps) {
   const [bestChoice,  setBestChoice]  = useState<SlotLabel | null>(existing?.bestChoice ?? draft?.bestChoice ?? null);
   const [explanation, setExplanation] = useState(existing?.explanation ?? draft?.explanation ?? '');
@@ -170,10 +176,14 @@ export function FinalAssessmentForm({
                flips `saved` back to false (see handleBestChoice/
                handleExplanation), which brings this button back labeled
                "Submit Assessment" again, so there's never a separate
-               "update" affordance to show. */}
-            {!saved && (
+               "update" affordance to show. The exception is a failed Sheets
+               submission: `saved` still flips true immediately on submit
+               (it just reflects "the form was filled in", not "Sheets
+               accepted it"), so without this the button would vanish with
+               no way to retry a failed send. */}
+            {(!saved || sheetsFailed) && (
               <Button type="submit" disabled={!valid || submitting} size="lg">
-                Submit Assessment
+                {sheetsFailed ? 'Retry Submission' : 'Submit Assessment'}
               </Button>
             )}
             {!valid && (

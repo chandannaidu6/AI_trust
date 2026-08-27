@@ -284,8 +284,8 @@ export default function QuestionReviewPage() {
 
             {allDone && sheetStatus === 'error' && (
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-sm text-red-700 dark:text-red-300">
-                Could not reach Google Sheets. Your response is still saved in this session. You
-                can download a backup copy from the summary page.
+                Could not reach Google Sheets. Your response is still saved in this session — click
+                Retry Submission below, or download a backup copy from the summary page.
               </div>
             )}
 
@@ -298,6 +298,7 @@ export default function QuestionReviewPage() {
                 onSubmit={handleAssessment}
                 onNext={handleFinish}
                 submitting={sheetStatus === 'submitting'}
+                sheetsFailed={sheetStatus === 'error'}
                 isFinalReview={willCompleteStudy}
               />
             )}
