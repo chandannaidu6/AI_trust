@@ -3,6 +3,7 @@ import { useNavigate, useParams, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
 import { Button } from '../components/ui/Button';
+import { DifficultyProgress } from '../components/ui/DifficultyProgress';
 import { useStudy } from '../state/StudyContext';
 import { loadCategory } from '../data/loader';
 import { Difficulty, DIFFICULTIES } from '../types';
@@ -48,7 +49,6 @@ export default function CategoryDifficultyPage() {
   }, [category]);
 
   const allDone = DIFFICULTIES.every(d => state.completedDifficulties[d]);
-  const doneCount = DIFFICULTIES.filter(d => state.completedDifficulties[d]).length;
 
   // Guard placed after every hook call above, so this component always calls
   // the same hooks in the same order regardless of participant state —
@@ -68,9 +68,12 @@ export default function CategoryDifficultyPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-0.5">{category}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             You review exactly one Easy, one Medium, and one Hard question across the whole
-            study. {doneCount} of 3 done so far. Pick a difficulty to see this category's
-            questions at that level.
+            study. Pick a difficulty to see this category's questions at that level.
           </p>
+        </div>
+
+        <div className="mb-6">
+          <DifficultyProgress completedDifficulties={state.completedDifficulties} />
         </div>
 
         {allDone && (

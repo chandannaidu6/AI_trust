@@ -165,9 +165,17 @@ export function FinalAssessmentForm({
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
-            <Button type="submit" disabled={!valid || submitting} size="lg">
-              {saved ? 'Update Assessment' : 'Submit Assessment'}
-            </Button>
+            {/* Once saved, the submit button disappears rather than turning
+               into an "Update Assessment" button -- editing an answer above
+               flips `saved` back to false (see handleBestChoice/
+               handleExplanation), which brings this button back labeled
+               "Submit Assessment" again, so there's never a separate
+               "update" affordance to show. */}
+            {!saved && (
+              <Button type="submit" disabled={!valid || submitting} size="lg">
+                Submit Assessment
+              </Button>
+            )}
             {!valid && (
               <p className="text-xs text-slate-400 dark:text-slate-500">
                 {!bestChoice ? 'Choose a best solution. ' : ''}

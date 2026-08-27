@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
 import { Button } from '../components/ui/Button';
+import { DifficultyProgress } from '../components/ui/DifficultyProgress';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestions } from '../data/loader';
 import { DIFFICULTIES } from '../types';
@@ -167,12 +168,16 @@ export default function CategorySelectionPage() {
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
       <Header step={2} back="/participant" />
       <PageContainer>
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Choose a Category</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
             Select the problem category you want to review. You'll review exactly one Easy, one
-            Medium, and one Hard question in total. {doneCount} of 3 done so far.
+            Medium, and one Hard question in total.
           </p>
+        </div>
+
+        <div className="mb-8">
+          <DifficultyProgress completedDifficulties={state.completedDifficulties} />
         </div>
 
         {allDone && (

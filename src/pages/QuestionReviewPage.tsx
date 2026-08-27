@@ -10,6 +10,7 @@ import { ReviewForm } from '../components/review/ReviewForm';
 import { ComprehensionQuestion } from '../components/review/ComprehensionQuestion';
 import { FinalAssessmentForm } from '../components/review/FinalAssessmentForm';
 import { Button } from '../components/ui/Button';
+import { DifficultyProgress } from '../components/ui/DifficultyProgress';
 import { useStudy } from '../state/StudyContext';
 import { loadQuestion } from '../data/loader';
 import { StudyQuestion, SlotLabel, SlotRating, FinalAssessment, SLOT_LABELS, DIFFICULTIES } from '../types';
@@ -298,6 +299,17 @@ export default function QuestionReviewPage() {
                 onNext={handleFinish}
                 submitting={sheetStatus === 'submitting'}
                 isFinalReview={willCompleteStudy}
+              />
+            )}
+
+            {/* Once this question's assessment is filed, make it obvious how
+               many of the 3 required reviews (Easy/Medium/Hard) remain --
+               skipped for the final one since that redirects straight to the
+               summary page instead. */}
+            {allDone && review.finalAssessment && !willCompleteStudy && (
+              <DifficultyProgress
+                completedDifficulties={state.completedDifficulties}
+                message={`${DIFFICULTIES.length - Object.values(state.completedDifficulties).filter(Boolean).length} more to go`}
               />
             )}
           </>

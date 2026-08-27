@@ -235,7 +235,12 @@ function flattenToCSVRow(p: ExportPayload): Record<string, unknown> {
   r['yearsExperience']    = p.participant.yearsExperience;
   r['role']               = p.participant.role;
   r['university']         = p.participant.university;
-  r['drawEmail']          = p.participant.drawEmail;
+  // Falls back to '' for a session whose participant object was persisted
+  // to sessionStorage before this field existed -- otherwise it'd be
+  // `undefined`, and JSON.stringify silently omits object keys with an
+  // undefined value, so the key would never even reach the Apps Script
+  // (not a case of the script ignoring it -- it just never arrives).
+  r['drawEmail']          = p.participant.drawEmail ?? '';
   r['reviewFrequency']    = p.participant.reviewFrequency;
   r['aiFamiliarity']      = p.participant.aiFamiliarity;
   // session
