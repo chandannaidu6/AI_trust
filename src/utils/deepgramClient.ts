@@ -46,7 +46,10 @@ const DEEPGRAM_WS_URL =
   // interim_results=true, which is already set above.
   '&utterance_end_ms=1500' +
   '&smart_format=true' +
-  '&punctuate=true';
+  '&punctuate=true' +
+  // Opts this connection out of Deepgram's Model Improvement Program, so
+  // this audio/transcript data isn't used to train their models.
+  '&mip_opt_out=true';
 
 async function fetchToken(): Promise<string> {
   const res = await fetch('/api/deepgram-token', { method: 'POST' });

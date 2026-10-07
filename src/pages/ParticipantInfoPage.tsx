@@ -74,7 +74,7 @@ export default function ParticipantInfoPage() {
       yearsExperience,
       role:               role as Role,
       university:         isStudent ? university.trim() : '',
-      drawEmail:          !isStudent ? drawEmail.trim() : '',
+      drawEmail:          drawEmail.trim(),
       reviewFrequency:    reviewFrequency as ReviewFrequency,
       aiFamiliarity:      aiFamiliarity as AIFamiliarity,
     };
@@ -178,7 +178,7 @@ export default function ParticipantInfoPage() {
               </Field>
             )}
 
-            {role !== '' && !isStudent && (
+            {role !== '' && (
               <Field
                 label="Prize draw"
                 description="If you want to participate in the draw, write your email. Your email will be used only for the draw."
