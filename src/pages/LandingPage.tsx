@@ -115,7 +115,6 @@ export default function LandingPage() {
             <Button size="lg" onClick={() => navigate('/participant')}>
               Begin Study →
             </Button>
-            <p className="text-xs text-slate-400 dark:text-slate-500">~10–15 minutes</p>
           </div>
 
           <p className="text-xs text-slate-300 dark:text-slate-600">
