@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -16,6 +16,18 @@ import {
 } from '../utils/export';
 
 const SLOT_COLOR = { A: 'violet', B: 'sky' } as const;
+
+// The drawing page is a separate deployment with its own storage, so an
+// email address entered there can never be linked back to study answers.
+// It only opens for someone who arrives with a valid, freshly-minted
+// token (see api/raffle-token.js) -- the bare URL on its own shows a
+// locked message, not the entry form.
+const RAFFLE_URL = import.meta.env.VITE_RAFFLE_URL ?? 'https://email-alpha-red.vercel.app';
+
+type RaffleLinkState =
+  | { status: 'idle' | 'loading' }
+  | { status: 'ready'; url: string }
+  | { status: 'error' };
 
 function ReviewSummaryCard({ review }: { review: ReviewSession }) {
   const assessment = review.finalAssessment;
@@ -106,6 +118,33 @@ export default function CompletionPage() {
   );
   const allRequiredDone = DIFFICULTIES.every(d => completedDifficulties[d]);
 
+  const [raffleLink, setRaffleLink] = useState<RaffleLinkState>({ status: 'idle' });
+
+  // Mint the one-time drawing link only once the participant has actually
+  // finished all three required reviews -- matches the consent form's
+  // "completing the review with valid answers" eligibility line.
+  useEffect(() => {
+    if (!allRequiredDone || !participant) return;
+    let cancelled = false;
+    setRaffleLink({ status: 'loading' });
+    fetch('/api/raffle-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ participantId: participant.id }),
+    })
+      .then(res => (res.ok ? res.json() : Promise.reject(new Error('request failed'))))
+      .then((data: { token?: string }) => {
+        if (cancelled || !data.token) throw new Error('missing token');
+        setRaffleLink({ status: 'ready', url: `${RAFFLE_URL}/?t=${encodeURIComponent(data.token)}` });
+      })
+      .catch(() => {
+        if (!cancelled) setRaffleLink({ status: 'error' });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [allRequiredDone, participant]);
+
   if (!participant || completedReviews.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
@@ -157,6 +196,50 @@ export default function CompletionPage() {
             </p>
           </div>
         </div>
+
+        {/* ── Gift card drawing ──────────────────────────────────────────── */}
+        {allRequiredDone && (
+          <section
+            aria-label="Gift card drawing"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden mb-6"
+          >
+            <div className="px-5 py-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                Gift Card Drawing (Optional)
+              </h2>
+            </div>
+            <div className="px-5 py-4 space-y-3">
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                If you would like to enter the drawing for a $100 gift card, use the link below.
+                It opens a separate page that asks only for your email address. Your email is not
+                connected to the answers you gave above, is used only to send the gift card if you
+                win, and is deleted once the drawing is complete. You do not have to enter the
+                drawing.
+              </p>
+              {raffleLink.status === 'ready' && (
+                <a
+                  href={raffleLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 font-semibold text-sm px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                >
+                  Enter the gift card drawing
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </a>
+              )}
+              {raffleLink.status === 'loading' && (
+                <p className="text-xs text-slate-400 dark:text-slate-500">Preparing your drawing link…</p>
+              )}
+              {raffleLink.status === 'error' && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Couldn't prepare your drawing link right now. Refreshing this page will try again.
+                </p>
+              )}
+            </div>
+          </section>
+        )}
 
         {!allRequiredDone && (
           <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 text-sm text-amber-700 dark:text-amber-300">
