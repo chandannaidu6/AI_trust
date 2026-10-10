@@ -45,7 +45,6 @@ export default function ParticipantInfoPage() {
   const [yearsExperience,  setYearsExperience]  = useState('');
   const [role,             setRole]             = useState<Role | ''>('');
   const [university,       setUniversity]       = useState('');
-  const [drawEmail,        setDrawEmail]        = useState('');
   const [reviewFrequency,  setReviewFrequency]  = useState<ReviewFrequency | ''>('');
   const [aiFamiliarity,    setAIFamiliarity]    = useState<AIFamiliarity | ''>('');
 
@@ -74,7 +73,8 @@ export default function ParticipantInfoPage() {
       yearsExperience,
       role:               role as Role,
       university:         isStudent ? university.trim() : '',
-      drawEmail:          drawEmail.trim(),
+      // Collected later, at the end of the study (CompletionPage) -- not here.
+      drawEmail:          '',
       reviewFrequency:    reviewFrequency as ReviewFrequency,
       aiFamiliarity:      aiFamiliarity as AIFamiliarity,
     };
@@ -91,6 +91,13 @@ export default function ParticipantInfoPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
             These questions help calibrate the study results. All responses are anonymous.
             Fields marked <span className="text-red-500" aria-label="required">*</span> are required.
+          </p>
+          <p className="text-slate-700 dark:text-slate-300 text-sm mt-2">
+            <strong className="font-bold">
+              At the end of the study, you'll get a link to a separate, optional survey for a
+              gift card drawing. It only asks for your email and is not connected to the answers
+              you give here.
+            </strong>
           </p>
         </div>
 
@@ -174,20 +181,6 @@ export default function ParticipantInfoPage() {
                   value={university}
                   onChange={setUniversity}
                   placeholder="e.g. Colorado State University"
-                />
-              </Field>
-            )}
-
-            {role !== '' && (
-              <Field
-                label="Prize draw"
-                description="If you want to participate in the draw, write your email. Your email will be used only for the draw."
-              >
-                <TextInput
-                  value={drawEmail}
-                  onChange={setDrawEmail}
-                  placeholder="you@example.com"
-                  type="email"
                 />
               </Field>
             )}

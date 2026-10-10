@@ -110,6 +110,21 @@ export default function LandingPage() {
             </p>
           </div>
 
+          {/* Prize draw email timing notice */}
+          <div className="flex items-start gap-3 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-4">
+            <svg className="w-4 h-4 text-slate-500 dark:text-slate-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <strong className="font-bold text-slate-700 dark:text-slate-300">
+                At the end of the study, you'll get a link to a separate, optional survey for a
+                gift card drawing. It only asks for your email and is not connected to your
+                answers here.
+              </strong>
+            </p>
+          </div>
+
           {/* CTA */}
           <div className="flex items-center gap-4">
             <Button size="lg" onClick={() => navigate('/participant')}>
